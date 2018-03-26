@@ -9,3 +9,10 @@ Blockv.init({
       "websocketAddress" : ""
     });
 ```
+
+#### Login
+
+```
+Blockv.UserManager.login("example@example.com", "email", "test")
+
+```
