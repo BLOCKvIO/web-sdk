@@ -35,6 +35,13 @@ Returns the current Access Token
 Blockv.UserManager.getAccessToken();
 ```
 
+#### setAccessToken(token)
+Sets the Access Token for the APP
+
+```
+Blockv.UserManager.setAccessToken(token);
+```
+
 #### getCurrentUser()
 Returns the current user information
 
