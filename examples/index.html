@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="HandheldFriendly" content="true">
+    <meta charset="UTF-8">
+    <title>Vatom Viewer</title>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            background-color: #505050;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: auto;
+        }
+
+        div.error {
+            left: 0;
+            right: 0;
+            position: absolute;
+            display: table;
+            width: 100%;
+            height: 100%;
+            visibility: hidden;
+        }
+
+        div.error > p {
+            font-family: Helvetica, Arial;
+            font-size: 16px;
+            color: #FFF;
+            text-align: center;
+            vertical-align: middle;
+            display: table-cell;
+
+        }
+    </style>
+</head>
+<body>
+<div id="error-message" class="error">
+    <p>Error Could Not Load</p>
+</div>
+<input type="file" name="avatar" id="avatar" onchange="doUpload()" />
+<script src="../dist/blockv-sdk.min.js"></script>
+<script>
+
+    //initialise blockv
+    Blockv.init({
+      "appID" : "87b4a201-054c-484c-b206-02742ba9ae87",
+      "server" : "https://apidev.blockv.net/",
+      "websocketAddress" : ""
+    });
+
+    Blockv.UserManager.login("kylmci+unittest@gmail.com", "email", "test")
+    .then(()=>{
+      //get access token
+      let uT = Blockv.UserManager.getAccessToken();
+      return uT
+    })
+    .then((uT) => {
+      //get current user
+      cU = Blockv.UserManager.getCurrentUser();
+      return cU
+    })
+    .then((cU)=>{
+      let avatar = Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018");
+      console.log(avatar);
+      //set a new access token
+
+      //let aT =  "im the new access token!";
+      //Blockv.UserManager.setAccessToken(aT);
+
+      //let nat = Blockv.UserManager.getAccessToken();
+      return cU;
+
+    }).then((cU)=>{
+      //logout
+      console.log("logging out this user : " + cU.properties.first_name)
+      Blockv.UserManager.logout()
+    });
+
+    /**
+     * Login with credentials
+     * @params : username | type | password
+     */
+
+
+
+    /**
+     * Gets the current Users token
+     * returns user token
+     */
+
+    // Blockv.UserManager.getAccessToken();
+
+    /**
+     * Register with inline params or a object
+     * accepts inline params or a object
+     *
+     * @params: firstName | lastName | birthday | language | password | tokens | namePublic | avatarPublic
+     */
+
+    // Blockv.UserManager.register()
+
+
+    /**
+     * Logout the user
+     */
+
+    //Blockv.UserManager.logout()
+
+    /**
+     * Gets the current user
+     * @return object
+     */
+
+    //  Blockv.UserManager.getCurrentUser();
+
+    /**
+     * Gets the users tokens
+     * @return JSON Object
+     */
+
+    //Blockv.UserManager.getCurrentUserTokens();
+
+    /**
+     * Uploads a avatar for the user
+     *
+     */
+
+
+    function doUpload(){
+      let f = document.getElementById('avatar');
+      let file = f.files[0];
+      let fData = new FormData();
+      fData.append('avatar', file);
+      Blockv.UserManager.uploadAvatar(fData);
+    }
+
+    /**
+     * Updates a user
+     * @param  {object} payload for the information to upload
+     */
+
+    //Blockv.UserManager.updateUser(payload);
+
+
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "name": "blockv-web-sdk",
+  "version": "0.0.1",
+  "description": "Allows web apps to display and interact with vatoms.",
+  "main": "lib/index.js",
+  "scripts": {
+    "build-lib": "babel src -d lib",
+    "test": "npm run build",
+    "build": "concurrently \"npm run build-min\" \"npm run build-lib\"",
+    "build-min": "webpack -p",
+    "watch": "webpack --watch",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "vatom",
+    "blockv",
+    "browser",
+    "web",
+    "html"
+  ],
+  "author": "Blockv",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-env": "^1.3.2",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-es2017": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "concurrently": "^3.5.1",
+    "copy": "^0.3.0",
+    "css-loader": "^0.28.0",
+    "file-loader": "^0.11.1",
+    "node-qunit-phantomjs": "^1.5.0",
+    "node-sass": "^4.5.2",
+    "postcss-loader": "~1.3.3",
+    "sass-loader": "^6.0.3",
+    "should": "^13.2.1",
+    "style-loader": "^0.16.1",
+    "unexpected": "^10.37.2",
+    "url-loader": "^0.5.7",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "webpack": "^2.3.3"
+  },
+  "dependencies": {
+    "better-assert": "^1.0.2",
+    "chai": "^4.1.2",
+    "expect.js": "^0.3.1",
+    "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.4",
+    "mocha": "^5.0.4"
+  }
+}
