@@ -20,6 +20,13 @@ Blockv.UserManager.login("example@example.com", "email", "test")
 
 ```
 
+#### logout()
+Logs out the current user
+
+```
+Blockv.UserManager.logout()
+```
+
 #### getAccessToken()
 
 Returns the current Access Token
