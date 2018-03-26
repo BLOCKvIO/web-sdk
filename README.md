@@ -26,7 +26,14 @@ Logs out the current user
 ```
 Blockv.UserManager.logout()
 ```
+#### register(registration)
+Registration can be done in two ways:
+- inline register(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic)
+- or as an object
 
+```
+Blockv.UserManager.register(registration)
+```
 #### getAccessToken()
 
 Returns the current Access Token
