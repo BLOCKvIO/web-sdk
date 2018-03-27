@@ -15,7 +15,7 @@ Blockv.init({
  - parameter two is the type of login (email / phone_number)
  - parameter three is the password 
 
-```
+```javascript 
 Blockv.UserManager.login("example@example.com", "email", "test")
 
 ```
@@ -23,7 +23,7 @@ Blockv.UserManager.login("example@example.com", "email", "test")
 #### logout()
 Logs out the current user
 
-```
+```javascript 
 Blockv.UserManager.logout()
 ```
 #### register(registration)
@@ -31,34 +31,34 @@ Registration can be done in two ways:
 - inline register(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic)
 - or as an object
 
-```
+```javascript 
 Blockv.UserManager.register(registration)
 ```
 #### getAccessToken()
 
 Returns the current Access Token
 
-```
+```javascript 
 Blockv.UserManager.getAccessToken();
 ```
 
 #### setAccessToken(token)
 Sets the Access Token for the APP
 
-```
+```javascript 
 Blockv.UserManager.setAccessToken(token);
 ```
 
 #### getCurrentUser()
 Returns the current user information
 
-```
+```javascript 
 Blockv.UserManager.getCurrentUser();
 ```
 
 #### encodeAssetProvider()
 Checks the current URI that was supplied against the logged in Asset Provider URI and if it is a match, builds a encoded link with the matching params
 
-```
+```javascript 
 Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018");
 ```
