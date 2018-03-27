@@ -7,9 +7,9 @@ export default class User{
       this.avatarUri = userData.user.properties.avatar_uri;
       this.birthday = userData.user.properties.birthday;
       this.language = userData.user.properties.language;
-      this.assetProvider = userData.asset_provider;
-
       
+
+
   }
 
 

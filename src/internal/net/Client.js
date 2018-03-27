@@ -48,9 +48,14 @@ import BaseResponse from './rest/response/BaseResponse'
        xhr.onload = e => onSuccess(JSON.parse(xhr.response))
 
    }).then(function (parsedBody) {
+
      return Object.assign(new BaseResponse(), parsedBody);
+    
    }).then(response=>{
-     return response.payload
+
+       return response.payload
+
+
      //throw if the server has an error
      //just return reponse.payload if success
    });

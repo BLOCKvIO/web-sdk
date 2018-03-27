@@ -53,8 +53,19 @@ class UserManager {
       return UserApi.encodeAssetProvider(url);
     }
 
+    resendVerification(token, token_type){
+      return UserApi.resendVerification(token, token_type);
+    }
 
+    getRefreshToken(){
+      return UserApi.getRefreshToken();
+    }
 
+    setRefreshToken(token){
+      return UserApi.setRefreshToken(token);
+    }
+
+    
 
 
 

@@ -18,8 +18,19 @@ export default class UserApi{
    }
 
    static setAccessToken(token){
+    Store.token = '';
     Store.token = token
     console.log("Access Token changed to  :" + token);
+   }
+
+   static getRefreshToken(){
+     return Store.refreshToken
+   }
+
+   static setRefreshToken(token){
+     Store.token = '';
+     Store.refreshToken = token;
+     console.log('Refresh Token changed to : ' + token);
    }
 
    static register(registration){
@@ -56,12 +67,22 @@ export default class UserApi{
 
       return  Client.request('POST', '/v1/user/login', payload, false).then(
           data => {
-            console.log(data);
 
-            Store.token = data.access_token.token;
-            Store.refreshToken = data.refresh_token.token;
-            Store.assetProvider = data.asset_provider;
-            return data;
+
+            if(!password){
+              let error =  new Error('Login Failed, Password Reset');
+              error.code = "PASSWORD_RESET";
+              throw error;
+            }else{
+              console.log(data);
+              Store.token = data.access_token.token;
+              Store.refreshToken = data.refresh_token.token;
+              Store.assetProvider = data.asset_provider;
+              return data;
+
+            }
+
+
           }).then(data => new User(data));
     }
 
@@ -77,7 +98,21 @@ export default class UserApi{
         "token" : guestId,
         "token_type" : "guest_id"
       }
-      return Client.request('POST', '/v1/user/login', payload, false)
+      return Client.request('POST', '/v1/user/login', payload, false).then(
+          data => {
+
+
+
+              console.log(data);
+              Store.token = data.access_token.token;
+              Store.refreshToken = data.refresh_token.token;
+              Store.assetProvider = data.asset_provider;
+              return data;
+
+          
+
+
+          }).then(data => new User(data));
 
     }
 
@@ -176,7 +211,7 @@ export default class UserApi{
    * @param tokenType the type of the token (phone or email)
    * @return JSON Object
    */
-   static resendVerification(token,TokenType){
+   static resendVerification(token,tokenType){
 
      let payload = {
        "token": token,

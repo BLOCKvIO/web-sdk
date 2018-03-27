@@ -55,10 +55,11 @@
       "websocketAddress" : ""
     });
 
-    Blockv.UserManager.login("kylmci+unittest@gmail.com", "email", "test")
+    Blockv.UserManager.loginGuest("6316fc74-882e-47e3-896f-94ad09fac143", "guest_id")
     .then(()=>{
       //get access token
-      let uT = Blockv.UserManager.getAccessToken();
+      let uT = Blockv.UserManager.getRefreshToken();
+      console.log("Refresh : " + uT);
       return uT
     })
     .then((uT) => {
@@ -81,6 +82,8 @@
       //logout
       console.log("logging out this user : " + cU.properties.first_name)
       Blockv.UserManager.logout()
+    }).catch( (err)=>{
+      console.log('login failed because '+ err);
     });
 
     /**
