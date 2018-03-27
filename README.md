@@ -111,7 +111,7 @@ sets the current refresh token
 Blockv.UserManager.setRefreshToken(token)
 ```
 
-##vAtom Actions
+## vAtom Actions
 
 - This is a generic function that takes 3 parameters.
 - vatomId is the vatom id
