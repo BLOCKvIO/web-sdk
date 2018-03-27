@@ -1,5 +1,8 @@
 # web-sdk
 
+## UserManager 
+
+
 initialise the Blockv SDK:
 
 ```javascript 
@@ -17,6 +20,15 @@ Blockv.init({
 
 ```javascript 
 Blockv.UserManager.login("example@example.com", "email", "test")
+
+```
+
+#### loginGuest()
+ - parameter one is the guest id string
+ 
+
+```javascript 
+Blockv.UserManager.login(guest_id)
 
 ```
 
@@ -61,4 +73,51 @@ Checks the current URI that was supplied against the logged in Asset Provider UR
 
 ```javascript 
 Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018");
+```
+
+#### getCurrentUserTokens()
+returns a list of the current user's tokens
+```javascript 
+Blockv.UserManager.getCurrentUserTokens();
+```
+
+#### uploadAvatar(formData)
+uploads a avatar for the current user
+```javascript
+Blockv.UserManager.uploadAvatar(formData)
+```
+
+#### updateUser()
+updates the current user with an object container the new details of the user
+```javascript
+Blockv.UserManager.updateUser(payload)
+```
+
+#### resendVerification()
+resends the verification token to the user
+```javascript
+Blockv.UserManager.resendVerification(token, token_type)
+```
+
+#### getRefreshToken()
+returns the current refresh token 
+```javascript
+Blockv.UserManager.getRefreshToken()
+```
+
+#### setRefreshToken()
+sets the current refresh token
+```javascript
+Blockv.UserManager.setRefreshToken(token)
+```
+
+##vAtom Actions
+
+- This is a generic function that takes 3 parameters.
+- vatomId is the vatom id
+- action is the type of action :: Drop, Pickup , Transfer , Require
+- payload is any additional information sent along with the vatom id
+
+```javascript
+Blockv.Vatoms.performAction(vatomId, action, payload)
 ```
