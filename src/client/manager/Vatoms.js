@@ -17,7 +17,7 @@ class Vatoms{
     //assigns this.id
     payload["this.id"] = vatomId;
 
-    return Client.request('POST', '/v1/user/vatom/action/'+action, payload, true).then(data => data.main.output);
+    return Client.request('POST', '/v1/user/vatom/action/'+action, payload, true).then(data => {data.main.output});
 
   }
 

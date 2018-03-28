@@ -65,7 +65,13 @@ class UserManager {
       return UserApi.setRefreshToken(token);
     }
 
-    
+    verifyUserToken(verify){
+      return UserApi.verifyUserToken(verify);
+    }
+
+    addUserToken(payload){
+      return UserApi.addUserToken(payload)
+    }
 
 
 

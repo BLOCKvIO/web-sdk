@@ -109,7 +109,7 @@ export default class UserApi{
               Store.assetProvider = data.asset_provider;
               return data;
 
-          
+
 
 
           }).then(data => new User(data));
@@ -170,7 +170,7 @@ export default class UserApi{
    */
    static updateUser(update){
 
-     Client.request("PATCH", '/v1/user', update, true);
+     return Client.request("PATCH", '/v1/user', update, true);
 
    }
 
@@ -199,7 +199,7 @@ export default class UserApi{
    */
    static verifyUserToken(verification){
 
-     Client.request('POST','/v1/user/verify_token', verification, true)
+    return Client.request('POST','/v1/user/verify_token', verification, true)
    }
 
    /**
@@ -307,6 +307,18 @@ export default class UserApi{
          return url;
        }
      }
+   }
+
+   static addUserToken(payload){
+     /**
+      * payload is
+      * {
+      * "token": "another.email@domain.com",
+      * "token_type": "email",
+      * "is_primary": false
+      * }
+      */
+     return Client.request('POST', 'v1/user/tokens', payload, true);
    }
 
 

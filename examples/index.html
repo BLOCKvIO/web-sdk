@@ -55,7 +55,7 @@
       "websocketAddress" : ""
     });
 
-    Blockv.UserManager.loginGuest("6316fc74-882e-47e3-896f-94ad09fac143", "guest_id")
+    Blockv.UserManager.login("kylmci+unittest@gmail.com", "email", "test")
     .then(()=>{
       //get access token
       let uT = Blockv.UserManager.getRefreshToken();
