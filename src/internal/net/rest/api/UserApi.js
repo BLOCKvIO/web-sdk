@@ -183,7 +183,7 @@ export default class UserApi{
 
 
 
-     Client.request('GET', '/v1/user/tokens', '', true);
+     return Client.request('GET', '/v1/user/tokens', '', true);
 
 
 
