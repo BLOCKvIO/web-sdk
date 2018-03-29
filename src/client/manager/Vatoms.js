@@ -21,7 +21,15 @@ class Vatoms{
 
   }
 
-
+  getVatomInventory() {
+    payload = {
+      "parent_id": ".",
+      "page": 1,
+      "limit": 1000
+    }
+    
+    return Client.request('POST', '/v1/user/vatom/inventory', payload, true);
+  }
 
 }
 
