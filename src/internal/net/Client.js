@@ -52,8 +52,15 @@ import BaseResponse from './rest/response/BaseResponse'
      return Object.assign(new BaseResponse(), parsedBody);
     
    }).then(response=>{
+      // Check for server error
+      if (!response.payload) {
+        var error = new Error(response.message || "An unknown server error occurred.")
+        error.code = response.error || 0
+        throw error
+      }
 
-       return response.payload
+      // No error, continue
+      return response.payload
 
 
      //throw if the server has an error
