@@ -134,14 +134,14 @@ export default class UserApi{
         // convert File to FormData
         
         const request = new FormData();
-        request.append("avatar", avatarImage);
+        request.append('avatar', avatarImage);
       
         //submit formData with new header
         let avatarHeader = {
           'Content-Type' : 'multipart/form-data'
         }
         
-        Client.request('POST', '/v1/user/avatar', request, true, avatarHeader);
+        return Client.request('POST', '/v1/user/avatar', request, true, avatarHeader);
     }
 
     /**
