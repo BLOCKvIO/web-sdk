@@ -130,18 +130,18 @@ export default class UserApi{
 
 
 
-    static uploadAvatar(request){
-
-        //get file
-        //change to formData
+    static uploadAvatar(avatarImage){
+        // convert File to FormData
+        
+        const request = new FormData();
+        request.append("avatar", avatarImage);
+      
         //submit formData with new header
         let avatarHeader = {
           'Content-Type' : 'multipart/form-data'
         }
-      Client.request('POST', '/v1/user/avatar', request, true, avatarHeader);
-
-
-
+        
+        Client.request('POST', '/v1/user/avatar', request, true, avatarHeader);
     }
 
     /**

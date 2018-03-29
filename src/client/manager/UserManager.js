@@ -33,8 +33,8 @@ class UserManager {
       return UserApi.getUserTokens();
     }
 
-    uploadAvatar(formData){
-      return UserApi.uploadAvatar(formData);
+    uploadAvatar(avatarImage){
+      return UserApi.uploadAvatar(avatarImage);
     }
 
     updateUser(payload){
