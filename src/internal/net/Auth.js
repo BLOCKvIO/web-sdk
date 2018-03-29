@@ -16,8 +16,17 @@ class Auth{
 
 
 
-      return Client.request('POST', '/v1/access_token', '', false,  options).then(function(data){
-
+      return Client.request('POST', '/v1/access_token', '', false, options).then(function (data) {
+        // note: the promise returned from `Client.request` will resolve
+        // even when the http call returned an error status code.
+        // when the user is not logged in, a 401 status code is returned
+        // and the `data` we receive here is undefined
+        // in this case, we will throw a custom error to handle this case
+        // specifically if needed
+        if (data === undefined) {
+          throw "no access token returned from server";
+        }
+        
         Store.token = data.access_token.token;
       })
 
@@ -43,7 +52,7 @@ class Auth{
      token = Store.token;
 
      if(token == 'undefined' || token == ''){
-       this.refreshToken();
+       return this.refreshToken();
      }else{
        try{
          decodedToken = jwt_decode(Store.token);
