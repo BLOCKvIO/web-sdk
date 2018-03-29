@@ -304,9 +304,9 @@ export default class UserApi{
            }
            total++;
          }
-         return url;
-       }
-     }
+        }
+      }
+      return url;
    }
 
    static addUserToken(payload){
