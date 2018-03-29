@@ -34,7 +34,7 @@ class UserManager {
     }
 
     uploadAvatar(formData){
-      UserApi.uploadAvatar(formData);
+      return UserApi.uploadAvatar(formData);
     }
 
     updateUser(payload){
