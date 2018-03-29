@@ -258,7 +258,7 @@ export default class UserApi{
    * @return new JSON
    */
    static logout(params){
-     Client.request('POST', '/v1/user/logout', params, true).then(function(){
+     return Client.request('POST', '/v1/user/logout', params, true).then(function(){
       console.log('User has been logged out!');
       Store.token = '';
       Store.refreshToken = '';
