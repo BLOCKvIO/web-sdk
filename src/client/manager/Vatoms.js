@@ -21,17 +21,20 @@ class Vatoms{
 
   }
 
-  getUserInventory() {
+  getUserInventory(){
     let payload = {
       "parent_id": ".",
       "page": 1,
       "limit": 1000
     }
-    
-    return Client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data.vatoms);
+
+     return Client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data.vatoms);
+
+
   }
-  
-  getUserVatoms(vatomId) {
+
+
+  getUserVatoms(vatomId){
     let payload = {
       "ids": [
         vatomId
@@ -40,6 +43,7 @@ class Vatoms{
 
     return Client.request('POST', '/v1/user/vatom/get', payload, true).then(data => data)
   }
+
 
 }
 

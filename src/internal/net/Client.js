@@ -50,21 +50,21 @@ import BaseResponse from './rest/response/BaseResponse'
    }).then(function (parsedBody) {
 
      return Object.assign(new BaseResponse(), parsedBody);
-    
+
    }).then(response=>{
-      // Check for server error
-      if (!response.payload) {
-        var error = new Error(response.message || "An unknown server error occurred.")
-        error.code = response.error || 0
-        throw error
-      }
 
-      // No error, continue
-      return response.payload
+     // Check for server error
+     if (!response.payload) {
+       var error = new Error(response.message || "An unknown server error occurred.")
+       error.code = response.error || 0
+       throw error
+     }
+
+     // No error, continue
+     return response.payload
 
 
-     //throw if the server has an error
-     //just return reponse.payload if success
+     
    });
 
  }

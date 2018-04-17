@@ -6,11 +6,11 @@ import UserApi from '../../internal/net/rest/api/UserApi'
 class UserManager {
 
     register(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic){
-      UserApi.register(new RegisterRequest(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic));
+      return UserApi.register(new RegisterRequest(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic));
     }
 
     register(registration){
-      UserApi.register(registration);
+      return UserApi.register(registration);
     }
 
     login(token, tokenType, password){
@@ -33,8 +33,8 @@ class UserManager {
       return UserApi.getUserTokens();
     }
 
-    uploadAvatar(avatarImage){
-      return UserApi.uploadAvatar(avatarImage);
+    uploadAvatar(formData){
+      UserApi.uploadAvatar(formData);
     }
 
     updateUser(payload){
@@ -70,7 +70,19 @@ class UserManager {
     }
 
     addUserToken(payload){
-      return UserApi.addUserToken(payload)
+      return UserApi.addUserToken(payload);
+    }
+
+    deleteUserToken(tokenId){
+      return UserApi.deleteUserToken(tokenId);
+    }
+
+    getGuestToken(){
+      return UserApi.getGuestToken();
+    }
+
+    resetToken(token, token_type){
+      return UserApi.resetToken(token, token_type);
     }
 
 
