@@ -1,9 +1,10 @@
 # web-sdk
 
-## UserManager 
+A web interface sdk for the BlockV platform
 
+## Getting Started
 
-initialise the Blockv SDK:
+Before any code is run, make sure you have initialised the BlockV SDK by adding the following :
 
 ```javascript 
 Blockv.init({
@@ -12,6 +13,10 @@ Blockv.init({
       "websocketAddress" : "wss://ws.blockv.net"
     });
 ```
+
+## UserManager 
+
+The User Manager part of the SDK allows you to interact with the user profile.
 
 #### login()
  - parameter one is the email address or the mobile number of the user
