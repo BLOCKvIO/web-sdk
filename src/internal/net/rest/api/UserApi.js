@@ -202,25 +202,8 @@ export default class UserApi{
     return Client.request('POST','/v1/user/verify_token', verification, true)
    }
 
-   /**
-   * Sends a verification code to the user's token (phone or email).
-   *
-   * This verification code should be used to verifiy the user's ownership of the token (phone or email).
-   *
-   * @param token the user's phone(E.164) or email
-   * @param tokenType the type of the token (phone or email)
-   * @return JSON Object
-   */
-   static resendVerification(token,tokenType){
 
-     let payload = {
-       "token": token,
-       "token_type": tokenType
-     }
 
-      Client.request('POST', '/v1/user/reset_token', payload, true);
-
-   }
   /**
    * Sends a One-Time-Pin (OTP) to the user's token (phone or email).
    *
@@ -230,24 +213,33 @@ export default class UserApi{
    * @param tokenType the type of the token (phone or email)
    * @return JSON Object
    */
-   static resetToken(token,tokenType){
+   static resetPassword(token,tokenType){
 
       let payload = {
         "token": token,
         "token_type": tokenType
       }
 
-     Client.request('POST', '/v1/user/reset_token', payload, true);
+     return Client.request('POST', '/v1/user/reset_token', payload, false);
 
    }
 
-  static resetTokenVerification(token, tokenType){
+   /**
+   * Sends a verification code to the user's token (phone or email).
+   *
+   * This verification code should be used to verifiy the user's ownership of the token (phone or email).
+   *
+   * @param token the user's phone(E.164) or email
+   * @param tokenType the type of the token (phone or email)
+   * @return JSON Object
+   */
+  static sendTokenVerification(token, tokenType){
 
     let payload = {
       "token": token,
       "token_type": tokenType
     }
-     Client.request('POST', '/v1/user/reset_token_verification', payload, true);
+    return Client.request('POST', '/v1/user/reset_token_verification', payload, false);
   }
 
   /**
@@ -260,7 +252,7 @@ export default class UserApi{
 
       return data.properties.guest_id
 
-     }) ;
+     });
   }
 
   /**

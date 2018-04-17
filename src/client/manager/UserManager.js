@@ -53,8 +53,8 @@ class UserManager {
       return UserApi.encodeAssetProvider(url);
     }
 
-    resendVerification(token, token_type){
-      return UserApi.resendVerification(token, token_type);
+    sendTokenVerification(token, token_type){
+      return UserApi.sendTokenVerification(token, token_type);
     }
 
     getRefreshToken(){
@@ -81,8 +81,8 @@ class UserManager {
       return UserApi.getGuestToken();
     }
 
-    resetToken(token, token_type){
-      return UserApi.resetToken(token, token_type);
+    resetPassword(token, token_type){
+      return UserApi.resetPassword(token, token_type);
     }
 
 
