@@ -28,7 +28,7 @@ Blockv.UserManager.login("example@example.com", "email", "test")
  
 
 ```javascript 
-Blockv.UserManager.login(guest_id)
+Blockv.UserManager.loginGuest(guest_id)
 
 ```
 
