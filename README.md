@@ -20,7 +20,7 @@ Before running any of the web api's you need to initialise the BlockV applicatio
 
 
 
-```javascript 
+```javascript
 Blockv.init({
       "appID" : {{APPID}},
       "server" : "https://apidev.blockv.net/",
@@ -29,7 +29,7 @@ Blockv.init({
 ```
 
 
-## UserManager 
+## UserManager
 
 
 
@@ -37,11 +37,11 @@ Blockv.init({
 #### login()
  - parameter one is the email address or the mobile number of the user
  - parameter two is the type of login (email / phone_number)
- - parameter three is the password 
+ - parameter three is the password
 
  * If the password is not set and left blank, an OTP will be sent to the users method of login, ie. email / mobile number.
 
-```javascript 
+```javascript
 Blockv.UserManager.login("example@example.com", "email", "test")
 
 ```
@@ -50,20 +50,47 @@ Blockv.UserManager.login("example@example.com", "email", "test")
 
 #### register(registration)
 Registration can be done in two ways:
-- inline `register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')`
-  * language is the shortcode eg: en / fr
-  * tokens will be used to log the user in, 
+- inline register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')
 - or as an object
 
-```javascript 
-Blockv.UserManager.register(registration)
+#### Examples
+
+
+
+```javascript
+
+let payload = {
+    firstName : 'John',
+    lastName : 'Smith',
+    birthday : '1970-12-23',
+    language : 'en',
+    password : '',
+    tokens : [
+      {
+        token : '+44 123 9876',
+        token_type : 'phone_number',
+        isPrimary : true
+      },
+      {
+        token : 'example@example.com',
+        token_type : 'email',
+        isPrimary : false
+      }
+    ],
+    namePublic : true,
+    avatarPublic : true
+}
+
+Blockv.UserManager.register(payload).then(data =>{
+  //do something here
+})
 ```
 
 #### loginGuest()
  - parameter one is the guest id string
- 
 
-```javascript 
+
+```javascript
 Blockv.UserManager.loginGuest(guest_id)
 
 ```
@@ -71,7 +98,7 @@ Blockv.UserManager.loginGuest(guest_id)
 #### logout()
 Logs out the current user
 
-```javascript 
+```javascript
 Blockv.UserManager.logout()
 ```
 
@@ -79,34 +106,34 @@ Blockv.UserManager.logout()
 
 Returns the current Access Token
 
-```javascript 
+```javascript
 Blockv.UserManager.getAccessToken();
 ```
 
 #### setAccessToken(token)
 Sets the Access Token for the APP
 
-```javascript 
+```javascript
 Blockv.UserManager.setAccessToken(token);
 ```
 
 #### getCurrentUser()
 Returns the current user information
 
-```javascript 
+```javascript
 Blockv.UserManager.getCurrentUser();
 ```
 
 #### encodeAssetProvider()
 Checks the current URI that was supplied against the logged in Asset Provider URI and if it is a match, builds a encoded link with the matching params
 
-```javascript 
+```javascript
 Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018");
 ```
 
 #### getCurrentUserTokens()
 returns a list of the current user's tokens
-```javascript 
+```javascript
 Blockv.UserManager.getCurrentUserTokens();
 ```
 
@@ -129,7 +156,7 @@ Blockv.UserManager.resendVerification(token, token_type)
 ```
 
 #### getRefreshToken()
-returns the current refresh token 
+returns the current refresh token
 ```javascript
 Blockv.UserManager.getRefreshToken()
 ```
