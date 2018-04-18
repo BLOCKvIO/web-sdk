@@ -50,7 +50,7 @@ Blockv.UserManager.login("example@example.com", "email", "test")
 
 #### register(registration)
 Registration can be done in two ways:
-- inline register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')
+- inline `register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')`
   * language is the shortcode eg: en / fr
   * tokens will be used to log the user in, 
 - or as an object
