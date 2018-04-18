@@ -1,31 +1,62 @@
 # web-sdk
 
-A web interface sdk for the BlockV platform
+## Overview
+
+The BlockV Web SDK allows you to interact with User Profiles and vAtoms through a series of easy to use api's.
+
+## Prerequisite: Request an App ID
+
+If you have not already done so, please request an App ID using the developer access page.
+
+Open the developer access page
+Fill out the registration form with your company and project details
+Submit the form for review
+The BLOCKv team will review your registration request, and if successful, send through your App ID. You will need this App ID to run the sample app explored in this tutorial.
+
 
 ## Getting Started
 
-Before any code is run, make sure you have initialised the BlockV SDK by adding the following :
+Before running any of the web api's you need to initialise the BlockV application, You can do so but putting the following code in your opening script tag.
+
+
 
 ```javascript 
 Blockv.init({
-      "appID" : "87b4a201-054c-484c-b206-02742ba9ae87",
+      "appID" : {{APPID}},
       "server" : "https://apidev.blockv.net/",
-      "websocketAddress" : "wss://ws.blockv.net"
+      "websocketAddress" : ""
     });
 ```
 
+
 ## UserManager 
 
-The User Manager part of the SDK allows you to interact with the user profile.
+
+
 
 #### login()
  - parameter one is the email address or the mobile number of the user
  - parameter two is the type of login (email / phone_number)
  - parameter three is the password 
 
+ * If the password is not set and left blank, an OTP will be sent to the users method of login, ie. email / mobile number.
+
 ```javascript 
 Blockv.UserManager.login("example@example.com", "email", "test")
 
+```
+
+## Registering a User
+
+#### register(registration)
+Registration can be done in two ways:
+- inline register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')
+  * language is the shortcode eg: en / fr
+  * tokens will be used to log the user in, 
+- or as an object
+
+```javascript 
+Blockv.UserManager.register(registration)
 ```
 
 #### loginGuest()
@@ -43,14 +74,7 @@ Logs out the current user
 ```javascript 
 Blockv.UserManager.logout()
 ```
-#### register(registration)
-Registration can be done in two ways:
-- inline register(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic)
-- or as an object
 
-```javascript 
-Blockv.UserManager.register(registration)
-```
 #### getAccessToken()
 
 Returns the current Access Token
