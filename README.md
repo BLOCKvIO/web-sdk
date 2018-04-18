@@ -240,6 +240,34 @@ Blockv.UserManager.setRefreshToken(token).then(data => {
 })
 ```
 
+####  verifyUserToken(verify)
+verifies the user token that was supplied
+
+```javascript
+let payload = {
+
+    "token": "jane@example.com",
+    "token_type": "email",
+    "verify_code": "1234"
+}
+Blockv.UserManager.verifyUserToken(payload).then(data => {
+    // do something after verified
+}).catch(err => {
+   console.error(err.message);
+})
+```
+
+#### resetPassword(token, token_type){
+Sends a login OTP , The OTP may only be used for the .login() api
+
+```javascript
+Blockv.UserManager.resetPassword("+44 123 4569", "phone_number").then(data => {
+     //do something after password is deleted
+}).catch(err => {
+     console.error(err.message)
+})
+```
+
 ## vAtom Actions
 
 - This is a generic function that takes 3 parameters.
