@@ -248,5 +248,9 @@ Blockv.UserManager.setRefreshToken(token).then(data => {
 - payload is any additional information sent along with the vatom id
 
 ```javascript
-Blockv.Vatoms.performAction(vatomId, action, payload)
+Blockv.Vatoms.performAction(vatomId, action, payload).then(data =>{
+  //do something after performing an action with a vAtom
+}).catch(err => {
+  console.error(err.message);
+})
 ```
