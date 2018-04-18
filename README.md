@@ -31,21 +31,6 @@ Blockv.init({
 
 ## UserManager
 
-
-
-
-#### login()
- - parameter one is the email address or the mobile number of the user
- - parameter two is the type of login (email / phone_number)
- - parameter three is the password
-
- * If the password is not set and left blank, an OTP will be sent to the users method of login, ie. email / mobile number.
-
-```javascript
-Blockv.UserManager.login("example@example.com", "email", "test")
-
-```
-
 ## Registering a User
 
 #### register(registration)
@@ -54,8 +39,6 @@ Registration can be done in two ways:
 - or as an object
 
 #### Examples
-
-
 
 ```javascript
 
@@ -83,7 +66,27 @@ let payload = {
 
 Blockv.UserManager.register(payload).then(data =>{
   //do something here
+}).catch(err => {
+  console.error(err.message);
 })
+```
+
+## Login with User Credentials
+
+#### login()
+ - parameter one is the email address or the mobile number of the user
+ - parameter two is the type of login (email / phone_number)
+ - parameter three is the password
+
+ * If the password is not set and left blank, an OTP will be sent to the users method of login, ie. email / mobile number.
+
+```javascript
+Blockv.UserManager.login("example@example.com", "email", "test").then(data => {
+  //proceed with logged in user
+}).catch(err => {
+  console.error(err.message);
+})
+
 ```
 
 #### loginGuest()
@@ -91,15 +94,25 @@ Blockv.UserManager.register(payload).then(data =>{
 
 
 ```javascript
-Blockv.UserManager.loginGuest(guest_id)
+Blockv.UserManager.loginGuest(guest_id).then(data => {
+  //proceed with code
+}).catch(err => {
+  console.error(err.message);
+})
 
 ```
+
+## Logout the currently logged in user
 
 #### logout()
 Logs out the current user
 
 ```javascript
-Blockv.UserManager.logout()
+Blockv.UserManager.logout().then(data => {
+  //proceed to redirect after logout
+}).catch(err => {
+  console.error(err.message);
+})
 ```
 
 #### getAccessToken()
@@ -107,64 +120,124 @@ Blockv.UserManager.logout()
 Returns the current Access Token
 
 ```javascript
-Blockv.UserManager.getAccessToken();
+Blockv.UserManager.getAccessToken().then(data => {
+  // Access Token returned is a String
+
+}).catch(err => {
+  console.error(err.message)
+})
 ```
 
 #### setAccessToken(token)
-Sets the Access Token for the APP
+Allows the App to set the Access Token for the user
 
 ```javascript
-Blockv.UserManager.setAccessToken(token);
+Blockv.UserManager.setAccessToken(token).then(data =>{
+  // do something with the new access token
+}).catch(err => {
+  console.error(err.message)
+})
 ```
 
 #### getCurrentUser()
 Returns the current user information
 
 ```javascript
-Blockv.UserManager.getCurrentUser();
+Blockv.UserManager.getCurrentUser().then(data => {
+  //do something with the returned user data
+}).catch(err => {
+  console.error(err.message);
+});
 ```
 
 #### encodeAssetProvider()
 Checks the current URI that was supplied against the logged in Asset Provider URI and if it is a match, builds a encoded link with the matching params
 
 ```javascript
-Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018");
+Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018").then(data => {
+  //proceed to use the newly returned url
+}).catch(err => {
+  console.error(err.message);
+});
 ```
 
 #### getCurrentUserTokens()
-returns a list of the current user's tokens
+returns a list of the current user's tokens (emails / phone numbers)
+
 ```javascript
-Blockv.UserManager.getCurrentUserTokens();
+Blockv.UserManager.getCurrentUserTokens().then(data => {
+  //do something here
+}).catch(err => {
+  console.error(err.message);
+});
 ```
 
 #### uploadAvatar(formData)
-uploads a avatar for the current user
+
+#### Example Avatar Upload
+
 ```javascript
-Blockv.UserManager.uploadAvatar(formData)
+
+function doUpload(){
+  let f = document.getElementById('avatar');
+  let file = f.files[0];
+  let fData = new FormData();
+  fData.append('avatar', file);
+  Blockv.UserManager.uploadAvatar(fData);
+}
 ```
+
+
 
 #### updateUser()
-updates the current user with an object container the new details of the user
+updates the current user with an object containing the new details of the user
+
+#### Example updating a user
 ```javascript
-Blockv.UserManager.updateUser(payload)
+let payload = {
+    'first_name' : 'Jane',
+    'last_name' : 'Smith',
+    tokens : [
+      {
+        token : 'jane@example.com',
+        token_type : 'email'
+      }
+    ]
+}
+
+Blockv.UserManager.updateUser(payload).then(data => {
+  //do something here after update
+}).catch(err => {
+  console.error(err.message);
+})
 ```
 
-#### resendVerification()
+#### sendTokenVerification()
 resends the verification token to the user
 ```javascript
-Blockv.UserManager.resendVerification(token, token_type)
+Blockv.UserManager.sendTokenVerification(token, token_type).then(data => {
+  //verify the token
+}).catch(err => {
+  console.error(err.message);
+})
 ```
 
 #### getRefreshToken()
 returns the current refresh token
 ```javascript
-Blockv.UserManager.getRefreshToken()
+Blockv.UserManager.getRefreshToken().then(data => {
+  //do something with the refresh token
+}).catch(err => {
+  console.error(err.message);
+})
 ```
 
 #### setRefreshToken()
 sets the current refresh token
 ```javascript
-Blockv.UserManager.setRefreshToken(token)
+Blockv.UserManager.setRefreshToken(token).then(data => {
+  // do something after assigning a new refresh token
+})
 ```
 
 ## vAtom Actions
