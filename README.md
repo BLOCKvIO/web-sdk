@@ -33,7 +33,7 @@ Blockv.init({
 
 ## Registering a User
 
-#### register(registration)
+#### register(payload)
 Registration can be done in two ways:
 - inline register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')
 - or as an object
@@ -73,7 +73,7 @@ Blockv.UserManager.register(payload).then(data =>{
 
 ## Login with User Credentials
 
-#### login()
+#### login(payload)
  - parameter one is the email address or the mobile number of the user
  - parameter two is the type of login (email / phone_number)
  - parameter three is the password
@@ -89,7 +89,7 @@ Blockv.UserManager.login("example@example.com", "email", "test").then(data => {
 
 ```
 
-#### loginGuest()
+#### loginGuest(guest_id)
  - parameter one is the guest id string
 
 
@@ -150,7 +150,7 @@ Blockv.UserManager.getCurrentUser().then(data => {
 });
 ```
 
-#### encodeAssetProvider()
+#### encodeAssetProvider(url)
 Checks the current URI that was supplied against the logged in Asset Provider URI and if it is a match, builds a encoded link with the matching params
 
 ```javascript
@@ -189,7 +189,7 @@ function doUpload(){
 
 
 
-#### updateUser()
+#### updateUser(payload)
 updates the current user with an object containing the new details of the user
 
 #### Example updating a user
@@ -212,7 +212,7 @@ Blockv.UserManager.updateUser(payload).then(data => {
 })
 ```
 
-#### sendTokenVerification()
+#### sendTokenVerification(token, token_type)
 resends the verification token to the user
 ```javascript
 Blockv.UserManager.sendTokenVerification(token, token_type).then(data => {
@@ -240,7 +240,7 @@ Blockv.UserManager.setRefreshToken(token).then(data => {
 })
 ```
 
-####  verifyUserToken(verify)
+####  verifyUserToken(payload)
 verifies the user token that was supplied
 
 ```javascript
