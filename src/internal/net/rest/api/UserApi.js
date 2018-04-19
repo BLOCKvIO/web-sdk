@@ -325,7 +325,7 @@ export default class UserApi{
       * "is_primary": false
       * }
       */
-     return Client.request('POST', 'v1/user/tokens', payload, true);
+     return Client.request('POST', '/v1/user/tokens', payload, true);
    }
 
 
