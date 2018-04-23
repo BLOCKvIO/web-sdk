@@ -292,7 +292,7 @@ export default class UserApi{
 
 
    static encodeAssetProvider(url){
-     let aP = JSON.parse(JSON.stringify(Store.assetProvider));
+     let aP = Store.assetProvider;
      let aPlen = aP.length;
      let compare = this.extractHostname(url);
 

@@ -40,11 +40,11 @@ export default class Store {
     }
 
     static set assetProvider(provider){
-      window.localStorage.setItem('asset_provider', provider);
+      window.localStorage.setItem('asset_provider', JSON.stringify(provider));
     }
 
     static get assetProvider(){
-      let aP = window.localStorage.getItem('asset_provider');
+      let aP = JSON.parse(window.localStorage.getItem('asset_provider') || 'undefined');
       return aP;
     }
 
