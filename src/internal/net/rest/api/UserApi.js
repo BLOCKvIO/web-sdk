@@ -292,7 +292,7 @@ export default class UserApi{
 
 
    static encodeAssetProvider(url){
-     let aP = JSON.parse(JSON.stringify(Store.assetProvider));
+     let aP = Store.assetProvider;
      let aPlen = aP.length;
      let compare = this.extractHostname(url);
 
@@ -325,7 +325,7 @@ export default class UserApi{
       * "is_primary": false
       * }
       */
-     return Client.request('POST', 'v1/user/tokens', payload, true);
+     return Client.request('POST', '/v1/user/tokens', payload, true);
    }
 
 
