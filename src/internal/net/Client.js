@@ -55,7 +55,23 @@ import BaseResponse from './rest/response/BaseResponse'
 
      // Check for server error
      if (!response.payload) {
-       var error = new Error(response.message || "An unknown server error occurred.")
+
+       const ErrorCodes = {
+         401: 'Token has Expired',
+         516: 'Invalid Payload',
+         521: 'Token Unavailable',
+         527: 'Invalid Date Format',
+         2030: 'No user found, Please register an account first.',
+         2031: 'Authentication Failed',
+         2032 : 'Login Failed, Please try again',
+         2034: 'Invalid Token',
+         2552: 'Unable To Retrieve Token',
+         2563: 'Token Already Confirmed',
+         2564: 'Invalid Verification Code',
+         2569: 'Invalid Phone Number'
+       }
+
+       var error = new Error(ErrorCodes[response.error] || "An unknown server error occurred.")
        error.code = response.error || 0
        throw error
      }
@@ -64,7 +80,7 @@ import BaseResponse from './rest/response/BaseResponse'
      return response.payload
 
 
-     
+
    });
 
  }
