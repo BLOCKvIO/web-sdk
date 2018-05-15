@@ -1,4 +1,4 @@
-# web-sdk
+# BLOCKv SDK for JavaScript
 
 ## Overview
 
@@ -13,6 +13,33 @@ Fill out the registration form with your company and project details
 Submit the form for review
 The BLOCKv team will review your registration request, and if successful, send through your App ID. You will need this App ID to run the sample app explored in this tutorial.
 
+## Installation
+
+Install from npm
+
+```javascript
+npm install @blockv/sdk
+```
+
+Use from the browser
+```javascript
+<script src="https://npmcdn.com/@blockv/sdk/dist/blockv-sdk.min.js"></script>
+```
+
+In Node.js
+
+```javascript
+var Blockv = require('@blockv/sdk')
+```
+
+ES6 & ES7
+```javascript
+import Blockv from '@blockv/sdk'
+```
+
+
+
+
 
 ## Getting Started
 
@@ -24,7 +51,7 @@ Before running any of the web api's you need to initialise the BlockV applicatio
 Blockv.init({
       "appID" : {{APPID}},
       "server" : "https://apidev.blockv.net/",
-      "websocketAddress" : ""
+      "websocketAddress" : "wss://ws.blockv.io"
     });
 ```
 
@@ -128,16 +155,6 @@ Blockv.UserManager.getAccessToken().then(data => {
 })
 ```
 
-#### setAccessToken(token)
-Allows the App to set the Access Token for the user
-
-```javascript
-Blockv.UserManager.setAccessToken(token).then(data =>{
-  // do something with the new access token
-}).catch(err => {
-  console.error(err.message)
-})
-```
 
 #### getCurrentUser()
 Returns the current user information
@@ -232,13 +249,6 @@ Blockv.UserManager.getRefreshToken().then(data => {
 })
 ```
 
-#### setRefreshToken()
-sets the current refresh token
-```javascript
-Blockv.UserManager.setRefreshToken(token).then(data => {
-  // do something after assigning a new refresh token
-})
-```
 
 ####  verifyUserToken(payload)
 verifies the user token that was supplied
