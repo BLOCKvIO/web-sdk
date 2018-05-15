@@ -11,7 +11,7 @@ If you have not already done so, please request an App ID using the developer ac
 Open the developer access page
 Fill out the registration form with your company and project details
 Submit the form for review
-The BLOCKv team will review your registration request, and if successful, send through your App ID. You will need this App ID to run the sample app explored in this tutorial.
+The BLOCKv team will review your registration request, and if successful, send through your App ID. You will need this App ID to run the endpoints explored in the examples below.
 
 ## Installation
 
@@ -292,3 +292,15 @@ Blockv.Vatoms.performAction(vatomId, action, payload).then(data =>{
   console.error(err.message);
 })
 ```
+
+## Security Disclosure
+
+If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.
+
+## Author
+
+[BLOCKv](developer.blockv.io)
+
+## License
+
+BLOCKv is available under the BLOCKv AG license. See the [LICENSE](https://github.com/BLOCKvIO/web-sdk/blob/master/LICENSE) file for more info.
