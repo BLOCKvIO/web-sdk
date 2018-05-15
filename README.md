@@ -1,8 +1,6 @@
 # BLOCKv SDK for JavaScript
 
-## Overview
-
-The BlockV Web SDK allows you to interact with User Profiles and vAtoms through a series of easy to use api's.
+This is the official BLOCKv Web SDK. It allows you to easily integrate your own web apps into the BLOCKv Platform.
 
 ## Prerequisite: Request an App ID
 
@@ -43,7 +41,7 @@ import Blockv from '@blockv/sdk'
 
 ## Getting Started
 
-Before running any of the web api's you need to initialise the BlockV application, You can do so but putting the following code in your opening script tag.
+Before running any of the web API's you need to initialise the BlockV application, You can do so but putting the following code in your opening script tag.
 
 
 
@@ -58,7 +56,7 @@ Blockv.init({
 
 ## UserManager
 
-## Registering a User
+### Registering a User
 
 #### register(payload)
 Registration can be done in two ways:
@@ -98,7 +96,7 @@ Blockv.UserManager.register(payload).then(data =>{
 })
 ```
 
-## Login with User Credentials
+### Login with User Credentials
 
 #### login(payload)
  - parameter one is the email address or the mobile number of the user
@@ -129,7 +127,7 @@ Blockv.UserManager.loginGuest(guest_id).then(data => {
 
 ```
 
-## Logout the currently logged in user
+### Logout the currently logged in user
 
 #### logout()
 Logs out the current user
@@ -268,7 +266,7 @@ Blockv.UserManager.verifyUserToken(payload).then(data => {
 ```
 
 #### resetPassword(token, token_type){
-Sends a login OTP , The OTP may only be used for the .login() api
+Sends a login OTP , The OTP may only be used for the .login() API
 
 ```javascript
 Blockv.UserManager.resetPassword("+44 123 4569", "phone_number").then(data => {
