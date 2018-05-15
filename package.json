@@ -1,5 +1,5 @@
 {
-  "name": "blockv-web-sdk",
+  "name": "@blockv/sdk",
   "version": "0.0.1",
   "description": "Allows web apps to display and interact with vatoms.",
   "main": "lib/index.js",
@@ -9,7 +9,7 @@
     "build": "concurrently \"npm run build-min\" \"npm run build-lib\"",
     "build-min": "webpack -p",
     "watch": "webpack --watch",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "keywords": [
     "vatom",
@@ -19,7 +19,7 @@
     "html"
   ],
   "author": "Blockv",
-  "license": "ISC",
+  "license": "BLOCKv AG",
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-core": "^6.14.0",
@@ -51,5 +51,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
     "mocha": "^5.0.4"
-  }
+  },
+  "repository" : "github:BLOCKvIO/web-sdk"
+
 }
