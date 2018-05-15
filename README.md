@@ -48,7 +48,7 @@ Before running any of the web API's you need to initialise the BlockV applicatio
 ```javascript
 Blockv.init({
       "appID" : {{APPID}},
-      "server" : "https://apidev.blockv.net/",
+      "server" : "https://apidev.blockv.io/",
       "websocketAddress" : "wss://ws.blockv.io"
     });
 ```
