@@ -57,7 +57,7 @@ The prefix attribute is critical if you are using multiple instances with the sa
 ```javascript
 let bv = new Blockv({
       "appID" : {{APPID}},
-      "server" : "https://apidev.blockv.io/",
+      "server" : "https://api.blockv.io/",
       "websocketAddress" : "wss://ws.blockv.io",
       "prefix" : "blockv"
     });
