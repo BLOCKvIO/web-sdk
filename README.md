@@ -47,7 +47,6 @@ The SDK supports multiple instances of Blockv to be initialised.
 
 
 *IMPORTANT NOTE:*
-<br />
 
 The prefix attribute is critical if you are using multiple instances with the same appID.
 
