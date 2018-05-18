@@ -305,7 +305,7 @@ export default class UserApi{
 
 
     encodeAssetProvider(url){
-     let aP = Store.assetProvider;
+     let aP = this.store.assetProvider;
      let aPlen = aP.length;
      let compare = this.extractHostname(url);
 
