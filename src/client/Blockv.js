@@ -9,20 +9,35 @@
 //  governing permissions and limitations under the License.
 //
 import Store from '../internal/repo/Store'
+import UserManager from './manager/UserManager'
+import UserApi from '../internal/net/rest/api/UserApi'
+import VatomApi from '../internal/net/rest/api/VatomApi'
+import Vatoms from './manager/Vatoms'
+import Client from '../internal/net/Client'
+
 /**
  * Created by LordCheddar on 2018/03/05.
  */
 
 class Blockv {
 
-  static init(init){
-    //const APPID = appID;
-    //const SERVER = 'https://apidev.blockv.net/';
-    Store.appID = init.appID;
-    Store.server = init.server;
-    Store.websocketAddress = init.websocketAddress;
+  constructor(payload){
+      let prefix = payload.prefix || payload.appID;
+      this.store = new Store(prefix);
+      this.store.appID = payload.appID;
+      this.store.server = payload.server;
+      this.store.websocketAddress = payload.websocketAddress;
 
+
+      let client = new Client(this.store);
+
+      let userApi = new UserApi(client, this.store);
+      let vatomApi = new VatomApi(client);
+
+      this.UserManager = new UserManager(userApi,this.store);
+      this.Vatoms = new Vatoms(vatomApi);
   }
+
 
 }
 

@@ -8,11 +8,15 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import Client from '../../Client'
-import Store from '../../../repo/Store';
+
 import User from '../../../../model/User';
 
 export default class UserApi{
+
+  constructor(client, store){
+    this.client = client;
+    this.store = store;
+  }
 
   /**
    * Registers a user on the Blockv platform.
@@ -21,34 +25,33 @@ export default class UserApi{
    * @return new Observable<User> instance
    */
 
-   static getAccessToken(){
-     let a = Store.token;
-     let ra = window.localStorage.getItem('refresh');
-     return Store.token;
+    getAccessToken(){
+
+     return this.store.token;
    }
 
-   static setAccessToken(token){
-    Store.token = '';
-    Store.token = token
-    console.log("Access Token changed to  :" + token);
+    setAccessToken(token){
+    this.store.token = '';
+    this.store.token = token
+
    }
 
-   static getRefreshToken(){
-     return Store.refreshToken
+    getRefreshToken(){
+     return this.store.refreshToken
    }
 
-   static setRefreshToken(token){
-     Store.token = '';
-     Store.refreshToken = token;
-     console.log('Refresh Token changed to : ' + token);
+    setRefreshToken(token){
+     this.store.token = '';
+     this.store.refreshToken = token;
    }
 
-   static register(registration){
+    register(registration){
 
-  return  Client.request('POST', '/v1/users', registration, false).then(
+  return  this.client.request('POST', '/v1/users', registration, false).then(
          data => {
-           Store.token = data.access_token.token;
-           Store.refreshToken = data.refresh_token.token;
+           this.store.token = data.access_token.token;
+           this.store.refreshToken = data.refresh_token.token;
+
            return data;
          }).then(data => new User(data));
 
@@ -64,7 +67,7 @@ export default class UserApi{
     * @return JSON Object
     */
 
-    static login(token, tokenType, password){
+     login(token, tokenType, password){
 
       let payload = {
           token      : token,
@@ -75,7 +78,7 @@ export default class UserApi{
           }
         }
 
-      return  Client.request('POST', '/v1/user/login', payload, false).then(
+      return  this.client.request('POST', '/v1/user/login', payload, false).then(
           data => {
 
 
@@ -84,10 +87,10 @@ export default class UserApi{
               error.code = "PASSWORD_RESET";
               throw error;
             }else{
-              console.log(data);
-              Store.token = data.access_token.token;
-              Store.refreshToken = data.refresh_token.token;
-              Store.assetProvider = data.asset_provider;
+              this.store.token = data.access_token.token;
+              this.store.refreshToken = data.refresh_token.token;
+              this.store.assetProvider = data.asset_provider;
+              this.store.userID = data.user.id;
               return data;
 
             }
@@ -102,21 +105,21 @@ export default class UserApi{
     * @param guestId the user's guest id.
     * @return JSON Object
     */
-    static loginGuest(guestId){
+     loginGuest(guestId){
       let payload =
       {
         "token" : guestId,
         "token_type" : "guest_id"
       }
-      return Client.request('POST', '/v1/user/login', payload, false).then(
+      return this.client.request('POST', '/v1/user/login', payload, false).then(
           data => {
 
 
 
               console.log(data);
-              Store.token = data.access_token.token;
-              Store.refreshToken = data.refresh_token.token;
-              Store.assetProvider = data.asset_provider;
+              this.store.token = data.access_token.token;
+              this.store.refreshToken = data.refresh_token.token;
+              this.store.assetProvider = data.asset_provider;
               return data;
 
 
@@ -133,14 +136,14 @@ export default class UserApi{
     * @param oauthToken the OAuth token issued by the OAuth provider.
     * @return JSON Object
     */
-    static loginOAuth(provider, oauthToken){
+     loginOAuth(provider, oauthToken){
       //waiting for a server fix before this one gets any more work!
 
     }
 
 
 
-    static uploadAvatar(request){
+     uploadAvatar(request){
 
         //get file
         //change to formData
@@ -148,7 +151,7 @@ export default class UserApi{
         let avatarHeader = {
           'Content-Type' : 'multipart/form-data'
         }
-      Client.request('POST', '/v1/user/avatar', request, true, avatarHeader);
+      this.client.request('POST', '/v1/user/avatar', request, true, avatarHeader);
 
 
 
@@ -160,11 +163,11 @@ export default class UserApi{
     * @return JSON Object
     */
 
-    static getCurrentUser(payload){
+     getCurrentUser(payload){
 
       //get the current authenticated in user
 
-       return Client.request('GET', '/v1/user', payload, true).then(
+       return this.client.request('GET', '/v1/user', payload, true).then(
           data => {
             console.log(data);
             return data;
@@ -178,9 +181,9 @@ export default class UserApi{
    * @param update holds the properties of the user, e.g. their first name. Only the properties to be updated should be set.
    * @return JSON Object
    */
-   static updateUser(update){
+    updateUser(update){
 
-     return Client.request("PATCH", '/v1/user', update, true);
+     return this.client.request("PATCH", '/v1/user', update, true);
 
    }
 
@@ -189,11 +192,11 @@ export default class UserApi{
     * @return JSON Object
     */
 
-  static getUserTokens(){
+   getUserTokens(){
 
 
 
-    return Client.request('GET', '/v1/user/tokens', '', true);
+    return this.client.request('GET', '/v1/user/tokens', '', true);
 
 
 
@@ -207,9 +210,9 @@ export default class UserApi{
    * @param code the verification code send to the user's token (phone or email).
    * @return JSON Object
    */
-   static verifyUserToken(verification){
+    verifyUserToken(verification){
 
-    return Client.request('POST','/v1/user/verify_token', verification, true)
+    return this.client.request('POST','/v1/user/verify_token', verification, true)
    }
 
 
@@ -223,14 +226,14 @@ export default class UserApi{
    * @param tokenType the type of the token (phone or email)
    * @return JSON Object
    */
-   static resetPassword(token,tokenType){
+    resetPassword(token,tokenType){
 
       let payload = {
         "token": token,
         "token_type": tokenType
       }
 
-     return Client.request('POST', '/v1/user/reset_token', payload, false);
+     return this.client.request('POST', '/v1/user/reset_token', payload, false);
 
    }
 
@@ -243,13 +246,13 @@ export default class UserApi{
    * @param tokenType the type of the token (phone or email)
    * @return JSON Object
    */
-  static sendTokenVerification(token, tokenType){
+   sendTokenVerification(token, tokenType){
 
     let payload = {
       "token": token,
       "token_type": tokenType
     }
-    return Client.request('POST', '/v1/user/reset_token_verification', payload, false);
+    return this.client.request('POST', '/v1/user/reset_token_verification', payload, false);
   }
 
   /**
@@ -257,8 +260,8 @@ export default class UserApi{
    * @return Object payload containing a guest user generated by the server
    */
 
-  static getGuestToken(){
-     return Client.request('POST', '/v1/user/guest', '', false).then(function(data){
+   getGuestToken(){
+     return this.client.request('POST', '/v1/user/guest', '', false).then(function(data){
 
       return data.properties.guest_id
 
@@ -272,16 +275,16 @@ export default class UserApi{
    *
    * @return new JSON
    */
-   static logout(params){
-     Client.request('POST', '/v1/user/logout', params, true).then(function(){
+    logout(params){
+     this.client.request('POST', '/v1/user/logout', params, true).then(function(){
       console.log('User has been logged out!');
-      Store.token = '';
-      Store.refreshToken = '';
+      this.store.token = '';
+      this.store.refreshToken = '';
     });
    }
 
 
-   static extractHostname(url) {
+    extractHostname(url) {
     var hostname;
     //find & remove protocol (http, ftp, etc.) and get hostname
 
@@ -301,7 +304,7 @@ export default class UserApi{
 }
 
 
-   static encodeAssetProvider(url){
+    encodeAssetProvider(url){
      let aP = Store.assetProvider;
      let aPlen = aP.length;
      let compare = this.extractHostname(url);
@@ -326,7 +329,7 @@ export default class UserApi{
      return url;
    }
 
-   static addUserToken(payload){
+    addUserToken(payload){
      /**
       * payload is
       * {
@@ -335,15 +338,20 @@ export default class UserApi{
       * "is_primary": false
       * }
       */
-     return Client.request('POST', '/v1/user/tokens', payload, true);
+     return this.client.request('POST', '/v1/user/tokens', payload, true);
    }
 
 
 
-   static deleteUserToken(tokenId){
+    deleteUserToken(tokenId){
 
-     return Cliet.request('DELETE', '/v1/user/tokens/'+tokenId, null, true);
+     return this.cliet.request('DELETE', '/v1/user/tokens/'+tokenId, null, true);
 
+   }
+
+    addRedeemable(payload){
+     let U = this.store.userID;
+     return this.client.request('POST', '/v1/users/'+U+'/redeemables', payload, true);
    }
 
 

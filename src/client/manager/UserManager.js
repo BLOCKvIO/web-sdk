@@ -8,90 +8,98 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import UserApi from '../../internal/net/rest/api/UserApi'
+
 
 class UserManager {
 
+    constructor(UserApi, store){
+      this.UserApi = UserApi;
+      this.store = store;
+    }
+
     register(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic){
-      return UserApi.register(new RegisterRequest(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic));
+      return this.UserApi.register(new RegisterRequest(firstName,lastName, birthday, language, password, tokens, namePublic, avatarPublic));
     }
 
     register(registration){
-      return UserApi.register(registration);
+      return this.UserApi.register(registration);
     }
 
     login(token, tokenType, password){
-    return  UserApi.login(token, tokenType, password);
+    return  this.UserApi.login(token, tokenType, password);
     }
 
     loginGuest(guestId){
-      return UserApi.loginGuest(guestId);
+      return this.UserApi.loginGuest(guestId);
     }
 
     logout(){
-      return UserApi.logout();
+      return this.UserApi.logout();
     }
 
     getCurrentUser(){
-      return UserApi.getCurrentUser();
+      return this.UserApi.getCurrentUser();
     }
 
     getCurrentUserTokens(){
-      return UserApi.getUserTokens();
+      return this.UserApi.getUserTokens();
     }
 
     uploadAvatar(formData){
-      UserApi.uploadAvatar(formData);
+      this.UserApi.uploadAvatar(formData);
     }
 
     updateUser(payload){
-      return UserApi.updateUser(payload);
+      return this.UserApi.updateUser(payload);
     }
 
     getAccessToken(){
-      return UserApi.getAccessToken();
+      return this.UserApi.getAccessToken();
     }
 
 
     encodeAssetProvider(url){
-      return UserApi.encodeAssetProvider(url);
+      return this.UserApi.encodeAssetProvider(url);
     }
 
     sendTokenVerification(token, token_type){
-      return UserApi.sendTokenVerification(token, token_type);
+      return this.UserApi.sendTokenVerification(token, token_type);
     }
 
     getRefreshToken(){
-      return UserApi.getRefreshToken();
+      return this.UserApi.getRefreshToken();
     }
 
     setRefreshToken(token){
-      return UserApi.setRefreshToken(token);
+      return this.UserApi.setRefreshToken(token);
     }
 
     verifyUserToken(verify){
-      return UserApi.verifyUserToken(verify);
+      return this.UserApi.verifyUserToken(verify);
     }
 
     addUserToken(payload){
-      return UserApi.addUserToken(payload);
+      return this.UserApi.addUserToken(payload);
     }
 
     deleteUserToken(tokenId){
-      return UserApi.deleteUserToken(tokenId);
+      return this.UserApi.deleteUserToken(tokenId);
     }
 
     getGuestToken(){
-      return UserApi.getGuestToken();
+      return this.UserApi.getGuestToken();
     }
 
     resetPassword(token, token_type){
-      return UserApi.resetPassword(token, token_type);
+      return this.UserApi.resetPassword(token, token_type);
     }
 
+    addRedeemable(payload){
+      return this.UserApi.addRedeemable(payload);
+    }
 
 
 
 }
 
-export default new UserManager();
+export default UserManager;

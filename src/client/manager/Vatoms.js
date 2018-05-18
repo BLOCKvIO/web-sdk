@@ -8,9 +8,12 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import Client from '../../internal/net/Client'
+
 
 class Vatoms{
+  constructor(vatomApi){
+    this.vatomApi = vatomApi
+  }
 
   /**
    * [performAction description]
@@ -20,6 +23,8 @@ class Vatoms{
    * @return {JSON}   json payload nested
    */
 
+
+
   performAction(vatomId, action, payload){
 
     //check that payload is set
@@ -27,8 +32,7 @@ class Vatoms{
     //assigns this.id
     payload["this.id"] = vatomId;
 
-    return Client.request('POST', '/v1/user/vatom/action/'+action, payload, true).then(data => {data.main.output});
-
+    return this.vatomApi.performAction(action, payload);
   }
 
   getUserInventory(){
@@ -38,7 +42,7 @@ class Vatoms{
       "limit": 1000
     }
 
-     return Client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data.vatoms);
+     return this.vatomApi.getUserInventory(payload);
 
 
   }
@@ -51,10 +55,10 @@ class Vatoms{
       ]
     }
 
-    return Client.request('POST', '/v1/user/vatom/get', payload, true).then(data => data)
+    return this.vatomApi.getUserVatoms(payload)
   }
 
 
 }
 
-export default new Vatoms();
+export default Vatoms;

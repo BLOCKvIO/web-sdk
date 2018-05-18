@@ -43,16 +43,28 @@ import Blockv from '@blockv/sdk'
 
 Before running any of the web API's you need to initialise the BlockV application, You can do so but putting the following code in your opening script tag.
 
+The SDK supports multiple instances of Blockv to be initialised.
 
+
+*IMPORTANT NOTE:*
+<br />
+
+The prefix attribute is critical if you are using multiple instances with the same appID.
+
+ Leaving the prefix out will force the sdk to use the appID as the prefix for any stored data, Using multiple instance with the same appID and the prefix omitted will result in data override.
+
+ It is recommended that in the case of multiple instances, You use a prefix so that each instance is unique and utilizes its own unique store.
 
 ```javascript
-Blockv.init({
+let bv = new Blockv({
       "appID" : {{APPID}},
       "server" : "https://apidev.blockv.io/",
-      "websocketAddress" : "wss://ws.blockv.io"
+      "websocketAddress" : "wss://ws.blockv.io",
+      "prefix" : "blockv"
     });
 ```
 
+The prefix attribute in the initialization of the Blockv SDK is optional, Left out, This will default to the appID attribute.  
 
 ## UserManager
 
@@ -89,7 +101,7 @@ let payload = {
     avatarPublic : true
 }
 
-Blockv.UserManager.register(payload).then(data =>{
+bv.UserManager.register(payload).then(data =>{
   //do something here
 }).catch(err => {
   console.error(err.message);
@@ -106,7 +118,7 @@ Blockv.UserManager.register(payload).then(data =>{
  * If the password is not set and left blank, an OTP will be sent to the users method of login, ie. email / mobile number.
 
 ```javascript
-Blockv.UserManager.login("example@example.com", "email", "test").then(data => {
+bv.UserManager.login("example@example.com", "email", "test").then(data => {
   //proceed with logged in user
 }).catch(err => {
   console.error(err.message);
@@ -119,7 +131,7 @@ Blockv.UserManager.login("example@example.com", "email", "test").then(data => {
 
 
 ```javascript
-Blockv.UserManager.loginGuest(guest_id).then(data => {
+bv.UserManager.loginGuest(guest_id).then(data => {
   //proceed with code
 }).catch(err => {
   console.error(err.message);
@@ -133,7 +145,7 @@ Blockv.UserManager.loginGuest(guest_id).then(data => {
 Logs out the current user
 
 ```javascript
-Blockv.UserManager.logout().then(data => {
+bv.UserManager.logout().then(data => {
   //proceed to redirect after logout
 }).catch(err => {
   console.error(err.message);
@@ -145,7 +157,7 @@ Blockv.UserManager.logout().then(data => {
 Returns the current Access Token
 
 ```javascript
-Blockv.UserManager.getAccessToken().then(data => {
+bv.UserManager.getAccessToken().then(data => {
   // Access Token returned is a String
 
 }).catch(err => {
@@ -158,7 +170,7 @@ Blockv.UserManager.getAccessToken().then(data => {
 Returns the current user information
 
 ```javascript
-Blockv.UserManager.getCurrentUser().then(data => {
+bv.UserManager.getCurrentUser().then(data => {
   //do something with the returned user data
 }).catch(err => {
   console.error(err.message);
@@ -169,7 +181,7 @@ Blockv.UserManager.getCurrentUser().then(data => {
 Checks the current URI that was supplied against the logged in Asset Provider URI and if it is a match, builds a encoded link with the matching params
 
 ```javascript
-Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018").then(data => {
+bv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars/b9e6581c-bb70-48d1-85eb-6657ee1a3bef.1521806344051057018").then(data => {
   //proceed to use the newly returned url
 }).catch(err => {
   console.error(err.message);
@@ -180,7 +192,7 @@ Blockv.UserManager.encodeAssetProvider("https://cdndev.blockv.net/blockv/avatars
 returns a list of the current user's tokens (emails / phone numbers)
 
 ```javascript
-Blockv.UserManager.getCurrentUserTokens().then(data => {
+bv.UserManager.getCurrentUserTokens().then(data => {
   //do something here
 }).catch(err => {
   console.error(err.message);
@@ -198,7 +210,7 @@ function doUpload(){
   let file = f.files[0];
   let fData = new FormData();
   fData.append('avatar', file);
-  Blockv.UserManager.uploadAvatar(fData);
+  bv.UserManager.uploadAvatar(fData);
 }
 ```
 
@@ -220,7 +232,7 @@ let payload = {
     ]
 }
 
-Blockv.UserManager.updateUser(payload).then(data => {
+bv.UserManager.updateUser(payload).then(data => {
   //do something here after update
 }).catch(err => {
   console.error(err.message);
@@ -230,7 +242,7 @@ Blockv.UserManager.updateUser(payload).then(data => {
 #### sendTokenVerification(token, token_type)
 resends the verification token to the user
 ```javascript
-Blockv.UserManager.sendTokenVerification(token, token_type).then(data => {
+bv.UserManager.sendTokenVerification(token, token_type).then(data => {
   //verify the token
 }).catch(err => {
   console.error(err.message);
@@ -240,7 +252,7 @@ Blockv.UserManager.sendTokenVerification(token, token_type).then(data => {
 #### getRefreshToken()
 returns the current refresh token
 ```javascript
-Blockv.UserManager.getRefreshToken().then(data => {
+bv.UserManager.getRefreshToken().then(data => {
   //do something with the refresh token
 }).catch(err => {
   console.error(err.message);
@@ -258,7 +270,7 @@ let payload = {
     "token_type": "email",
     "verify_code": "1234"
 }
-Blockv.UserManager.verifyUserToken(payload).then(data => {
+bv.UserManager.verifyUserToken(payload).then(data => {
     // do something after verified
 }).catch(err => {
    console.error(err.message);
@@ -269,7 +281,7 @@ Blockv.UserManager.verifyUserToken(payload).then(data => {
 Sends a login OTP , The OTP may only be used for the .login() API
 
 ```javascript
-Blockv.UserManager.resetPassword("+44 123 4569", "phone_number").then(data => {
+bv.UserManager.resetPassword("+44 123 4569", "phone_number").then(data => {
      //do something after password is deleted
 }).catch(err => {
      console.error(err.message)
@@ -284,7 +296,7 @@ Blockv.UserManager.resetPassword("+44 123 4569", "phone_number").then(data => {
 - payload is any additional information sent along with the vatom id
 
 ```javascript
-Blockv.Vatoms.performAction(vatomId, action, payload).then(data =>{
+bv.Vatoms.performAction(vatomId, action, payload).then(data =>{
   //do something after performing an action with a vAtom
 }).catch(err => {
   console.error(err.message);

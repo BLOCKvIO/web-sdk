@@ -10,51 +10,61 @@
 //
 export default class Store {
 
-    static get server(){
+    constructor(prefix){
+      this.prefix = prefix
+    }
+
+     get server(){
       return this.serverAddress // {{ SERVER }}
     }
 
-    static set server(address){
+     set server(address){
       this.serverAddress = address;
     }
-    static get appID(){
+     set userID(userid){
+      this.USERID = userid;
+    }
+     get userID(){
+      return this.USERID;
+    }
+     get appID(){
       return this.APPID //{{APPID}}
     }
-    static set appID(appid){
+     set appID(appid){
       this.APPID = appid
     }
 
-    static get websocketAddress(){
+     get websocketAddress(){
       return this.wssocketAddress
     }
 
-    static set websocketAddress(websocAddress){
+     set websocketAddress(websocAddress){
       this.wssocketAddress = websocAddress;
     }
 
-    static set token(token){
+     set token(token){
       this.accessToken = token;
     }
 
-    static get token(){
+     get token(){
       return this.accessToken;
     }
 
-    static set refreshToken(refresh){
-      window.localStorage.setItem('refresh', refresh);
+     set refreshToken(refresh){
+      window.localStorage.setItem(this.prefix+'_refresh', refresh);
     }
 
-    static get refreshToken(){
-      let rT = window.localStorage.getItem('refresh');
+     get refreshToken(){
+      let rT = window.localStorage.getItem(this.prefix+'_refresh');
       return rT;
     }
 
-    static set assetProvider(provider){
-      window.localStorage.setItem('asset_provider', JSON.stringify(provider));
+     set assetProvider(provider){
+      window.localStorage.setItem(this.prefix+'_asset_provider', JSON.stringify(provider));
     }
 
-    static get assetProvider(){
-      let aP = JSON.parse(window.localStorage.getItem('asset_provider') || 'undefined');
+     get assetProvider(){
+      let aP = JSON.parse(window.localStorage.getItem(this.prefix+'_asset_provider') || 'undefined');
       return aP;
     }
 

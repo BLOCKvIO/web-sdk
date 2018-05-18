@@ -8,16 +8,20 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import Store from '../repo/Store'
-import Auth from '../net/Auth'
-
+import jwt_decode from 'jwt-decode'
 import BaseResponse from './rest/response/BaseResponse'
 
  class Client{
 
+   constructor(store){
+     this.store = store
+   }
+
+
+
    request(method, endpoint, payload, auth, headers){
      if(auth === true){
-        return Auth.checkToken().then(e => this._request(method, endpoint, payload, headers));
+        return this.checkToken().then(e => this._request(method, endpoint, payload, headers));
      }else{
        return this._request(method, endpoint, payload, headers);
      }
@@ -28,8 +32,8 @@ import BaseResponse from './rest/response/BaseResponse'
    _request(method, endpoint, payload, headers) {
 
      headers = Object.assign({
-       'App-Id': Store.appID,
-       'Authorization' : 'Bearer ' + Store.token,
+       'App-Id': this.store.appID,
+       'Authorization' : 'Bearer ' + this.store.token,
        'Content-Type' : 'application/json'
      }, headers)
 
@@ -45,7 +49,7 @@ import BaseResponse from './rest/response/BaseResponse'
        // Create XHR
        var xhr = new XMLHttpRequest()
        xhr.responseType = 'text'
-       xhr.open(method, Store.server + endpoint)
+       xhr.open(method, this.store.server + endpoint)
        for(let name in headers){
          xhr.setRequestHeader(name, headers[name])
        }
@@ -70,6 +74,7 @@ import BaseResponse from './rest/response/BaseResponse'
      if (!response.payload) {
 
        const ErrorCodes = {
+         11 : "Problem with payload",
          401: 'Token has Expired',
          516: 'Invalid Payload',
          521: 'Token Unavailable',
@@ -131,10 +136,56 @@ import BaseResponse from './rest/response/BaseResponse'
 
  }
 
+ /**
+  * Refresh's the users access token
+  * @return JSON save the token with the bearer.
+  */
+ refreshToken() {
 
+     let options = {
+         'Authorization' : 'Bearer '+this.store.refreshToken
+       }
+
+
+
+     return this.request('POST', '/v1/access_token', '', false,  options).then(data => {
+
+       this.store.token = data.access_token.token;
+     })
+
+   }
+
+   checkToken(valid = false) {
+
+     //define our vars
+     let decodedToken, nowDate, expirationTime, token;
+     token = this.store.token;
+
+     if(token == 'undefined' || token == ''){
+       this.refreshToken();
+     }else{
+       try{
+         decodedToken = jwt_decode(this.store.token);
+         expirationTime = (decodedToken.exp * 1000);
+         nowDate = Date.now();
+
+         //quick calc to determine if the token has expired
+         //if ((nowDate - 30000) > expirationTime)
+         return this.refreshToken();
+         //else
+         //   return Promise.resolve(true)
+       }catch(e){
+         return this.refreshToken();
+       }
+
+
+     }
+
+
+   }
 
 
 
 
 }
-export default new Client()
+export default Client
