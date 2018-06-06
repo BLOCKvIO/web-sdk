@@ -8,6 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
+import {request, plugins as popsicle_plugins} from 'popsicle'
 import jwt_decode from 'jwt-decode'
 import BaseResponse from './rest/response/BaseResponse'
 
@@ -31,41 +32,25 @@ import BaseResponse from './rest/response/BaseResponse'
 
    _request(method, endpoint, payload, headers) {
 
+
      headers = Object.assign({
        'App-Id': this.store.appID,
        'Authorization' : 'Bearer ' + this.store.token,
        'Content-Type' : 'application/json'
      }, headers)
 
-     // Convert object payload to JSON
-     if (!(payload instanceof FormData) && typeof payload == "object")
-       payload = JSON.stringify(payload)
-
-       if(payload instanceof FormData)
-        delete headers['Content-Type'];
-       // Create promise
-       return new Promise((onSuccess, onFail) => {
-
-       // Create XHR
-       var xhr = new XMLHttpRequest()
-       xhr.responseType = 'text'
-       xhr.open(method, this.store.server + endpoint)
-       for(let name in headers){
-         xhr.setRequestHeader(name, headers[name])
-       }
 
 
-       xhr.send(payload)
+    return request({
+       method: method,
+       url: this.store.server + endpoint,
+       body: payload,
+       headers: headers
 
-       // Add handlers
-       xhr.onerror = onFail
-       xhr.onload = e => onSuccess(JSON.parse(xhr.response))
-
-   }).then(function (parsedBody) {
-
-     return Object.assign(new BaseResponse(), parsedBody);
-
-   }).then(response=>{
+     }).use(popsicle_plugins.parse('json'))
+     .then(function (res) {
+        return Object.assign(new BaseResponse(), res.body);
+     }).then(response=>{
 
      console.log(response);
 
