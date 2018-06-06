@@ -51,20 +51,20 @@ export default class Store {
     }
 
      set refreshToken(refresh){
-      window.localStorage.setItem(this.prefix+'_refresh', refresh);
+       localStorage.setItem(this.prefix+'_refresh', refresh);
     }
 
      get refreshToken(){
-      let rT = window.localStorage.getItem(this.prefix+'_refresh');
+      let rT = localStorage.getItem(this.prefix+'_refresh');
       return rT;
     }
 
      set assetProvider(provider){
-      window.localStorage.setItem(this.prefix+'_asset_provider', JSON.stringify(provider));
+       localStorage.setItem(this.prefix+'_asset_provider', JSON.stringify(provider));
     }
 
      get assetProvider(){
-      let aP = JSON.parse(window.localStorage.getItem(this.prefix+'_asset_provider') || 'undefined');
+      let aP = JSON.parse(localStorage.getItem(this.prefix+'_asset_provider') || 'undefined');
       return aP;
     }
 
