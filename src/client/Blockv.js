@@ -15,6 +15,7 @@ import VatomApi from '../internal/net/rest/api/VatomApi'
 import Vatoms from './manager/Vatoms'
 import Client from '../internal/net/Client'
 
+
 /**
  * Created by LordCheddar on 2018/03/05.
  */
@@ -29,13 +30,14 @@ class Blockv {
       this.store.websocketAddress = payload.websocketAddress;
 
 
-      let client = new Client(this.store);
+      this.client = new Client(this.store);
 
-      let userApi = new UserApi(client, this.store);
-      let vatomApi = new VatomApi(client);
+      let userApi = new UserApi(this.client, this.store);
+      let vatomApi = new VatomApi(this.client);
 
       this.UserManager = new UserManager(userApi,this.store);
       this.Vatoms = new Vatoms(vatomApi);
+
   }
 
 

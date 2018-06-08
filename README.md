@@ -302,6 +302,27 @@ bv.Vatoms.performAction(vatomId, action, payload).then(data =>{
 })
 ```
 
+## vAtom Inventory
+
+Retrieves a list of the current vAtoms in the users inventory
+
+```javascript
+bv.Vatoms.getUserInventory().then(data =>{
+  //do something with the returned inventory
+}).catch(err => {
+  console.error(err.message);
+})
+```
+
+## Discover
+
+```javascript
+let filter = new Blockv.Discover(bv);
+filter.setScope("vAtom::vAtomType.owner", "$currentuser");
+filter.appendFilter("vAtom::vAtomType.template", "vatomic::v1::vAtom::Avatar", "Match", "And");
+filter.execute();
+```
+
 ## Security Disclosure
 
 If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.

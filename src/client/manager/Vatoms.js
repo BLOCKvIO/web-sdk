@@ -47,7 +47,6 @@ class Vatoms{
 
   }
 
-
   getUserVatoms(vatomId){
     let payload = {
       "ids": [
@@ -57,6 +56,30 @@ class Vatoms{
 
     return this.vatomApi.getUserVatoms(payload)
   }
+
+  geoDiscover(bottomLeft, topRight, filter){
+    filter = filter || "all";
+    let payload = {
+        "bottom_left": {
+            "lat":bottomLeft.lat,
+            "lon": bottomLeft.lon
+        },
+        "top_right": {
+            "lat": topRight.lat,
+            "lon": topRight.lon
+        },
+        "filter": filter,
+        "limit": 100000
+      }
+
+    return this.vatomApi.geoDiscover(payload);
+  }
+
+
+  
+
+
+
 
 
 }

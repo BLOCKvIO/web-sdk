@@ -9,5 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 import Blockv from "./client/Blockv"
+import Discover from "./client/Discover"
 
 module.exports = Blockv;
+module.exports.Discover = Discover;
