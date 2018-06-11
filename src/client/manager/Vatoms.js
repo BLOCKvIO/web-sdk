@@ -20,7 +20,7 @@ class Vatoms{
    * @param  {String} vatomId id of the vatom to perform action
    * @param  {String} action  can be either of the following : Drop, Pickup , Transfer , Require
    * @param  {Object} payload contains geo-coordianates or anything else sent along with vatomid
-   * @return {JSON}   json payload nested
+   * @return {Promise<Object>}   json payload nested
    */
 
 
@@ -37,7 +37,7 @@ class Vatoms{
 
   /**
    * Gets the current users vAtom inventory
-   * @return {[JSON OBJECT]} return a list of JSON Objects that contain the users inventory
+   * @return {Promise<Object>} return a list of JSON Objects that contain the users inventory
    * No parameters are required for this call
    */
 
