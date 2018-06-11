@@ -35,6 +35,12 @@ class Vatoms{
     return this.vatomApi.performAction(action, payload);
   }
 
+  /**
+   * Gets the current users vAtom inventory
+   * @return {[JSON OBJECT]} return a list of JSON Objects that contain the users inventory
+   * No parameters are required for this call
+   */
+
   getUserInventory(){
     let payload = {
       "parent_id": ".",
@@ -47,6 +53,11 @@ class Vatoms{
 
   }
 
+  /**
+   * Gets a vAtom based on the vAtom ID
+   * @param  {[STRING]} vatomId ID of the vAtom that is being searched for
+   * @return {[JSON OBJECT]} returns a JSON Object containing the vAtom.
+   */
   getUserVatoms(vatomId){
     let payload = {
       "ids": [
@@ -57,7 +68,7 @@ class Vatoms{
     return this.vatomApi.getUserVatoms(payload)
   }
 
-  geoDiscover(bottomLeft, topRight, filter){
+/*  geoDiscover(bottomLeft, topRight, filter){
     filter = filter || "all";
     let payload = {
         "bottom_left": {
@@ -75,8 +86,10 @@ class Vatoms{
     return this.vatomApi.geoDiscover(payload);
   }
 
+  */
 
-  
+
+
 
 
 

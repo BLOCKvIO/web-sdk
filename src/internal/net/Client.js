@@ -72,6 +72,7 @@ import BaseResponse from './rest/response/BaseResponse'
          2552: 'Unable To Retrieve Token',
          2563: 'Token Already Confirmed',
          2564: 'Invalid Verification Code',
+         2566: 'Token Already Confirmed',
          2569: 'Invalid Phone Number'
        }
 
