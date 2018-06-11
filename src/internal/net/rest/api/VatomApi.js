@@ -31,7 +31,11 @@ export default class VatomApi{
     return this.client.request('POST', '/v1/user/vatom/get', payload, true).then(data => data)
   }
 
+  geoDiscover(payload){
+    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then(data => data)
+  }
 
+  
 
 
 }
