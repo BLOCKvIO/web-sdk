@@ -15,6 +15,26 @@ export default class VatomApi{
     this.client = client
   }
 
+  getActions(templateID){
+    return this.client.request('GET', '/v1/user/actions/'+templateID, {}, true)
+           .then(data => {
+             let len = data.length;
+             let actions = [];
+             for (var i=0; i<len;i++){
+
+              let action = data[i].name.split('::Action::');
+              actions.push(
+                {
+                  "template_id" :  action[0],
+                  "action" : action[1]
+                })
+              }
+
+
+              return actions;
+           })
+
+  }
 
   performAction(action, payload){
 
@@ -26,7 +46,6 @@ export default class VatomApi{
      return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data.vatoms);
   }
 
-
   getUserVatoms(payload){
     return this.client.request('POST', '/v1/user/vatom/get', payload, true).then(data => data)
   }
@@ -35,7 +54,9 @@ export default class VatomApi{
     return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then(data => data)
   }
 
-  
+  geoDiscoverGroups(payload){
+    return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data);
+  }
 
 
 }

@@ -341,11 +341,15 @@ export default class UserApi{
      return this.client.request('POST', '/v1/user/tokens', payload, true);
    }
 
+   setDefaultToken(tokenId){
+     return this.client.request('PUT', '/v1/user/tokens/'+tokenId+'/default', null, true);
+   }
+
 
 
     deleteUserToken(tokenId){
 
-     return this.cliet.request('DELETE', '/v1/user/tokens/'+tokenId, null, true);
+     return this.client.request('DELETE', '/v1/user/tokens/'+tokenId, null, true);
 
    }
 

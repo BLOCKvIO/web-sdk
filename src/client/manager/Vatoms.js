@@ -15,6 +15,18 @@ class Vatoms{
     this.vatomApi = vatomApi
   }
 
+
+  /**
+   * Returns a list of actions that can be performed on a template
+   * @param  {[String]} templateID Template ID is the vAtom template iD
+   * @return {[Promise<Object>]} returns a object containing a list of available actions
+   */
+  
+  getActions(templateID){
+    return this.vatomApi.getActions(templateID)
+  }
+
+
   /**
    * [performAction description]
    * @param  {String} vatomId id of the vatom to perform action
@@ -55,8 +67,8 @@ class Vatoms{
 
   /**
    * Gets a vAtom based on the vAtom ID
-   * @param  {[STRING]} vatomId ID of the vAtom that is being searched for
-   * @return {[JSON OBJECT]} returns a JSON Object containing the vAtom.
+   * @param  {[String]} vatomId ID of the vAtom that is being searched for
+   * @return {[Promise<Object>} returns a JSON Object containing the vAtom.
    */
   getUserVatoms(vatomId){
     let payload = {
@@ -68,8 +80,15 @@ class Vatoms{
     return this.vatomApi.getUserVatoms(payload)
   }
 
-/*  geoDiscover(bottomLeft, topRight, filter){
-    filter = filter || "all";
+  /**
+   * Gets a list of vAtoms based on the coordinates.
+   * @param  {[Object]} bottomLeft containing a "lat" and "lon" coordinate
+   * @param  {[Object]} topRight   containing a "lat" and "lon" coordinate
+   * @param  {[String]} filter     defaults to "all"
+   * @return {[Promise<Object>}  returns a list of vAtoms, faces and actions
+   */
+  geoDiscover(bottomLeft, topRight, filter){
+    filter = filter || "vatoms";
     let payload = {
         "bottom_left": {
             "lat":bottomLeft.lat,
@@ -79,14 +98,42 @@ class Vatoms{
             "lat": topRight.lat,
             "lon": topRight.lon
         },
-        "filter": filter,
-        "limit": 100000
+        "filter": filter
       }
 
     return this.vatomApi.geoDiscover(payload);
   }
 
-  */
+  /**
+   * Discover groups of vAtoms with Keys
+   * @param  {Object} bottomLeft contains a lat and lon coordinate. Coordinate must be integers and not strings
+   * @param  {Object} topRight   contains a lat and lon coordinate. Coordinate must be integers and not strings
+   * @param  {Integer} precision  1 - 12 defines the accuracy of the combination.
+   * @param  {String} filter     defaults to all
+   * @return {Promise<Object>}   Returns a list of groups
+   */
+  geoDiscoverGroups(bottomLeft, topRight, precision, filter){
+    filter = filter || "all";
+
+    let payload = {
+      "bottom_left" : {
+        "lat" : bottomLeft.lat,
+        "lon" : bottomLeft.lon
+      },
+      "top_right" : {
+        "lat" : topRight.lat,
+        "lon" : topRight.lon
+      },
+      "precision" : precision,
+      "filter" : filter
+    }
+
+    return this.vatomApi.geoDiscoverGroups(payload);
+
+
+  }
+
+
 
 
 
