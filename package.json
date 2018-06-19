@@ -1,12 +1,12 @@
 {
   "name": "@blockv/sdk",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Allows web apps to display and interact with vatoms.",
   "main": "lib/index.js",
   "scripts": {
     "build-lib": "babel src -d lib",
     "test": "npm run build",
-    "mocha" : "mocha",
+    "mocha": "mocha",
     "build": "concurrently \"npm run build-min\" \"npm run build-lib\"",
     "build-min": "webpack -p",
     "watch": "webpack --watch",
