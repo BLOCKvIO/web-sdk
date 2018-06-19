@@ -59,22 +59,35 @@ import BaseResponse from './rest/response/BaseResponse'
      if (!response.payload) {
 
        const ErrorCodes = {
-         11 : "Problem with payload",
+         2 : 'Blank App ID',
+         11 : 'Problem with payload',
+         17 : 'invalid App ID',
          401: 'Token has Expired',
          516: 'Invalid Payload',
+         517: 'Invalid Payload',
          521: 'Token Unavailable',
          527: 'Invalid Date Format',
+         1004: 'Invalid Request Payload',
+         1701: 'vAtom Unrecognized',
          2030: 'No user found, Please register an account first.',
          2031: 'Authentication Failed',
          2032 : 'Login Failed, Please try again',
          2034: 'Invalid Token',
+         2037: 'Upload Avatar Failed',
+         2049: 'Refresh Token Expired / Not Whitelisted',
          2051 : 'Too many login attempts, Please try again later.',
          2552: 'Unable To Retrieve Token',
+         2553: 'Token ID Invalid',
+         2562: 'Cannot Delete Primary Token',
          2563: 'Token Already Confirmed',
          2564: 'Invalid Verification Code',
          2566: 'Token Already Confirmed',
-         2569: 'Invalid Phone Number'
+         2567: 'Invalid Verification Code',
+         2569: 'Invalid Token Type',
+         2571: 'Invalid Email',
+         2572: 'Invalid Phone Number'
        }
+
 
        if(response.error === 2051){
          // Check for the special login locked error
@@ -156,10 +169,10 @@ import BaseResponse from './rest/response/BaseResponse'
          nowDate = Date.now();
 
          //quick calc to determine if the token has expired
-         //if ((nowDate - 30000) > expirationTime)
+         if ((nowDate - 30000) > expirationTime)
          return this.refreshToken();
-         //else
-         //   return Promise.resolve(true)
+         else
+            return Promise.resolve(true)
        }catch(e){
          return this.refreshToken();
        }

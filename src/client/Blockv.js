@@ -14,6 +14,7 @@ import UserApi from '../internal/net/rest/api/UserApi'
 import VatomApi from '../internal/net/rest/api/VatomApi'
 import Vatoms from './manager/Vatoms'
 import Client from '../internal/net/Client'
+import WebSockets from './manager/WebSockets'
 
 
 /**
@@ -26,15 +27,15 @@ class Blockv {
       let prefix = payload.prefix || payload.appID;
       this.store = new Store(prefix);
       this.store.appID = payload.appID;
-      this.store.server = payload.server;
-      this.store.websocketAddress = payload.websocketAddress;
-
-
+      this.store.server = payload.server || "https://api.blockv.io";
+      this.store.websocketAddress = payload.websocketAddress || "wss://ws.blockv.io";
       this.client = new Client(this.store);
+      
 
       let userApi = new UserApi(this.client, this.store);
       let vatomApi = new VatomApi(this.client);
 
+      this.WebSockets = new WebSockets(this.store);
       this.UserManager = new UserManager(userApi,this.store);
       this.Vatoms = new Vatoms(vatomApi);
 
