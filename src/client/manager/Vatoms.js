@@ -21,7 +21,7 @@ class Vatoms{
    * @param  {[String]} templateID Template ID is the vAtom template iD
    * @return {[Promise<Object>]} returns a object containing a list of available actions
    */
-  
+
   getActions(templateID){
     return this.vatomApi.getActions(templateID)
   }
@@ -72,9 +72,7 @@ class Vatoms{
    */
   getUserVatoms(vatomId){
     let payload = {
-      "ids": [
-        vatomId
-      ]
+      "ids": vatomId
     }
 
     return this.vatomApi.getUserVatoms(payload)

@@ -116,7 +116,7 @@ export default class UserApi{
 
 
 
-              console.log(data);
+
               this.store.token = data.access_token.token;
               this.store.refreshToken = data.refresh_token.token;
               this.store.assetProvider = data.asset_provider;
@@ -169,7 +169,7 @@ export default class UserApi{
 
        return this.client.request('GET', '/v1/user', payload, true).then(
           data => {
-            console.log(data);
+
             return data;
           });
 
@@ -277,7 +277,7 @@ export default class UserApi{
    */
     logout(params){
      this.client.request('POST', '/v1/user/logout', params, true).then(function(){
-      console.log('User has been logged out!');
+      
       this.store.token = '';
       this.store.refreshToken = '';
     });
@@ -346,16 +346,29 @@ export default class UserApi{
    }
 
 
-
+    /**
+     * Deletes a Users Token
+     * @param  {String} tokenId
+     * @return {Promise<Object>} returns a success
+     */
     deleteUserToken(tokenId){
 
      return this.client.request('DELETE', '/v1/user/tokens/'+tokenId, null, true);
 
    }
 
+   /**
+    * Adds a redeemable the users account
+    * @param {Object} payload Object containing the redeemable information
+    * @return {Promise<Object>} returns a Object containing the new redeemable
+    */
     addRedeemable(payload){
      let U = this.store.userID;
      return this.client.request('POST', '/v1/users/'+U+'/redeemables', payload, true);
+   }
+
+   getPublicUserProfile(userID){
+     return this.client.request('GET', '/v1/users/'+userID, {}, true);
    }
 
 

@@ -198,6 +198,15 @@ class UserManager {
       return this.UserApi.resetPassword(token, token_type);
     }
 
+    /**
+     * Returns a Public User Profile
+     * @param  {String} userID Public User ID
+     * @return {Promise<Object>}  Returns a Public User Object
+     */
+    getPublicUserProfile(userID){
+      return this.UserApi.getPublicUserProfile(userID);
+    }
+
 
     addRedeemable(payload){
       return this.UserApi.addRedeemable(payload);

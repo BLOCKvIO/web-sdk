@@ -29,9 +29,8 @@ class Blockv {
       this.store.appID = payload.appID;
       this.store.server = payload.server || "https://api.blockv.io";
       this.store.websocketAddress = payload.websocketAddress || "wss://ws.blockv.io";
-
-
       this.client = new Client(this.store);
+      
 
       let userApi = new UserApi(this.client, this.store);
       let vatomApi = new VatomApi(this.client);
