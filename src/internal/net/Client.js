@@ -52,8 +52,6 @@ import BaseResponse from './rest/response/BaseResponse'
         return Object.assign(new BaseResponse(), res.body);
      }).then(response=>{
 
-     console.log(response);
-
 
      // Check for server error
      if (!response.payload) {
