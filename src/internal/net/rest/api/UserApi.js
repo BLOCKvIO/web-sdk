@@ -276,8 +276,8 @@ export default class UserApi{
    * @return new JSON
    */
     logout(params){
-     this.client.request('POST', '/v1/user/logout', params, true).then(function(){
-      
+     return this.client.request('POST', '/v1/user/logout', params, true).then(() =>{
+
       this.store.token = '';
       this.store.refreshToken = '';
     });

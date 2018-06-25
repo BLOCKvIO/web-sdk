@@ -49,7 +49,7 @@ class Vatoms{
 
   /**
    * Gets the current users vAtom inventory
-   * @return {Promise<Object>} return a list of JSON Objects that contain the users inventory
+   * @return {Promise<Array<Object>>} return a list of JSON Objects that contain the users inventory
    * No parameters are required for this call
    */
 
@@ -129,6 +129,15 @@ class Vatoms{
     return this.vatomApi.geoDiscoverGroups(payload);
 
 
+  }
+
+  /**
+   * Deletes a vatom from your inventory
+   * @param  {String} vatomID  Id of the vAtom you want to delete
+   * @return {Promise<Object>} An object containing a success message
+   */
+  deleteVatom(vatomID){
+    return this.vatomApi.deleteVatom(vatomID);
   }
 
 
