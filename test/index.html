@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web SDK tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css" />
+    <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+  </head>
+  <body>
+
+  <div class="columns">
+    <div class="column" id="topbar">
+      <p></p>
+    </div>
+  </div>
+  <div class="columns">
+    <div class="column is-2">
+      <h3>User Management</h3>
+        <ul class="menu">
+          <li>Register</li>
+          <li onclick="load('login')">Login</li>
+          <li>Login Guest</li>
+          <li>Logout</li>
+          <li>Get Current User</li>
+          <li>Get Current User Tokens</li>
+          <li>Upload Avatar</li>
+          <li>Update User</li>
+          <li>Get Access Token</li>
+          <li>Encode Asset Provider</li>
+          <li>Send Token Verification</li>
+          <li>Get Refresh Token</li>
+          <li>Set Refresh Token</li>
+          <li>Verify User Token</li>
+          <li>Add User Token</li>
+          <li>Delete User Token</li>
+          <li>Get Guest Token</li>
+          <li>Reset Password</li>
+          <li>Add Redeemable</li>
+      </ul>
+
+      <h3>Vatoms</h3>
+        <ul>
+          <li>Perform Action</li>
+          <li>Get User Inventory</li>
+          <li>Get User Vatoms</li>
+          <li>Discover</li>
+          <li>Geo Discover</li>
+        </ul>
+    </div>
+    <div class="column is-5">
+      <textarea class="textarea" rows="23" id="input" >
+
+
+      </textarea>
+      <a class="button is-success" onclick="runCode()">Run Code</a>
+    </div>
+    <div class="column is-5">
+      <textarea class="textarea" rows="23" id="output">
+
+
+      </textarea>
+    </div>
+
+
+  </div>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="../dist/blockv-sdk.min.js"></script>
+  <script src="test.js"></script>
+
+  </body>
+</html>

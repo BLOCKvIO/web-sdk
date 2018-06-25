@@ -38,7 +38,7 @@ export default class VatomApi{
 
   performAction(action, payload){
 
-    return this.client.request('POST', '/v1/user/vatom/action/'+action, payload, true).then(data => {data.main.output});
+    return this.client.request('POST', '/v1/user/vatom/action/'+action, payload, true).then(data => data.main.output);
 
   }
 
@@ -58,5 +58,11 @@ export default class VatomApi{
     return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data);
   }
 
+  deleteVatom(vatomID){
+    let payload ={
+      "this.id": vatomID
+    }
+    return this.client.request('POST', '/v1/user/vatom/trash', payload, true).then(data=> data);
+  }
 
 }

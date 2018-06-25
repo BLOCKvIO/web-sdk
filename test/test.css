@@ -1,0 +1,26 @@
+body,html{
+  margin: 0;
+  padding:0;
+  width:100%;
+  height:100%;
+}
+
+#container{
+  width:100%;
+  height:100%;
+}
+
+#leftpanel{
+  width: 33.5%;
+  height:100%;
+  background: #999999;
+  color: #222;
+  float:left;
+}
+#rightpanel{
+  width:66.5%;
+  height:100%;
+  background: #000;
+  color: green;
+  float:right;
+}
