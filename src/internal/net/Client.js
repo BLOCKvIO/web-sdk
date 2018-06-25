@@ -54,12 +54,6 @@ import BaseResponse from './rest/response/BaseResponse'
        return response
      }).then(response=>{
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> dev
-
      // Check for server error
      if (!response.payload) {
 
