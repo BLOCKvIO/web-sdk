@@ -102,7 +102,7 @@ class UserManager {
      * @return {Promise<Object>}   An Object containing a upload success message
      */
     uploadAvatar(formData){
-      this.UserApi.uploadAvatar(formData);
+      return this.UserApi.uploadAvatar(formData);
     }
 
     /**

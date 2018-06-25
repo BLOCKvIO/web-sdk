@@ -314,6 +314,18 @@ bv.Vatoms.getUserInventory().then(data =>{
 })
 ```
 
+## vAtom Delete
+
+Deletes a vAtom in the users inventory
+
+```javascript
+bv.Vatoms.deleteVatom(vatomID).then(data =>{
+  //do something after the vAtom has been deleted
+}).catch(err => {
+  console.error(err.message);
+})
+```
+
 ## Discover
 
 ```javascript

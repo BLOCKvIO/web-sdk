@@ -49,11 +49,10 @@ import BaseResponse from './rest/response/BaseResponse'
 
      }).use(popsicle_plugins.parse('json'))
      .then(function (res) {
-        return Object.assign(new BaseResponse(), res.body);
+       var response = Object.assign(new BaseResponse(), res.body)
+       response.httpStatus = res.status
+       return response
      }).then(response=>{
-
-     console.log(response);
-
 
      // Check for server error
      if (!response.payload) {
@@ -118,7 +117,8 @@ import BaseResponse from './rest/response/BaseResponse'
        }else{
 
          var error = new Error(ErrorCodes[response.error] || "An unknown server error occurred.")
-         error.code = response.error || 0
+         error.code = response.error || response.httpStatus || 0
+         error.httpStatus = response.httpStatus
          throw error
        }
 
@@ -144,9 +144,6 @@ import BaseResponse from './rest/response/BaseResponse'
      let options = {
          'Authorization' : 'Bearer '+this.store.refreshToken
        }
-
-
-
      return this.request('POST', '/v1/access_token', '', false,  options).then(data => {
 
        this.store.token = data.access_token.token;
