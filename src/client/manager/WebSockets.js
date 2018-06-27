@@ -24,6 +24,10 @@ export default class WebSockets extends EventEmitter{
 
   }
 
+  /**
+   * The connection function establishes a connection to the websockets
+   * @return {Promise<WebSocket>}
+   */
   connect() {
     //before we connect, make sure the token is valid
     if(this.socket && this.socket.readyState !== 3)
@@ -46,17 +50,13 @@ export default class WebSockets extends EventEmitter{
 
   }
 
+  /**
+   * The handleMessage allows the different types of messages to be returned, stateUpdate,inventory,activity,info
+   * @param  {JSON<Object>} e A JSON Object that is passed into the function automatically from connect()
+   * @return {JSON<Object>}  A JSON Object is returned containing the list of chosen message types
+   */
   handleMessage(e){
-    /*
-      /// INTERNAL: Broadcast on initial connection to the socket.
-      case info           = "info"
-      /// Inventory event
-      case inventory      = "inventory"
-      /// Vatom state update event
-      case stateUpdate    = "state_update"
-      /// Activity event
-      case activity       = "my_events"
-     */
+
     let ed = JSON.parse(e.data);
 
     //if the user only wants state updates
@@ -80,6 +80,11 @@ export default class WebSockets extends EventEmitter{
 
   }
 
+  /**
+   * Lets the User know that the connection is connected
+   * @param  {Event<SocketStatus>} e no need for inputting the parameter
+   * @return {Function<connected>} triggers the connected function
+   */
   handleConnected(e){
 
     this.delayTime = 1000;
@@ -87,7 +92,10 @@ export default class WebSockets extends EventEmitter{
   }
 
 
-
+  /**
+   * When the connection drops or the Websocket is closed, this function will auto-retry connection until successfully connected
+   * @return {Promise<WebSockets>} returns the connection function
+   */
   retryConnection(){
     //set Time x 2
     //
@@ -102,12 +110,19 @@ export default class WebSockets extends EventEmitter{
       this.delayTime *= 2
   }
 
+  /**
+   * Handles the WebSocket close event
+   * @param  {Event} e no need for inputting, It is a Websocket Event
+   */
   handleClose(e){
 
     this.retryConnection();
 
   }
 
+  /**
+   * Forcefully close the WebSocket, It will null the socket and stop the auto connect
+   */
   close(){
       if(!this.socket)
         return
