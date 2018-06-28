@@ -25,7 +25,7 @@ export default class WebSockets extends EventEmitter{
   }
 
   /**
-   * The connection function establishes a connection to the websockets
+   * The connect function establishes a connection the Web socket.
    * @return {Promise<WebSocket>}
    */
   connect() {
@@ -51,7 +51,7 @@ export default class WebSockets extends EventEmitter{
   }
 
   /**
-   * The handleMessage allows the different types of messages to be returned, stateUpdate,inventory,activity,info
+   * The handleMessage function allows the different types of messages to be returned: stateUpdate, inventory, activity, and, info.
    * @param  {JSON<Object>} e A JSON Object that is passed into the function automatically from connect()
    * @return {JSON<Object>}  A JSON Object is returned containing the list of chosen message types
    */
@@ -111,7 +111,7 @@ export default class WebSockets extends EventEmitter{
   }
 
   /**
-   * Handles the WebSocket close event
+   * Handles the Web socket close event
    * @param  {Event} e no need for inputting, It is a Websocket Event
    */
   handleClose(e){
@@ -121,7 +121,8 @@ export default class WebSockets extends EventEmitter{
   }
 
   /**
-   * Forcefully close the WebSocket, It will null the socket and stop the auto connect
+   * Forcefully closes the Web socket.
+     Note: Socket will be set to null. Auto connect will be disabled.
    */
   close(){
       if(!this.socket)
