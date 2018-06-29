@@ -38,9 +38,9 @@ import Blockv from '@blockv/sdk'
 
 ## Getting Started
 
-Before running any of the web API's you need to initialise the BlockV application, You can do so but putting the following code in your opening script tag.
+Before running any of the web APIs you need to initialise the BLOCKv application, So by putting the following code in your opening script tag.
 
-The SDK supports multiple instances of Blockv to be initialised.
+The SDK supports multiple instances of `Blockv` to be initialised.
 
 
 *IMPORTANT NOTE:*
@@ -60,7 +60,7 @@ let bv = new Blockv({
     });
 ```
 
-The prefix attribute in the initialization of the Blockv SDK is optional, Left out, This will default to the appID attribute.  
+The prefix attribute in the initialization of the BLOCKv SDK is optional, Left out, This will default to the appID attribute.  
 
 ## UserManager
 
@@ -359,13 +359,13 @@ filter.execute();
 
 *Important to note, the Web socket connection can only be established if the current user is authenticated. Thus, connect() should only be called after the user has successfully logged in.*
 
-The Web socket class is used to provide realtime feedback for the user when they perform certain actions on the BlockV platform.
+The Web socket class is used to provide realtime feedback for the user when they perform certain actions on the BLOCKv platform.
 
 
 #### Connection
 A connection to the Web socket should be established before invoking any of the listeners on the socket.
 ```javascript
-bv.Websockets.connect().then(()=>{
+bv.WebSockets.connect().then(()=>{
 		//Do something with the connected sockets
 }).catch(err => {
 		console.error(err.message);
@@ -389,7 +389,7 @@ There are four different event listeners you can monitor:
 | all							| All of the above together																							|
 
 ```javascript
-bv.Websockets.connect().then(()=>{
+bv.WebSockets.connect().then(()=>{
  
   //adding a listener for state Updates
   bv.WebSockets.addEventListener('stateUpdate', function(data){
@@ -421,13 +421,52 @@ bv.Websockets.connect().then(()=>{
 The caller can manually force a socket connection to close by using the close() function. This will prevent the Web socket from trying to auto-connect.
 
 ```javascript
-bv.Websockets.close();
+bv.WebSockets.close();
 ```
 
 ## Activity
 
+### Threads
+Fetch the activity threads of the current user.
 
+Each thread represents an activity feed between two users. The BLOCKv platform will automatically create and update threads when sending or receiving a vAtom.
 
+```javascript
+//returns a list of threads
+bv.Activity.threads().then(data => {
+		//do something with the returned threads
+}).catch(err => {
+		console.error(err.message);
+})
+```
+
+### Thread Messages
+Fetch the event messages for an activity thread belonging to the current user.
+
+To get the id required to specify the activity thread see Threads function above.
+
+```javascript
+//Fetches a list of messages from the specified activity thread.
+let id = 'id-of-thread'
+bv.Activity.threadMessages(id).then(data => {
+	//do something with the returned activity thread
+}).catch(err => {
+		console.error(err.message)
+})
+```
+### Send message
+
+Send a text message to a user on the BLOCKv platform. This will create a new activity thread or update the existing one between the two users.
+
+```javascript
+//send a message to a user on the BLOCKv platform
+let id = "id-of-the-user-to-send-to"
+bv.Activity.sendMessage(id).then(data =>{
+	//do something with the returned message here
+}).catch(err => {
+		console.error(err.message);
+})
+```
 ## Security Disclosure
 
 If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.
