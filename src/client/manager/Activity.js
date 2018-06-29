@@ -10,9 +10,9 @@
 //
 
 
-export default class Chat{
-  constructor(chatApi){
-    this.chatApi = chatApi
+export default class Activity{
+  constructor(activityApi){
+    this.activityApi = activityApi
   }
 
   /**
@@ -20,7 +20,7 @@ export default class Chat{
    * @return {Promise<Object>} JSON array containing all the activity from the user.
    */
   myThreads(){
-    return this.chatApi.myThreads();
+    return this.activityApi.threads();
   }
 
   /**
@@ -29,18 +29,17 @@ export default class Chat{
    * @return {Promise<Object>}  returns a detailed object containing the thread specified from the name
    */
   myThreadMessages(name){
-    return this.chatApi.myThreadMessages(name);
+    return this.activityApi.threadMessages(name);
   }
 
   /**
   * Send a message to a user that appears in the "activity" tab
-  * @param  {String} token      Phone number or email or id of the user that is going to receive the message
-  * @param  {String} token_type phone_number / email / id
+  * @param  {String} id      id of the user that is going to receive the message
   * @param  {String} message    Message that will get sent to the user
   * @return {Promise<Object>}   Success Object
   */
-  sendMessage(token, token_type, message){
-    return this.chatApi.sendMessage(token, token_type, message);
+  sendMessage(id, message){
+    return this.activityApi.sendMessage(id, message);
   }
 
 
