@@ -20,7 +20,7 @@ export default class Activity{
    * @return {Promise<Object>} JSON array containing all the activity from the user.
    */
   myThreads(){
-    return this.activityApi.myThreads();
+    return this.activityApi.threads();
   }
 
   /**
@@ -29,7 +29,7 @@ export default class Activity{
    * @return {Promise<Object>}  returns a detailed object containing the thread specified from the name
    */
   myThreadMessages(name){
-    return this.activityApi.myThreadMessages(name);
+    return this.activityApi.threadMessages(name);
   }
 
   /**
