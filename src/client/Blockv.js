@@ -13,8 +13,8 @@ import UserManager from './manager/UserManager'
 import UserApi from '../internal/net/rest/api/UserApi'
 import VatomApi from '../internal/net/rest/api/VatomApi'
 import Vatoms from './manager/Vatoms'
-import Chat from './manager/Chat'
-import ChatApi from '../internal/net/rest/api/ChatApi'
+import Activity from './manager/Activity'
+import ActivityApi from '../internal/net/rest/api/ActivityApi'
 import Client from '../internal/net/Client'
 import WebSockets from './manager/WebSockets'
 
@@ -36,9 +36,9 @@ class Blockv {
 
       let userApi = new UserApi(this.client, this.store);
       let vatomApi = new VatomApi(this.client);
-      let chatApi = new ChatApi(this.client);
+      let activityApi = new ActivityApi(this.client);
 
-      this.Chat = new Chat(chatApi);
+      this.Activity = new Activity(activityApi);
       this.WebSockets = new WebSockets(this.store, this.client);
       this.UserManager = new UserManager(userApi,this.store);
       this.Vatoms = new Vatoms(vatomApi);

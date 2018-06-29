@@ -26,6 +26,7 @@ export default class WebSockets extends EventEmitter{
 
   /**
    * The connect function establishes a connection the Web socket.
+   * @public
    * @return {Promise<WebSocket>}
    */
   connect() {
@@ -52,6 +53,7 @@ export default class WebSockets extends EventEmitter{
 
   /**
    * The handleMessage function allows the different types of messages to be returned: stateUpdate, inventory, activity, and, info.
+   * @private
    * @param  {JSON<Object>} e A JSON Object that is passed into the function automatically from connect()
    * @return {JSON<Object>}  A JSON Object is returned containing the list of chosen message types
    */
@@ -82,6 +84,7 @@ export default class WebSockets extends EventEmitter{
 
   /**
    * Lets the User know that the connection is connected
+   * @private
    * @param  {Event<SocketStatus>} e no need for inputting the parameter
    * @return {Function<connected>} triggers the connected function
    */
@@ -94,6 +97,7 @@ export default class WebSockets extends EventEmitter{
 
   /**
    * When the connection drops or the Websocket is closed, this function will auto-retry connection until successfully connected
+   * @private
    * @return {Promise<WebSockets>} returns the connection function
    */
   retryConnection(){
@@ -112,6 +116,7 @@ export default class WebSockets extends EventEmitter{
 
   /**
    * Handles the Web socket close event
+   * @private
    * @param  {Event} e no need for inputting, It is a Websocket Event
    */
   handleClose(e){
@@ -121,6 +126,7 @@ export default class WebSockets extends EventEmitter{
   }
 
   /**
+   * @public
    * Forcefully closes the Web socket.
      Note: Socket will be set to null. Auto connect will be disabled.
    */

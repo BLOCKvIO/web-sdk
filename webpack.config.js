@@ -54,5 +54,5 @@ module.exports.node = {
         net: 'empty',
         tls: 'empty'
     };
-    
+
 module.exports.plugins.push(new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}));

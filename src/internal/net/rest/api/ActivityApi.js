@@ -9,17 +9,17 @@
 //  governing permissions and limitations under the License.
 
 
-export default class ChatApi{
+export default class ActivityApi{
 
   constructor(client){
     this.client = client
   }
 
-  myThreads(){
+  threads(){
       return this.client.request('POST', '/v1/activity/mythreads', {}, true).then(data => data.threads);
   }
 
-  myThreadMessages(name){
+  threadMessages(name){
     let payload = {
       "name": name,
       "cursor": "",
@@ -29,10 +29,10 @@ export default class ChatApi{
 
   }
 
-  sendMessage(token, token_type, message){
+  sendMessage(id, message){
     let payload = {
         "message": message,
-        token_type : token
+        "id" : id
       }
     return this.client.request('POST', '/v1/user/message', payload, true).then(data => data);
   }
