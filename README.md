@@ -38,18 +38,7 @@ import Blockv from '@blockv/sdk'
 
 ## Getting Started
 
-Before running any of the web APIs you need to initialise the BLOCKv application, So by putting the following code in your opening script tag.
-
-The SDK supports multiple instances of `Blockv` to be initialised.
-
-
-*IMPORTANT NOTE:*
-
-The prefix attribute is critical if you are using multiple instances with the same appID.
-
- Leaving the prefix out will force the sdk to use the appID as the prefix for any stored data, Using multiple instance with the same appID and the prefix omitted will result in data override.
-
- It is recommended that in the case of multiple instances, You use a prefix so that each instance is unique and utilizes its own unique store.
+Before running any of the web APIs you need to initialise the BLOCKv application. Place the following code in your opening script tag.
 
 ```javascript
 let bv = new Blockv({
@@ -60,7 +49,15 @@ let bv = new Blockv({
     });
 ```
 
-The prefix attribute in the initialization of the BLOCKv SDK is optional, Left out, This will default to the appID attribute.  
+The SDK supports multiple instances of `Blockv` to be initialised.
+
+
+*IMPORTANT NOTE:*
+
+The prefix attribute is critical if you are using multiple instances with the same appID.
+
+Leaving the prefix out will force the sdk to use the appID as the prefix for any stored data, Using multiple instance with the same appID and the prefix omitted will result in data override.
+
 
 ## UserManager
 
