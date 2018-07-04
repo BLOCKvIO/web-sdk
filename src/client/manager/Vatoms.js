@@ -10,9 +10,9 @@
 //
 
 
-class Vatoms{
-  constructor(vatomApi){
-    this.vatomApi = vatomApi
+class Vatoms {
+  constructor(vatomApi) {
+    this.vatomApi = vatomApi;
   }
 
 
@@ -22,10 +22,9 @@ class Vatoms{
    * @return {[Promise<Object>]} returns a object containing a list of available actions
    */
 
-  getActions(templateID){
-    return this.vatomApi.getActions(templateID)
+  getActions(templateID) {
+    return this.vatomApi.getActions(templateID);
   }
-
 
   /**
    * [performAction description]
@@ -35,15 +34,11 @@ class Vatoms{
    * @return {Promise<Object>}   json payload nested
    */
 
-
-
-  performAction(vatomId, action, payload){
-
-    //check that payload is set
-    payload = payload || {}
-    //assigns this.id
-    payload["this.id"] = vatomId;
-
+  performAction(vatomId, action, payload) {
+    // check that payload is set
+    const pload = payload || {};
+    // assigns this.id
+    pload['this.id'] = vatomId;
     return this.vatomApi.performAction(action, payload);
   }
 
@@ -53,16 +48,14 @@ class Vatoms{
    * No parameters are required for this call
    */
 
-  getUserInventory(){
-    let payload = {
-      "parent_id": ".",
-      "page": 1,
-      "limit": 1000
-    }
+  getUserInventory() {
+    const payload = {
+      parent_id: '.',
+      page: 1,
+      limit: 1000,
+    };
 
-     return this.vatomApi.getUserInventory(payload);
-
-
+    return this.vatomApi.getUserInventory(payload);
   }
 
   /**
@@ -70,12 +63,11 @@ class Vatoms{
    * @param  {[String]} vatomId ID of the vAtom that is being searched for
    * @return {[Promise<Object>} returns a JSON Object containing the vAtom.
    */
-  getUserVatoms(vatomId){
-    let payload = {
-      "ids": vatomId
-    }
-
-    return this.vatomApi.getUserVatoms(payload)
+  getUserVatoms(vatomId) {
+    const payload = {
+      ids: vatomId,
+    };
+    return this.vatomApi.getUserVatoms(payload);
   }
 
   /**
@@ -85,50 +77,48 @@ class Vatoms{
    * @param  {[String]} filter     defaults to "all"
    * @return {[Promise<Object>}  returns a list of vAtoms, faces and actions
    */
-  geoDiscover(bottomLeft, topRight, filter){
-    filter = filter || "vatoms";
-    let payload = {
-        "bottom_left": {
-            "lat":bottomLeft.lat,
-            "lon": bottomLeft.lon
-        },
-        "top_right": {
-            "lat": topRight.lat,
-            "lon": topRight.lon
-        },
-        "filter": filter
-      }
+  geoDiscover(bottomLeft, topRight, filter) {
+    const fil = filter || 'vatoms';
+    const payload = {
+      bottom_left: {
+        lat: bottomLeft.lat,
+        lon: bottomLeft.lon,
+      },
+      top_right: {
+        lat: topRight.lat,
+        lon: topRight.lon,
+      },
+      filter: fil,
+    };
 
     return this.vatomApi.geoDiscover(payload);
   }
 
   /**
    * Discover groups of vAtoms with Keys
-   * @param  {Object} bottomLeft contains a lat and lon coordinate. Coordinate must be integers and not strings
-   * @param  {Object} topRight   contains a lat and lon coordinate. Coordinate must be integers and not strings
+   * @param  {Object} bottomLeft contains a lat and lon coordinate.
+   *                             Coordinate must be integers and not string
+   * @param  {Object} topRight   contains a lat and lon coordinate.
+   *                             Coordinate must be integers and not strings
    * @param  {Integer} precision  1 - 12 defines the accuracy of the combination.
    * @param  {String} filter     defaults to all
    * @return {Promise<Object>}   Returns a list of groups
    */
-  geoDiscoverGroups(bottomLeft, topRight, precision, filter){
-    filter = filter || "all";
-
-    let payload = {
-      "bottom_left" : {
-        "lat" : bottomLeft.lat,
-        "lon" : bottomLeft.lon
+  geoDiscoverGroups(bottomLeft, topRight, precision, filter = 'all') {
+    const payload = {
+      bottom_left: {
+        lat: bottomLeft.lat,
+        lon: bottomLeft.lon,
       },
-      "top_right" : {
-        "lat" : topRight.lat,
-        "lon" : topRight.lon
+      top_right: {
+        lat: topRight.lat,
+        lon: topRight.lon,
       },
-      "precision" : precision,
-      "filter" : filter
-    }
+      precision,
+      filter,
+    };
 
     return this.vatomApi.geoDiscoverGroups(payload);
-
-
   }
 
   /**
@@ -136,19 +126,9 @@ class Vatoms{
    * @param  {String} vatomID  Id of the vAtom you want to delete
    * @return {Promise<Object>} An object containing a success message
    */
-  deleteVatom(vatomID){
+  deleteVatom(vatomID) {
     return this.vatomApi.deleteVatom(vatomID);
   }
-
-
-
-
-
-
-
-
-
-
 }
 
 export default Vatoms;

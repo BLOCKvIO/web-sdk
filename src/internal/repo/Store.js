@@ -9,67 +9,91 @@
 //  governing permissions and limitations under the License.
 //
 export default class Store {
+  constructor(prefix) {
+    this.prefix = prefix;
+  }
 
-    constructor(prefix){
-      this.prefix = prefix
+  get server() {
+    return this.serverAddress;
+  }
+
+  set server(address) {
+    this.serverAddress = address;
+  }
+
+  set userID(userid) {
+    this.USERID = userid;
+  }
+
+  get userID() {
+    return this.USERID;
+  }
+
+  get appID() {
+    return this.APPID;
+  }
+
+  set appID(appid) {
+    this.APPID = appid;
+  }
+
+  get websocketAddress() {
+    return this.wssocketAddress;
+  }
+
+  set websocketAddress(websocAddress) {
+    this.wssocketAddress = websocAddress;
+  }
+
+  set token(token) {
+    this.accessToken = token;
+  }
+
+  get token() {
+    return this.accessToken;
+  }
+
+  set refreshToken(refresh) {
+    this.privateRefreshToken = refresh;
+    if (typeof localStorage !== 'undefined') {
+      // eslint-disable-next-line no-undef
+      localStorage.setItem(`${this.prefix}_refresh`, refresh);
     }
+  }
 
-     get server(){
-      return this.serverAddress // {{ SERVER }}
+  get refreshToken() {
+    if (this.privateRefreshToken) {
+      return this.privateRefreshToken;
     }
-
-     set server(address){
-      this.serverAddress = address;
+    if (typeof localStorage !== 'undefined') {
+      // eslint-disable-next-line no-undef
+      const rT = localStorage.getItem(`${this.prefix}_refresh`);
+      if (rT) {
+        return rT;
+      }
     }
-     set userID(userid){
-      this.USERID = userid;
+    return null;
+  }
+
+  set assetProvider(provider) {
+    this.privateAssetProvider = provider;
+    if (typeof localStorage !== 'undefined') {
+      // eslint-disable-next-line no-undef
+      localStorage.setItem(`${this.prefix}_asset_provider`, JSON.stringify(provider));
     }
-     get userID(){
-      return this.USERID;
+  }
+
+  get assetProvider() {
+    if (this.privateAssetProvider) {
+      return this.privateAssetProvider;
     }
-     get appID(){
-      return this.APPID //{{APPID}}
+    if (typeof localStorage !== 'undefined') {
+      // eslint-disable-next-line no-undef
+      const aP = JSON.parse(localStorage.getItem(`${this.prefix}_asset_provider`) || 'undefined');
+      if (aP) {
+        return aP;
+      }
     }
-     set appID(appid){
-      this.APPID = appid
-    }
-
-     get websocketAddress(){
-      return this.wssocketAddress
-    }
-
-     set websocketAddress(websocAddress){
-      this.wssocketAddress = websocAddress;
-    }
-
-     set token(token){
-      this.accessToken = token;
-    }
-
-     get token(){
-      return this.accessToken;
-    }
-
-     set refreshToken(refresh){
-       localStorage.setItem(this.prefix+'_refresh', refresh);
-    }
-
-     get refreshToken(){
-      let rT = localStorage.getItem(this.prefix+'_refresh');
-      return rT;
-    }
-
-     set assetProvider(provider){
-       localStorage.setItem(this.prefix+'_asset_provider', JSON.stringify(provider));
-    }
-
-     get assetProvider(){
-      let aP = JSON.parse(localStorage.getItem(this.prefix+'_asset_provider') || 'undefined');
-      return aP;
-    }
-
-
-
-
-
+    return null;
+  }
 }
