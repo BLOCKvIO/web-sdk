@@ -77,8 +77,7 @@ class Vatoms {
    * @param  {[String]} filter     defaults to "all"
    * @return {[Promise<Object>}  returns a list of vAtoms, faces and actions
    */
-  geoDiscover(bottomLeft, topRight, filter) {
-    const fil = filter || 'vatoms';
+  geoDiscover(bottomLeft, topRight, filter = 'vatoms') {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
@@ -88,7 +87,7 @@ class Vatoms {
         lat: topRight.lat,
         lon: topRight.lon,
       },
-      filter: fil,
+      filter,
     };
 
     return this.vatomApi.geoDiscover(payload);
@@ -104,7 +103,7 @@ class Vatoms {
    * @param  {String} filter     defaults to all
    * @return {Promise<Object>}   Returns a list of groups
    */
-  geoDiscoverGroups(bottomLeft, topRight, precision, filter = 'all') {
+  geoDiscoverGroups(bottomLeft, topRight, precision = 2, filter = 'all') {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
