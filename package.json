@@ -5,8 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "build-lib": "babel src -d lib",
-    "test": "npm run build",
+    "test": "npm run build && npm run jest --detectOpenHandles",
     "mocha": "mocha",
+    "jest": "jest",
     "build": "concurrently \"npm run build-min\" \"npm run build-lib\"",
     "build-min": "webpack -p",
     "watch": "webpack --watch",
@@ -58,9 +59,12 @@
     "expect.js": "^0.3.1",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
-    "mocha": "^5.2.0",
     "popsicle": "^10.0.1",
-    "url-parse": "^1.4.1"
+    "url-parse": "^1.4.1",
+    "dotenv": "^6.0.0"
   },
-  "repository": "github:BLOCKvIO/web-sdk"
+  "repository": "github:BLOCKvIO/web-sdk",
+  "jest": {
+    "bail": true
+  }
 }
