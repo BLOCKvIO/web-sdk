@@ -1,4 +1,4 @@
-# BLOCKv SDK for JavaScript
+# BLOCKv SDK for JavaScript (Beta)
 
 This is the official BLOCKv Web SDK. It allows you to easily integrate your own web apps into the BLOCKv Platform.
 
@@ -464,6 +464,12 @@ bv.Activity.sendMessage(id).then(data =>{
 		console.error(err.message);
 })
 ```
+
+## Production Support
+
+The BLOCKv SDK for JavaScript is currently in public **beta**. Breaking changes may still be introduced in the coming months.  This is *important* to consider if you are planning on releasing your application using the JavaScript SDK.
+
+
 ## Security Disclosure
 
 If you believe you have identified a security vulnerability with BLOCKv, you should report it as soon as possible via email to support@blockv.io. Please do not post it to a public issue tracker.
