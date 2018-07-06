@@ -8,24 +8,22 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-export default class LoginRequest{
+export default class LoginRequest {
+  constructor(
+    tokenType,
+    token,
+    password,
+  ) {
+    this.token_type = tokenType;
+    this.token = token;
+    this.auth_data = { password };
+  }
 
-  constructor(tokenType,
-                token,
-                password) {
-        this.token_type = tokenType;
-        this.token = token;
-        this.auth_data = {password:password};
-    }
+  get tokenType() {
+    return this.token_type;
+  }
 
-    get tokenType() {
-        return this.token_type;
-    }
-
-    set tokenType(tokenType) {
-        this.token_type = tokenType;
-    }
-
-
-
+  set tokenType(tokenType) {
+    this.token_type = tokenType;
+  }
 }

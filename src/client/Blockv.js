@@ -8,15 +8,15 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import Store from '../internal/repo/Store'
-import UserManager from './manager/UserManager'
-import UserApi from '../internal/net/rest/api/UserApi'
-import VatomApi from '../internal/net/rest/api/VatomApi'
-import Vatoms from './manager/Vatoms'
-import Activity from './manager/Activity'
-import ActivityApi from '../internal/net/rest/api/ActivityApi'
-import Client from '../internal/net/Client'
-import WebSockets from './manager/WebSockets'
+import Store from '../internal/repo/Store';
+import UserManager from './manager/UserManager';
+import UserApi from '../internal/net/rest/api/UserApi';
+import VatomApi from '../internal/net/rest/api/VatomApi';
+import Vatoms from './manager/Vatoms';
+import Activity from './manager/Activity';
+import ActivityApi from '../internal/net/rest/api/ActivityApi';
+import Client from '../internal/net/Client';
+import WebSockets from './manager/WebSockets';
 
 
 /**
@@ -24,28 +24,24 @@ import WebSockets from './manager/WebSockets'
  */
 
 class Blockv {
+  constructor(payload) {
+    const prefix = payload.prefix || payload.appID;
+    this.store = new Store(prefix);
+    this.store.appID = payload.appID;
+    this.store.server = payload.server || 'https://api.blockv.io';
+    this.store.websocketAddress = payload.websocketAddress || 'wss://ws.blockv.io';
+    this.client = new Client(this.store);
 
-  constructor(payload){
-      let prefix = payload.prefix || payload.appID;
-      this.store = new Store(prefix);
-      this.store.appID = payload.appID;
-      this.store.server = payload.server || "https://api.blockv.io";
-      this.store.websocketAddress = payload.websocketAddress || "wss://ws.blockv.io";
-      this.client = new Client(this.store);
 
+    const userApi = new UserApi(this.client, this.store);
+    const vatomApi = new VatomApi(this.client);
+    const activityApi = new ActivityApi(this.client);
 
-      let userApi = new UserApi(this.client, this.store);
-      let vatomApi = new VatomApi(this.client);
-      let activityApi = new ActivityApi(this.client);
-
-      this.Activity = new Activity(activityApi);
-      this.WebSockets = new WebSockets(this.store, this.client);
-      this.UserManager = new UserManager(userApi,this.store);
-      this.Vatoms = new Vatoms(vatomApi);
-
+    this.Activity = new Activity(activityApi);
+    this.WebSockets = new WebSockets(this.store, this.client);
+    this.UserManager = new UserManager(userApi, this.store);
+    this.Vatoms = new Vatoms(vatomApi);
   }
-
-
 }
 
 export default Blockv;

@@ -8,180 +8,154 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import {request, plugins as popsicle_plugins} from 'popsicle'
-import jwt_decode from 'jwt-decode'
-import BaseResponse from './rest/response/BaseResponse'
+import { request, plugins as popsiclePlugins } from 'popsicle';
+import jwtDecode from 'jwt-decode';
+import BaseResponse from './rest/response/BaseResponse';
 
- class Client{
+class Client {
+  constructor(store) {
+    this.store = store;
+  }
 
-   constructor(store){
-     this.store = store
-   }
-
-
-
-   request(method, endpoint, payload, auth, headers){
-     if(auth === true){
-        return this.checkToken().then(e => this._request(method, endpoint, payload, headers));
-     }else{
-       return this._request(method, endpoint, payload, headers);
-     }
-
-   }
+  request(method, endpoint, payload, auth, headers) {
+    if (auth) {
+      return this.checkToken().then(() => this.authRequest(method, endpoint, payload, headers));
+      // eslint-disable-next-line no-else-return
+    } else {
+      return this.authRequest(method, endpoint, payload, headers);
+    }
+  }
 
 
-   _request(method, endpoint, payload, headers) {
-
-
-     headers = Object.assign({
-       'App-Id': this.store.appID,
-       'Authorization' : 'Bearer ' + this.store.token,
-       'Content-Type' : 'application/json'
-     }, headers)
-
-
+  authRequest(method, endpoint, payload, headers) {
+    const header = Object.assign({
+      'App-Id': this.store.appID,
+      Authorization: `Bearer ${this.store.token}`,
+      'Content-Type': 'application/json',
+    }, headers);
 
     return request({
-       method: method,
-       url: this.store.server + endpoint,
-       body: payload,
-       headers: headers
+      method,
+      url: this.store.server + endpoint,
+      body: payload,
+      headers: header,
 
-     }).use(popsicle_plugins.parse('json'))
-     .then(function (res) {
-       var response = Object.assign(new BaseResponse(), res.body)
-       response.httpStatus = res.status
-       return response
-     }).then(response=>{
+    }).use(popsiclePlugins.parse('json'))
+      .then((res) => {
+        const response = Object.assign(new BaseResponse(), res.body);
+        response.httpStatus = res.status;
+        return response;
+      }).then((response) => {
+        // Check for server error
+        if (!response.payload) {
+          const ErrorCodes = {
+            2: 'Blank App ID',
+            11: 'Problem with payload',
+            17: 'invalid App ID',
+            401: 'Token has Expired',
+            516: 'Invalid Payload',
+            517: 'Invalid Payload',
+            521: 'Token Unavailable',
+            527: 'Invalid Date Format',
+            1004: 'Invalid Request Payload',
+            1701: 'vAtom Unrecognized',
+            2030: 'No user found, Please register an account first.',
+            2031: 'Authentication Failed',
+            2032: 'Login Failed, Please try again',
+            2034: 'Invalid Token',
+            2037: 'Upload Avatar Failed',
+            2049: 'Refresh Token Expired / Not Whitelisted',
+            2051: 'Too many login attempts, Please try again later.',
+            2552: 'Unable To Retrieve Token',
+            2553: 'Token ID Invalid',
+            2562: 'Cannot Delete Primary Token',
+            2563: 'Token Already Confirmed',
+            2564: 'Invalid Verification Code',
+            2566: 'Token Already Confirmed',
+            2567: 'Invalid Verification Code',
+            2569: 'Invalid Token Type',
+            2571: 'Invalid Email',
+            2572: 'Invalid Phone Number',
+          };
 
-     // Check for server error
-     if (!response.payload) {
+          if (response.error === 2051) {
+            // Check for the special login locked error
+            // We need to pull the timestamp that is in the reponse.message to show when they
+            // can login agin
 
-       const ErrorCodes = {
-         2 : 'Blank App ID',
-         11 : 'Problem with payload',
-         17 : 'invalid App ID',
-         401: 'Token has Expired',
-         516: 'Invalid Payload',
-         517: 'Invalid Payload',
-         521: 'Token Unavailable',
-         527: 'Invalid Date Format',
-         1004: 'Invalid Request Payload',
-         1701: 'vAtom Unrecognized',
-         2030: 'No user found, Please register an account first.',
-         2031: 'Authentication Failed',
-         2032 : 'Login Failed, Please try again',
-         2034: 'Invalid Token',
-         2037: 'Upload Avatar Failed',
-         2049: 'Refresh Token Expired / Not Whitelisted',
-         2051 : 'Too many login attempts, Please try again later.',
-         2552: 'Unable To Retrieve Token',
-         2553: 'Token ID Invalid',
-         2562: 'Cannot Delete Primary Token',
-         2563: 'Token Already Confirmed',
-         2564: 'Invalid Verification Code',
-         2566: 'Token Already Confirmed',
-         2567: 'Invalid Verification Code',
-         2569: 'Invalid Token Type',
-         2571: 'Invalid Email',
-         2572: 'Invalid Phone Number'
-       }
+            // HACK: Pull time from original server error string
+            const dateString = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g.exec(response.message);
+            response.lockedUntil = new Date(dateString);
 
+            // Replace duration in the error message
+            let duration = response.lockedUntil.getTime() - Date.now();
+            if (duration < 2000) duration = 2000;
+            const seconds = Math.floor(duration / 1000);
+            const minutes = Math.floor(duration / 1000 / 60);
+            if (seconds <= 90) {
+              response.error = response.message.replace('%DURATION%', seconds === 1 ? '1 second' : `${seconds}  seconds`);
+            } else {
+              response.message = response.message.replace('%DURATION%', minutes === 1 ? '1 minute' : `${minutes} minutes`);
+            }
+            // Rethrow error
+            const error = new Error(`Too many login attempts, Try again at : ${response.lockedUntil}`);
+            error.code = response.error || 0;
+            throw error;
+          } else {
+            const error = new Error(ErrorCodes[response.error] || 'An unknown server error occurred.');
+            error.code = response.error || response.httpStatus || 0;
+            error.httpStatus = response.httpStatus;
+            throw error;
+          }
+        }
 
-       if(response.error === 2051){
-         // Check for the special login locked error
-         // We need to pull the timestamp that is in the reponse.message to show when they
-         // can login agin
+        // No error, continue
+        return response.payload;
+      });
+  }
 
-
-          // HACK: Pull time from original server error string
-          var dateString = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g.exec(response.message)
-          response.lockedUntil = new Date(dateString)
-
-          // Replace duration in the error message
-          var duration = response.lockedUntil.getTime() - Date.now()
-          if (duration < 2000) duration = 2000
-          var seconds = Math.floor(duration / 1000)
-          var minutes = Math.floor(duration / 1000 / 60)
-          if (seconds <= 90)
-              response.error = response.message.replace("%DURATION%", seconds == 1 ? "1 second" : seconds + " seconds")
-          else
-              response.message = response.message.replace("%DURATION%", minutes == 1 ? "1 minute" : minutes + " minutes")
-
-          // Rethrow error
-          var error = new Error("Too many login attempts, Try again at : " + response.lockedUntil)
-          error.code = response.error || 0
-          throw error
-
-
-       }else{
-
-         var error = new Error(ErrorCodes[response.error] || "An unknown server error occurred.")
-         error.code = response.error || response.httpStatus || 0
-         error.httpStatus = response.httpStatus
-         throw error
-       }
-
-
-
-     }
-
-     // No error, continue
-     return response.payload
-
-
-
-   });
-
- }
-
- /**
+  /**
   * Refresh's the users access token
   * @return JSON save the token with the bearer.
   */
- refreshToken() {
+  refreshToken() {
+    const options = {
+      Authorization: `Bearer ${this.store.refreshToken}`,
+    };
+    return this.request('POST', '/v1/access_token', '', false, options).then((data) => {
+      this.store.token = data.access_token.token;
+    });
+  }
 
-     let options = {
-         'Authorization' : 'Bearer '+this.store.refreshToken
-       }
-     return this.request('POST', '/v1/access_token', '', false,  options).then(data => {
+  checkToken() {
+    // define our vars
+    let decodedToken;
+    let nowDate;
+    let expirationTime;
+    const { token } = this.store;
 
-       this.store.token = data.access_token.token;
-     })
+    if (token === 'undefined' || token === '') {
+      this.refreshToken();
+      return false;
+      // eslint-disable-next-line no-else-return
+    } else {
+      try {
+        decodedToken = jwtDecode(this.store.token);
+        expirationTime = (decodedToken.exp * 1000);
+        nowDate = Date.now();
 
-   }
-
-   checkToken(valid = false) {
-
-     //define our vars
-     let decodedToken, nowDate, expirationTime, token;
-     token = this.store.token;
-
-     if(token == 'undefined' || token == ''){
-       this.refreshToken();
-     }else{
-       try{
-         decodedToken = jwt_decode(this.store.token);
-         expirationTime = (decodedToken.exp * 1000);
-         nowDate = Date.now();
-
-         //quick calc to determine if the token has expired
-         if ((nowDate - 30000) > expirationTime)
-         return this.refreshToken();
-         else
-            return Promise.resolve(true)
-       }catch(e){
-         return this.refreshToken();
-       }
-
-
-     }
-
-
-   }
-
-
-
-
+        // quick calc to determine if the token has expired
+        if ((nowDate - 30000) > expirationTime) {
+          return this.refreshToken();
+          // eslint-disable-next-line no-else-return
+        } else {
+          return Promise.resolve(true);
+        }
+      } catch (e) {
+        return this.refreshToken();
+      }
+    }
+  }
 }
-export default Client
+
+export default Client;

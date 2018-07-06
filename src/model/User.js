@@ -8,20 +8,13 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-export default class User{
-
-  constructor(userData){
-      this.id = userData.user.id;
-      this.firstName = userData.user.properties.first_name;
-      this.lastName = userData.user.properties.last_name;
-      this.avatarUri = userData.user.properties.avatar_uri;
-      this.birthday = userData.user.properties.birthday;
-      this.language = userData.user.properties.language;
-
-
-
+export default class User {
+  constructor(userData) {
+    this.id = userData.user.id;
+    this.firstName = userData.user.properties.first_name;
+    this.lastName = userData.user.properties.last_name;
+    this.avatarUri = userData.user.properties.avatar_uri;
+    this.birthday = userData.user.properties.birthday;
+    this.language = userData.user.properties.language;
   }
-
-
-
 }
