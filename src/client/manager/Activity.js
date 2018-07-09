@@ -10,25 +10,25 @@
 //
 
 
-export default class Activity{
-  constructor(activityApi){
-    this.activityApi = activityApi
+export default class Activity {
+  constructor(activityApi) {
+    this.activityApi = activityApi;
   }
 
   /**
    * Returns a list of messages of activity
    * @return {Promise<Object>} JSON array containing all the activity from the user.
    */
-  myThreads(){
+  myThreads() {
     return this.activityApi.threads();
   }
 
   /**
    * Returns a single activity message thread
    * @param  {String} name Unique identifier from the myThreads response
-   * @return {Promise<Object>}  returns a detailed object containing the thread specified from the name
+   * @return {Promise<Object>}  returns a detailed object containing the thread
    */
-  myThreadMessages(name){
+  myThreadMessages(name) {
     return this.activityApi.threadMessages(name);
   }
 
@@ -38,10 +38,7 @@ export default class Activity{
   * @param  {String} message    Message that will get sent to the user
   * @return {Promise<Object>}   Success Object
   */
-  sendMessage(id, message){
+  sendMessage(id, message) {
     return this.activityApi.sendMessage(id, message);
   }
-
-
-
 }

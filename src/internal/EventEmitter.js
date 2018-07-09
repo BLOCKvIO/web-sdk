@@ -10,140 +10,124 @@
 //
 
 
-
 //
-// EventEmitter class - This class provides simple event functionality for classes, with Promise support.
+// EventEmitter class
+// This class provides simple event functionality for classes, with Promise support.
+// Usage for once-off event listeners:
+//    myObj.when("closed").then(function(data) {
+//       alert("Closed! " + data);
+//    });
 //
-//	Usage for once-off event listeners:
+// Usage for permanent event listeners:
+//    myObj.on("closed", function(data) {
+//      alert("Closed! " + data);
+//    });
 //
-//		myObj.when("closed").then(function(data) {
-//			alert("Closed! " + data);
-//		});
-//
-//
-//	Usage for permanent event listeners:
-//
-//		myObj.on("closed", function(data) {
-//			alert("Closed! " + data);
-//		});
-//
-//
-//	Usage when triggering an event from a subclass:
-//
-//		this.emit("closed", "customData");
-//
+// Usage when triggering an event from a subclass:
+//    this.emit("closed", "customData");
 
 export default class EventEmitter {
+  /**
+   * Adds an event listener. If callback is null, a Promise will be returned.
+   * Note that if using the Promise
+   * it will only be triggered on the first event emitted. */
 
+  when(eventName, callback = null) {
+    // Make sure event listener object exists
+    this.privateEventListeners = this.privateEventListeners || {};
 
-	/** Adds an event listener. If callback is null, a Promise will be returned. Note that if using the Promise
-	 *  it will only be triggered on the first event emitted. */
-	when(eventName, callback = null) {
+    // Make sure event listener array exists
+    this.privateEventListeners[eventName] = this.privateEventListeners[eventName] || [];
 
-		// Make sure event listener object exists
-		this._eventListeners = this._eventListeners || {};
-
-		// Make sure event listener array exists
-		this._eventListeners[eventName] = this._eventListeners[eventName] || [];
-
-		// Check if using promise form
-		if (callback) {
-
-			// Just add the callback
-			this._eventListeners[eventName].push(callback);
-
-		} else {
-
-			// Return the promise
-			return new Promise((onSuccess, onFail) => {
-
-				// Promise callbacks can only be used once
-				onSuccess._removeAfterCall = true;
-
-				// Add success handler to event listener array
-				this._eventListeners[eventName].push(onSuccess);
-
-			});
-
-		}
-
-	}
-
-	/** Synonyms */
-	on() {
-		return this.when.apply(this, arguments);
-	}
-
-	addEventListener() {
-		return this.when.apply(this, arguments);
-	}
-
-
-
-    /** Remove event listener */
-    removeEventListener(eventName, callback) {
-
-		// Make sure event listener object exists
-		this._eventListeners = this._eventListeners || {};
-
-		// Make sure event listener array exists
-		this._eventListeners[eventName] = this._eventListeners[eventName] || [];
-
-        // Find and remove it
-        for (var i = 0 ; i < this._eventListeners[eventName] ; i++)
-            if (this._eventListeners[eventName][i] == callback)
-                this._eventListeners[eventName].splice(i--, 1)
-
+    // Check if using promise form
+    if (callback) {
+    // Just add the callback
+      this.privateEventListeners[eventName].push(callback);
+      return null;
     }
+    // Return the promise
+    return new Promise((onSuccess) => {
+      // Promise callbacks can only be used once
+      // eslint-disable-next-line no-param-reassign
+      onSuccess.removeAfterCall = true;
 
-    off() {
-        return this.removeEventListener.apply(this, arguments);
+      // Add success handler to event listener array
+      this.privateEventListeners[eventName].push(onSuccess);
+    });
+  }
+
+  /** Synonyms */
+  on(...args) {
+    return this.when(...args);
+  }
+
+  addEventListener(...args) {
+    return this.when(...args);
+  }
+
+  /** Remove event listener */
+  removeEventListener(eventName, callback) {
+  // Make sure event listener object exists
+    this.privateEventListeners = this.privateEventListeners || {};
+
+    // Make sure event listener array exists
+    this.privateEventListeners[eventName] = this.privateEventListeners[eventName] || [];
+
+    // Find and remove it
+    for (let i = 0; i < this.privateEventListeners[eventName]; i += 1) {
+      if (this.privateEventListeners[eventName][i] === callback) {
+        this.privateEventListeners[eventName].splice(i, 1);
+        i -= 1;
+      }
     }
+  }
+
+  off(...args) {
+    return this.removeEventListener(...args);
+  }
 
 
+  /** Triggers an event. Each argument after the first one will be passed to event listeners */
+  emit(eventName, ...args) {
+    // Setup the once-off promise if one of it's events were triggered
+    // if (eventName == "success" || eventName == "failed")
+    // this._setupPromise();
 
+    // Get list of callbacks
+    const callbacks = (this.privateEventListeners && this.privateEventListeners[eventName]) || [];
 
-	/** Triggers an event. Each argument after the first one will be passed to event listeners */
-	emit(eventName, ...args) {
+    // Call events
+    callbacks.forEach((callback) => {
+      callback(...args);
+    });
 
-		// Setup the once-off promise if one of it's events were triggered
-		//if (eventName == "success" || eventName == "failed")
-		//	this._setupPromise();
+    // Remove callbacks that can only be called once
+    for (let i = 0; i < callbacks.length; i += 1) {
+      if (callbacks[i].removeAfterCall) {
+        callbacks.splice(i, 1);
+        i -= 1;
+      }
+    }
+  }
 
-		// Get list of callbacks
-		var callbacks = this._eventListeners && this._eventListeners[eventName] || [];
+  /** Synonyms */
+  trigger(...args) {
+    return this.emit(...args);
+  }
 
-		// Call events
-		for (var callback of callbacks) {
-
-			// Call it
-			callback.apply(this, args);
-
-		}
-
-		// Remove callbacks that can only be called once
-		for (var i = 0 ; i < callbacks.length ; i++)
-			if (callbacks[i]._removeAfterCall)
-				callbacks.splice(i--, 1);
-
-	}
-
-	/** Synonyms */
-	trigger() {
-		return this.emit.apply(this, arguments);
-	}
-
-	triggerEvent() {
-		return this.emit.apply(this, arguments);
-	}
-
+  triggerEvent(...args) {
+    return this.emit(...args);
+  }
 }
 
 // Apply as a mixin to a class or object
-EventEmitter.mixin = function(otherClass) {
-
-	for (var prop in EventEmitter.prototype)
-		if (EventEmitter.prototype.hasOwnProperty(prop))
-			otherClass[prop] = EventEmitter.prototype[prop];
-
-}
+EventEmitter.mixin = function eventEmitterMixin(otherClass) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const prop in EventEmitter.prototype) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (EventEmitter.prototype.hasOwnProperty(prop)) {
+      // eslint-disable-next-line no-param-reassign
+      otherClass[prop] = EventEmitter.prototype[prop];
+    }
+  }
+};
