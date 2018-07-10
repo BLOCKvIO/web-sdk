@@ -121,12 +121,12 @@ class Vatoms {
   }
 
   /**
-   * Deletes a vatom from your inventory
-   * @param  {String} vatomID  Id of the vAtom you want to delete
+   * Removes a vatom from your inventory
+   * @param  {String} vatomID  Id of the vAtom you want to remove
    * @return {Promise<Object>} An object containing a success message
    */
-  deleteVatom(vatomID) {
-    return this.vatomApi.deleteVatom(vatomID);
+  trashVatom(vatomID) {
+    return this.vatomApi.trashVatom(vatomID);
   }
 }
 
