@@ -121,7 +121,7 @@ class Vatoms {
   }
 
   /**
-   * Removes a vatom from your inventory
+   * Removes the specified vAtom from the current user's inventory
    * @param  {String} vatomID  Id of the vAtom you want to remove
    * @return {Promise<Object>} An object containing a success message
    */
