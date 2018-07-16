@@ -298,11 +298,14 @@ bv.Vatoms.performAction(vatomId, action, payload).then(data =>{
 
 ## vAtom Inventory
 
-Retrieves a list of the current vAtoms in the users inventory
+Retrieves a list of the current vAtoms, actions and faces in the users inventory
 
 ```javascript
 bv.Vatoms.getUserInventory().then(data =>{
-  //do something with the returned inventory
+  // do something with the returned inventory
+  // data.vatoms (array of vatoms)
+  // data.faces (array of faces)
+  // data.actions (array of actions)
 }).catch(err => {
   console.error(err.message);
 })

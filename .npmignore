@@ -1,2 +1,6 @@
 node_modules
+example-app
+test
 unittests
+.env
+
