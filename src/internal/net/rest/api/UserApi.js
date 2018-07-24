@@ -223,19 +223,13 @@ export default class UserApi {
 
   encodeAssetProvider(url) {
     const aP = this.store.assetProvider;
-    console.log(aP);
     const aPlen = aP.length;
-    console.log(aPlen);
     const compare = urlParse(url);
-    console.log(compare);
     for (let i = 0; i < aPlen; i += 1) {
       const comparethis = urlParse(aP[i].uri);
-      console.log(comparethis);
       if (compare.hostname === comparethis.hostname) {
-        console.log(UserApi.mapString(aP[i].descriptor));
         // same uri so get the policy signature and key and append
         const queryString = UserApi.mapString(aP[i].descriptor);
-        console.log(queryString);
         return `${url}?${queryString}`;
       }
     }
