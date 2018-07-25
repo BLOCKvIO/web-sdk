@@ -1,8 +1,8 @@
 node_modules
 test
-.env
 unittests
+.env
 dist
-example-app
+sample-app
 .DS_Store
 lib

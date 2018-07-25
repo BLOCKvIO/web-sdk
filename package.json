@@ -1,6 +1,6 @@
 {
   "name": "@blockv/sdk",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Allows web apps to display and interact with vatoms.",
   "main": "lib/index.js",
   "scripts": {
