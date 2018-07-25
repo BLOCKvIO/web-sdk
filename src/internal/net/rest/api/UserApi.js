@@ -131,7 +131,7 @@ export default class UserApi {
 
   getCurrentUser(payload) {
   // get the current authenticated in user
-    return this.client.request('GET', '/v1/user', payload, true).then(data => data);
+    return this.client.request('GET', '/v1/user', payload, true).then(data => new User(data));
   }
 
   /**
@@ -218,14 +218,13 @@ export default class UserApi {
   }
 
   static mapString(o) {
-    Object.keys(o).map(key => `${key}=${o[key]}`).join('&');
+    return Object.keys(o).map(key => `${key}=${o[key]}`).join('&');
   }
 
   encodeAssetProvider(url) {
     const aP = this.store.assetProvider;
     const aPlen = aP.length;
     const compare = urlParse(url);
-
     for (let i = 0; i < aPlen; i += 1) {
       const comparethis = urlParse(aP[i].uri);
       if (compare.hostname === comparethis.hostname) {
