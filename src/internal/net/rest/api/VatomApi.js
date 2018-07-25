@@ -38,7 +38,7 @@ export default class VatomApi {
   }
 
   getUserInventory(payload) {
-    return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data.vatoms);
+    return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data);
   }
 
   getUserVatoms(payload) {
