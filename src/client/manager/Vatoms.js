@@ -39,7 +39,7 @@ class Vatoms {
     const pload = payload || {};
     // assigns this.id
     pload['this.id'] = vatomId;
-    return this.vatomApi.performAction(action, payload);
+    return this.vatomApi.performAction(action, pload);
   }
 
   /**
