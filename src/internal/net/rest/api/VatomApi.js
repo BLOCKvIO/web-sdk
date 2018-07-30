@@ -53,7 +53,7 @@ export default class VatomApi {
     return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data);
   }
 
-  deleteVatom(vatomID) {
+  trashVatom(vatomID) {
     const payload = {
       'this.id': vatomID,
     };
