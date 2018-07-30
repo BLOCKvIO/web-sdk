@@ -52,7 +52,7 @@ export default class UserApi {
           this.store.refreshToken = data.refresh_token.token;
           return data;
         },
-      ).then(data => new User(data));
+      ).then(data => new User(data.user));
   }
 
 
@@ -89,7 +89,7 @@ export default class UserApi {
           return data;
         }
       },
-    ).then(data => new User(data));
+    ).then(data => new User(data.user));
   }
 
   /**
@@ -110,7 +110,7 @@ export default class UserApi {
         this.store.assetProvider = data.asset_provider;
         return data;
       },
-    ).then(data => new User(data));
+    ).then(data => new User(data.user));
   }
 
   uploadAvatar(request) {

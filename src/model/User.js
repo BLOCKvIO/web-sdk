@@ -9,15 +9,15 @@
 //  governing permissions and limitations under the License.
 //
 export default class User {
-  constructor(userData) {
-    this.id = userData.user.id;
-    this.firstName = userData.user.properties.first_name;
-    this.lastName = userData.user.properties.last_name;
-    this.namePublic = userData.user.properties.name_public;
-    this.avatarUri = userData.user.properties.avatar_uri;
-    this.avatarPublic = userData.user.properties.avatar_public;
-    this.birthday = userData.user.properties.birthday;
-    this.language = userData.user.properties.language;
-    this.nonPushNotification = userData.user.properties.nonpush_notification;
+  constructor(user) {
+    this.id = user.id;
+    this.firstName = user.properties.first_name;
+    this.lastName = user.properties.last_name;
+    this.namePublic = user.properties.name_public;
+    this.avatarUri = user.properties.avatar_uri;
+    this.avatarPublic = user.properties.avatar_public;
+    this.birthday = user.properties.birthday;
+    this.language = user.properties.language;
+    this.nonPushNotification = user.properties.nonpush_notification;
   }
 }
