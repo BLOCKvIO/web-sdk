@@ -2,13 +2,13 @@
 //
 // WebPack config file
 
-import webpack from 'webpack';
-import path from 'path';
+const webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
   plugins: [],
   module: {
-    loaders: [],
+    rules: [],
   },
 };
 // The app's starting file
@@ -25,26 +25,26 @@ module.exports.output = {
 module.exports.devtool = 'source-map';
 
 // Compile support for ES6 classes and React etc
-module.exports.module.loaders.push({
+module.exports.module.rules.push({
   test: /\.js$/,
   exclude: /node_modules/,
   loader: 'babel-loader',
-  query: {
-    presets: ['env'],
+  options: {
+    presets: ['env', 'stage-0'],
   },
 });
 
 // Compile support for CSS
-module.exports.module.loaders.push({
+module.exports.module.rules.push({
   test: /\.css$/,
   loaders: ['style', 'css'],
 });
-module.exports.module.loaders.push({
+module.exports.module.rules.push({
   test: /(\.scss|\.css)$/,
   loader: 'style!css!postcss!sass',
 });
 
-module.exports.module.loaders.push({
+module.exports.module.rules.push({
   test: /(\.png|\.svg|\.jpg)$/,
   loader: 'url-loader',
 });
