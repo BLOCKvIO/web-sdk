@@ -27,8 +27,6 @@
     "babel-core": "^6.26.3",
     "babel-loader": "^6.2.5",
     "babel-preset-env": "^1.7.0",
-    "babel-preset-es2015": "^6.14.0",
-    "babel-preset-es2017": "^6.14.0",
     "babel-preset-react": "^6.11.1",
     "concurrently": "^3.6.1",
     "copy": "^0.3.2",
@@ -60,6 +58,7 @@
     "expect.js": "^0.3.1",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
+    "path": "^0.12.7",
     "popsicle": "^10.0.1",
     "url-parse": "^1.4.3"
   },
