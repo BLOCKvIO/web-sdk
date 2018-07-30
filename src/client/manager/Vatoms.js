@@ -35,11 +35,7 @@ class Vatoms {
    */
 
   performAction(vatomId, action, payload) {
-    // check that payload is set
-    const pload = payload || {};
-    // assigns this.id
-    pload['this.id'] = vatomId;
-    return this.vatomApi.performAction(action, payload);
+    return this.vatomApi.performAction(action, { 'this.id': vatomId, ...payload });
   }
 
   /**
