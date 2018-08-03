@@ -93,7 +93,7 @@ class Client {
             const seconds = Math.floor(duration / 1000);
             const minutes = Math.floor(duration / 1000 / 60);
             if (seconds <= 90) {
-              response.error = response.message.replace('%DURATION%', seconds === 1 ? '1 second' : `${seconds}  seconds`);
+              response.message = response.message.replace('%DURATION%', seconds === 1 ? '1 second' : `${seconds}  seconds`);
             } else {
               response.message = response.message.replace('%DURATION%', minutes === 1 ? '1 minute' : `${minutes} minutes`);
             }
@@ -102,7 +102,7 @@ class Client {
             error.code = response.error || 0;
             throw error;
           } else {
-            const error = new Error(ErrorCodes[response.error] || 'An unknown server error occurred.');
+            const error = new Error(ErrorCodes[response.error] || response.message || 'An unknown server error has occurred');
             error.code = response.error || response.httpStatus || 0;
             error.httpStatus = response.httpStatus;
             throw error;
