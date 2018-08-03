@@ -102,7 +102,7 @@ class Client {
             error.code = response.error || 0;
             throw error;
           } else {
-            const error = new Error(ErrorCodes[response.error] || response.message || 'An unknown server error has occured');
+            const error = new Error(ErrorCodes[response.error] || response.message || 'An unknown server error has occurred');
             error.code = response.error || response.httpStatus || 0;
             error.httpStatus = response.httpStatus;
             throw error;
