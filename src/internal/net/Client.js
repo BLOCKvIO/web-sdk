@@ -132,30 +132,22 @@ class Client {
     let decodedToken;
     let nowDate;
     let expirationTime;
-    const { token } = this.store;
 
-    if (token === 'undefined' || token === '') {
-      this.refreshToken();
-      return false;
-      // eslint-disable-next-line no-else-return
-    } else {
-      try {
-        decodedToken = jwtDecode(this.store.token);
-        expirationTime = (decodedToken.exp * 1000);
-        nowDate = Date.now();
+    try {
+      decodedToken = jwtDecode(this.store.token);
+      expirationTime = (decodedToken.exp * 1000);
+      nowDate = Date.now();
 
-        // quick calc to determine if the token has expired
-        if ((nowDate - 30000) > expirationTime) {
-          return this.refreshToken();
-          // eslint-disable-next-line no-else-return
-        } else {
-          return Promise.resolve(true);
-        }
-      } catch (e) {
+      // quick calc to determine if the token has expired
+      if ((nowDate - 30000) > expirationTime) {
         return this.refreshToken();
+        // eslint-disable-next-line no-else-return
+      } else {
+        return Promise.resolve(true);
       }
+    } catch (e) {
+      return this.refreshToken();
     }
   }
 }
-
 export default Client;
