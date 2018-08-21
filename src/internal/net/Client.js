@@ -134,9 +134,8 @@ class Client {
     let expirationTime;
     const { token } = this.store;
 
-    if (token === 'undefined' || token === '') {
-      this.refreshToken();
-      return false;
+    if (!token) {
+      return this.refreshToken();
       // eslint-disable-next-line no-else-return
     } else {
       try {
