@@ -59,6 +59,7 @@ class Client {
             527: 'Invalid Date Format',
             1004: 'Invalid Request Payload',
             1701: 'vAtom Unrecognized',
+            1708: 'vAtom Unvailable',
             2030: 'No user found, Please register an account first.',
             2031: 'Authentication Failed',
             2032: 'Login Failed, Please try again',
