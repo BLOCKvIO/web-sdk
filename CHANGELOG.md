@@ -77,11 +77,11 @@ Delete vAtom endpoint
 
 EventEmitter class
 
-Websocket Documentation 
+Web socket Documentation 
  - Pull Request [#6] (https://github.com/BLOCKvIO/web-sdk/pull/6)
 
 ## Updated:
-Updated Readme to include Websockets and Discover Query
+Updated Readme to include Web sockets and Discover Query
  - Pull Request [#7] (https://github.com/BLOCKvIO/web-sdk/pull/7)
 
 Updated .gitignore file
@@ -97,7 +97,7 @@ Pull Request [#2] (https://github.com/BLOCKvIO/web-sdk/pull/2)
 ## Added:
 Inline docs 
 
-Websockets  
+Web sockets  
 
 ## Removed:
 console.log’s 
