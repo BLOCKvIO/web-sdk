@@ -67,18 +67,20 @@ export default class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType'];
-        const obj = {
-          id: v.id,
-          private: v.private,
-          unpublished: v.unpublished,
-          version: v.version,
-          when_created: v.when_created,
-          when_modified: v.when_modified,
-          properties: v['vAtom::vAtomType'],
-          faces: facesArray.filter(f => f.template === template),
-          actions: actionsArray.filter(a => a.template === template),
-        };
-        vatomsArray.push(obj);
+        if (template !== 'vatomic::v1::vAtom::Avatar') {
+          const obj = {
+            id: v.id,
+            private: v.private,
+            unpublished: v.unpublished,
+            version: v.version,
+            when_created: v.when_created,
+            when_modified: v.when_modified,
+            properties: v['vAtom::vAtomType'],
+            faces: facesArray.filter(f => f.template === template),
+            actions: actionsArray.filter(a => a.template === template),
+          };
+          vatomsArray.push(obj);
+        }
       }
       return vatomsArray;
     });
