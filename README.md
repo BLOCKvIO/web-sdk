@@ -13,6 +13,8 @@ The BLOCKv team will review your registration request, and if successful, send t
 
 ## Installation
 
+You can import the SDK with or without Face Module support.
+
 Install from npm
 
 ```javascript
@@ -22,17 +24,25 @@ npm install @blockv/sdk
 Use from the browser
 ```javascript
 <script src="https://npmcdn.com/@blockv/sdk/dist/blockv-sdk.min.js"></script>
+- or - 
+<script src="https://npmcdn.com/@blockv/sdk/dist/blockv-faces.min.js"></script>
 ```
+
+> When importing via the script tag, all classes will have a `Blockv.` prefix.
 
 In Node.js
 
 ```javascript
 var Blockv = require('@blockv/sdk')
+- or -
+var Blockv = require('@blockv/sdk/face')
 ```
 
 ES6 & ES7
 ```javascript
 import Blockv from '@blockv/sdk'
+- or -
+import Blockv from '@blockv/sdk/face'
 ```
 
 
@@ -467,6 +477,53 @@ bv.Activity.sendMessage(id).then(data =>{
 		console.error(err.message);
 })
 ```
+
+# Face Module
+
+### Displaying a vAtom (VatomView)
+
+In order to visually display a vAtom, you would need to create a `VatomView` instance and add its element to the DOM.
+
+```javascript
+let vv = new VatomView(bv, << vAtom >>, FaceSelection.Icon);
+document.body.append(vv.element);
+```
+
+### Registering a Face
+
+In order to register a native face, you would need to create a class and register is at app startup.
+
+```javascript
+// create your face class.  
+class MyFace {
+  constructor(vatomView, vatom, faceSpec) {
+    // Create element
+    this.element = document.createElement('div');
+    this.element.style.position = 'relative';
+    this.element.style.width = '100%';
+    this.element.style.height = '100%';
+  }
+
+  onResize() {}
+
+  onLoad() {}
+
+  onUnload() {}
+
+  onVatomUpdated() {}
+
+  static get url() {
+    return 'native://my-face';
+  }
+}
+
+```
+
+```javascript
+// register face on app startup
+VatomView.registerFace(MyFace);
+```
+
 
 ## Production Support
 

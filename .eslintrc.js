@@ -1,6 +1,7 @@
 module.exports = {
   "globals": {
-    "WebSocket": true
+    "WebSocket": true,
+    "document": true,
   },
   "extends": "airbnb-base"
 };
