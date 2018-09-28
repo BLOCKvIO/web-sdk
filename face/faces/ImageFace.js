@@ -11,12 +11,6 @@
 import BaseFace from './BaseFace';
 
 export default class ImageFace extends BaseFace {
-  // eslint-disable-next-line
-  constructor(vatomView, vatom, face) {
-    super(vatomView, vatom, face);
-    this.onLoad();
-  }
-
   onLoad() {
     // eslint-disable-next-line
     return this.updateImage();
