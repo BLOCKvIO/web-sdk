@@ -28,7 +28,7 @@ Use from the browser
 <script src="https://npmcdn.com/@blockv/sdk/dist/blockv-faces.min.js"></script>
 ```
 
-> When importing via the script tag , All classes will have a `Blockv.` prefix.
+> When importing via the script tag, all classes will have a `Blockv.` prefix.
 
 In Node.js
 
@@ -511,7 +511,12 @@ class MyFace {
   onUnload() {}
 
   onVatomUpdated() {}
+
+  static get url() {
+    return 'native://my-face';
+  }
 }
+
 ```
 
 ```javascript
