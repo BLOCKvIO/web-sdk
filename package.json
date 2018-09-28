@@ -5,10 +5,11 @@
   "main": "lib/index.js",
   "scripts": {
     "build-lib": "babel src -d lib",
+    "build-faces": "webpack -p --config ./face/webpack.config.js",
     "test": "npm run build && npm run jest --detectOpenHandles",
     "mocha": "mocha",
     "jest": "jest",
-    "build": "concurrently \"npm run build-min\" \"npm run build-lib\"",
+    "build": "concurrently \"npm run build-min\" \"npm run build-lib\" \"npm run build-faces\"",
     "build-min": "webpack -p",
     "watch": "webpack --watch",
     "prepare": "npm run build"

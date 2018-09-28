@@ -38,15 +38,146 @@ export default class VatomApi {
   }
 
   getUserInventory(payload) {
-    return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then(data => data);
+    return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then((data) => {
+      const { actions, faces, vatoms } = data;
+
+      const actionsArray = [];
+      const facesArray = [];
+      const vatomsArray = [];
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::');
+        const aKey = aName[0];
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType'];
+        if (template !== 'vatomic::v1::vAtom::Avatar') {
+          const obj = {
+            id: v.id,
+            private: v.private,
+            unpublished: v.unpublished,
+            version: v.version,
+            when_created: v.when_created,
+            when_modified: v.when_modified,
+            properties: v['vAtom::vAtomType'],
+            faces: facesArray.filter(f => f.template === template),
+            actions: actionsArray.filter(a => a.template === template),
+          };
+          vatomsArray.push(obj);
+        }
+      }
+      return vatomsArray;
+    });
   }
 
   getUserVatoms(payload) {
-    return this.client.request('POST', '/v1/user/vatom/get', payload, true).then(data => data);
+    return this.client.request('POST', '/v1/user/vatom/get', payload, true).then((data) => {
+      const { actions, faces, vatoms } = data;
+
+      const actionsArray = [];
+      const facesArray = [];
+      const vatomsArray = [];
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::');
+        const aKey = aName[0];
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType'];
+        const obj = {
+          id: v.id,
+          private: v.private,
+          unpublished: v.unpublished,
+          version: v.version,
+          when_created: v.when_created,
+          when_modified: v.when_modified,
+          properties: v['vAtom::vAtomType'],
+          faces: facesArray.filter(f => f.template === template),
+          actions: actionsArray.filter(a => a.template === template),
+        };
+        vatomsArray.push(obj);
+      }
+      return vatomsArray;
+    });
   }
 
   geoDiscover(payload) {
-    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then(data => data);
+    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then((data) => {
+      const { actions, faces, vatoms } = data;
+
+      const actionsArray = [];
+      const facesArray = [];
+      const vatomsArray = [];
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::');
+        const aKey = aName[0];
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType'];
+        const obj = {
+          id: v.id,
+          private: v.private,
+          unpublished: v.unpublished,
+          version: v.version,
+          when_created: v.when_created,
+          when_modified: v.when_modified,
+          properties: v['vAtom::vAtomType'],
+          faces: facesArray.filter(f => f.template === template),
+          actions: actionsArray.filter(a => a.template === template),
+        };
+        vatomsArray.push(obj);
+      }
+      return vatomsArray;
+    });
   }
 
   geoDiscoverGroups(payload) {
