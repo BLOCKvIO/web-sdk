@@ -140,7 +140,7 @@ class Client {
       nowDate = Date.now();
 
       // quick calc to determine if the token has expired
-      if ((nowDate - 30000) > expirationTime) {
+      if ((nowDate + 5000) > expirationTime) {
         return this.refreshToken();
         // eslint-disable-next-line no-else-return
       } else {
