@@ -50,6 +50,8 @@ export default class UserApi {
         (data) => {
           this.store.token = data.access_token.token;
           this.store.refreshToken = data.refresh_token.token;
+          this.store.assetProvider = data.asset_provider;
+          this.store.userID = data.user.id;
           return data;
         },
       ).then(data => new User(data.user));
@@ -214,6 +216,11 @@ export default class UserApi {
     return this.client.request('POST', '/v1/user/logout', params, true).then(() => {
       this.store.token = '';
       this.store.refreshToken = '';
+    }).catch((err) => {
+      console.warn(err);
+      this.store.token = '';
+      this.store.refreshToken = '';
+      throw err;
     });
   }
 
