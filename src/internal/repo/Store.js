@@ -89,9 +89,10 @@ export default class Store {
     }
     if (typeof localStorage !== 'undefined') {
       // eslint-disable-next-line no-undef
-      const aP = JSON.parse(localStorage.getItem(`${this.prefix}_asset_provider`) || 'undefined');
-      if (aP) {
-        return aP;
+      try {
+        return JSON.parse(localStorage.getItem(`${this.prefix}_asset_provider`) || 'undefined');
+      } catch (e) {
+        console.warn(e);
       }
     }
     return null;
