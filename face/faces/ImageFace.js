@@ -22,8 +22,9 @@ export default class ImageFace extends BaseFace {
     this.element.style.backgroundPosition = 'center';
     this.element.style.backgroundRepeat = 'no-repeat';
 
+    
     // Get resource name
-    const resourceName = 'ActivatedImage';
+    const resourceName = this.face.properties.config && this.face.properties.config.image || this.face.properties.resources[0] || 'ActivatedImage';
 
     // Get resource
     const resource = this.vatom.properties.resources.find(r => r.name === resourceName);
