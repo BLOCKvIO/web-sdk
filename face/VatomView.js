@@ -85,7 +85,16 @@ export default class VatomView {
   }
 
   load() {
-    
+    // reset errorview and loader
+    if (this.loader && this.loader.parentNode) {
+      this.loader.parentNode.removeChild(this.loader);
+    }
+    if (this.errorView && this.errorView.parentNode) {
+      this.errorView.parentNode.removeChild(this.errorView);
+    }
+    this.loader = null;
+    this.errorView = null;
+
     let rFace = null;
     Promise.resolve(() => null).then(() => {
     // start the face selection procedure
