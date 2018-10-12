@@ -56,6 +56,5 @@ function start(vatom, viewmode) {
   // return the best face available
   // eslint-disable-next-line
   let best = bf.reduce((max, p) => p.rate > max.rate ? p : max, bf[0]);
-  console.log(best);
   return best && best.face;
 }

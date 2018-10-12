@@ -48,7 +48,7 @@ export default class VatomView {
       let con = document.createElement('div');
       const rN = 'ActivatedImage';
       const rs = v.properties.resources.find(r => r.name === rN);
-      const du = bvi.UserManager.encodeAssetProvider(rs.value.value);
+      const du = rs && bvi.UserManager.encodeAssetProvider(rs.value.value);
       con.style.backgroundSize = 'contain';
       con.style.backgroundPosition = 'center';
       con.style.backgroundRepeat = 'no-repeat';
@@ -97,10 +97,7 @@ export default class VatomView {
       if (FaceClass === undefined && du.indexOf('http') !== -1) {
         FaceClass = ImageFace;
       } else if (FaceClass === undefined) {
-        // display activated Image in the case that the face is undefined!
-        FaceClass = ImageFace;
-
-        throw new Error("No Face Registered");
+        throw new Error('No Face Registered');
       }
       // create a new instance of the chosen face class and pass through the information
       rFace = new FaceClass(this, this.vatomObj, st);
@@ -114,7 +111,7 @@ export default class VatomView {
       // add the loader
       this.element.appendChild(this.loader = this.createLoader());
 
-      //check for error
+      // check for error
       
       // call rface.onload , wait for promise
       return rFace.onLoad();
