@@ -10,21 +10,22 @@
 //
 /* eslint-disable no-use-before-define */
 export default {
-  Icon: faces => start(faces, 'icon'),
-  Engaged: faces => start(faces, 'engaged'),
-  Fullscreen: faces => start(faces, 'fullscreen'),
-  Card: faces => start(faces, 'card'),
+  Icon: vatom => start(vatom, 'icon'),
+  Engaged: vatom => start(vatom, 'engaged'),
+  Fullscreen: vatom => start(vatom, 'fullscreen'),
+  Card: vatom => start(vatom, 'card'),
 };
 
-function start(faces, viewmode) {
+function start(vatom, viewmode) {
   // get the faces & vatoms array
   // create a best face array
   const bf = [];
   // define what is native
   const native = 'web';
+  const farray = vatom.faces;
   // loop through the faces
   // eslint-disable-next-line
-    for(let face of faces) {
+    for(let face of farray) {
     // set base rating
     let rate = 0;
     // set default viewmode
@@ -55,5 +56,6 @@ function start(faces, viewmode) {
   // return the best face available
   // eslint-disable-next-line
   let best = bf.reduce((max, p) => p.rate > max.rate ? p : max, bf[0]);
+  console.log(best);
   return best && best.face;
 }
