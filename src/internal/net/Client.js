@@ -8,9 +8,9 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import { request, plugins as popsiclePlugins } from 'popsicle';
-import jwtDecode from 'jwt-decode';
-import BaseResponse from './rest/response/BaseResponse';
+const popsicle = require('popsicle');
+const jwtDecode = require('jwt-decode');
+const BaseResponse = require('./rest/response/BaseResponse');
 
 class Client {
   constructor(store) {
@@ -34,13 +34,13 @@ class Client {
       'Content-Type': 'application/json',
     }, headers);
 
-    return request({
+    return popsicle.request({
       method,
       url: this.store.server + endpoint,
       body: payload,
       headers: header,
 
-    }).use(popsiclePlugins.parse('json'))
+    }).use(popsicle.plugins.parse('json'))
       .then((res) => {
         const response = Object.assign(new BaseResponse(), res.body);
         response.httpStatus = res.status;
