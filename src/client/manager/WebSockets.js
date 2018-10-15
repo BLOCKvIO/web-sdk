@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-import EventEmitter from '../../internal/EventEmitter';
+const EventEmitter = require('../../internal/EventEmitter');
 
 export default class WebSockets extends EventEmitter {
   constructor(store, client) {
