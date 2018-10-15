@@ -2,14 +2,13 @@
   "name": "@blockv/sdk",
   "version": "2.0.1",
   "description": "Allows web apps to display and interact with vatoms.",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "build-lib": "babel src -d lib",
     "build-faces": "webpack -p --config ./face/webpack.config.js",
     "test": "npm run build && npm run jest --detectOpenHandles",
     "mocha": "mocha",
     "jest": "jest",
-    "build": "concurrently \"npm run build-min\" \"npm run build-lib\" \"npm run build-faces\"",
+    "build": "concurrently \"npm run build-min\" \"npm run build-faces\"",
     "build-min": "webpack -p",
     "watch": "webpack --watch",
     "prepare": "npm run build"
