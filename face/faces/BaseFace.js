@@ -10,7 +10,8 @@
 //
 
 /* eslint-disable class-methods-use-this */
-export default class BaseFace {
+
+module.exports = class BaseFace {
   constructor(vatomView, vatom, face) {
     // Store info
     this.vatomView = vatomView;

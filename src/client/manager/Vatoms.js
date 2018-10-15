@@ -10,7 +10,7 @@
 //
 
 
-class Vatoms {
+module.exports = class Vatoms {
   constructor(vatomApi) {
     this.vatomApi = vatomApi;
   }
@@ -126,4 +126,4 @@ class Vatoms {
   }
 }
 
-export default Vatoms;
+

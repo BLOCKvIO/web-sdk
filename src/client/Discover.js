@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-export default class Discover {
+module.exports = class Discover {
   constructor(bv, customPayload) {
     this.bv = bv;
     // Setup default vars

@@ -23,7 +23,7 @@ const WebSockets = require('./manager/WebSockets');
  * Created by LordCheddar on 2018/03/05.
  */
 
-class Blockv {
+module.exports = class Blockv {
   constructor(payload) {
     const prefix = payload.prefix || payload.appID;
     this.store = new Store(prefix);
@@ -43,5 +43,3 @@ class Blockv {
     this.Vatoms = new Vatoms(vatomApi);
   }
 }
-
-export default Blockv;

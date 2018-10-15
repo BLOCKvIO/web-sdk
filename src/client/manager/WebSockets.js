@@ -11,7 +11,7 @@
 
 const EventEmitter = require('../../internal/EventEmitter');
 
-export default class WebSockets extends EventEmitter {
+module.exports = class WebSockets extends EventEmitter {
   constructor(store, client) {
     super();
     this.store = store;

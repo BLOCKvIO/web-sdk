@@ -12,7 +12,7 @@ const urlParse = require('url-parse');
 const User = require('../../../../model/User');
 
 
-export default class UserApi {
+module.exports = class UserApi {
   constructor(client, store) {
     this.client = client;
     this.store = store;

@@ -19,7 +19,7 @@ let registeredFace = {
   'native://image': ImageFace,
 };
 
-export default class VatomView {
+module.exports = class VatomView {
   constructor(bv, vAtom, FSP, config) {
     this.blockv = bv;
     this.vatomObj = vAtom;

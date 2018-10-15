@@ -10,7 +10,7 @@
 //
 
 
-export default class Activity {
+module.exports = class Activity {
   constructor(activityApi) {
     this.activityApi = activityApi;
   }

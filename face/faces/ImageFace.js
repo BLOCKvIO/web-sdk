@@ -10,7 +10,7 @@
 //
 const BaseFace = require('./BaseFace');
 
-export default class ImageFace extends BaseFace {
+module.exports = class ImageFace extends BaseFace {
   onLoad() {
     // eslint-disable-next-line
     return this.updateImage();

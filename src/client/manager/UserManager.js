@@ -10,7 +10,7 @@
 //
 const jwtDecode = require('jwt-decode');
 
-class UserManager {
+module.exports = class UserManager {
   constructor(UserApi, store) {
     this.UserApi = UserApi;
     this.store = store;
@@ -215,5 +215,3 @@ class UserManager {
     }
   }
 }
-
-export default UserManager;

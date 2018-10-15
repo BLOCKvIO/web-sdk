@@ -26,7 +26,7 @@
 // Usage when triggering an event from a subclass:
 //    this.emit("closed", "customData");
 
-export default class EventEmitter {
+module.exports = class EventEmitter {
   /**
    * Adds an event listener. If callback is null, a Promise will be returned.
    * Note that if using the Promise

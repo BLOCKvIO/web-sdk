@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 
 
-export default class ActivityApi {
+module.exports = class ActivityApi {
   constructor(client) {
     this.client = client;
   }

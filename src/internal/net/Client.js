@@ -12,7 +12,7 @@ const popsicle = require('popsicle');
 const jwtDecode = require('jwt-decode');
 const BaseResponse = require('./rest/response/BaseResponse');
 
-class Client {
+module.exports = class Client {
   constructor(store) {
     this.store = store;
   }
@@ -151,4 +151,4 @@ class Client {
     }
   }
 }
-export default Client;
+
