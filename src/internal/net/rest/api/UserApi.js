@@ -8,8 +8,8 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import urlParse from 'url-parse';
-import User from '../../../../model/User';
+const urlParse = require('url-parse');
+const User = require('../../../../model/User');
 
 
 export default class UserApi {
