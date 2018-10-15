@@ -11,8 +11,8 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-import FaceSelection from './FaceSelection';
-import ImageFace from './faces/ImageFace';
+const FaceSelection = require('./FaceSelection');
+const ImageFace = require('./faces/ImageFace');
 
 // list registered faces
 let registeredFace = {
