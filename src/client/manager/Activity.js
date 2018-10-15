@@ -41,4 +41,4 @@ module.exports = class Activity {
   sendMessage(id, message) {
     return this.activityApi.sendMessage(id, message);
   }
-}
+};

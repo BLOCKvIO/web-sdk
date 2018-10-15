@@ -34,4 +34,4 @@ module.exports = class ActivityApi {
     };
     return this.client.request('POST', '/v1/user/message', payload, true).then(data => data);
   }
-}
+};

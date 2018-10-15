@@ -214,4 +214,4 @@ module.exports = class UserManager {
       return false;
     }
   }
-}
+};

@@ -96,4 +96,4 @@ module.exports = class Store {
     }
     return null;
   }
-}
+};

@@ -136,4 +136,4 @@ module.exports = class WebSockets extends EventEmitter {
     this.socket.close();
     this.socket = null;
   }
-}
+};

@@ -15,4 +15,4 @@ module.exports = class BaseResponse {
     this.message = message;
     this.payload = payload;
   }
-}
+};

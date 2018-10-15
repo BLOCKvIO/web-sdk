@@ -150,5 +150,4 @@ module.exports = class Client {
       return this.refreshToken();
     }
   }
-}
-
+};

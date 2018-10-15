@@ -34,4 +34,4 @@ module.exports = class User {
       whenModified: user.meta.when_modified,
     };
   }
-}
+};

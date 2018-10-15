@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-module.exports = class Discover {
+class Discover {
   constructor(bv, customPayload) {
     this.bv = bv;
     // Setup default vars
@@ -188,3 +188,5 @@ Discover.FieldTemplateVariation = 'vAtom::vAtomType.template_variation';
 Discover.FieldVisibilityType = 'vAtom::vAtomType.visibility.type';
 Discover.FieldOwner = 'vAtom::vAtomType.owner';
 Discover.FieldParentID = 'vAtom::vAtomType.parent_id';
+
+module.exports = Discover;

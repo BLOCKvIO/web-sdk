@@ -282,4 +282,4 @@ module.exports = class UserApi {
   getPublicUserProfile(userID) {
     return this.client.request('GET', `/v1/users/${userID}`, {}, true);
   }
-}
+};

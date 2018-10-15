@@ -42,4 +42,4 @@ module.exports = class Blockv {
     this.UserManager = new UserManager(userApi, this.store);
     this.Vatoms = new Vatoms(vatomApi);
   }
-}
+};

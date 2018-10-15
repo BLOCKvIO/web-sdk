@@ -26,7 +26,7 @@
 // Usage when triggering an event from a subclass:
 //    this.emit("closed", "customData");
 
-module.exports = class EventEmitter {
+class EventEmitter {
   /**
    * Adds an event listener. If callback is null, a Promise will be returned.
    * Note that if using the Promise
@@ -118,7 +118,7 @@ module.exports = class EventEmitter {
   triggerEvent(...args) {
     return this.emit(...args);
   }
-}
+};
 
 // Apply as a mixin to a class or object
 EventEmitter.mixin = function eventEmitterMixin(otherClass) {
@@ -131,3 +131,4 @@ EventEmitter.mixin = function eventEmitterMixin(otherClass) {
     }
   }
 };
+module.exports = EventEmitter;

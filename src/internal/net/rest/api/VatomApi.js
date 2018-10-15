@@ -190,4 +190,4 @@ module.exports = class VatomApi {
     };
     return this.client.request('POST', '/v1/user/vatom/trash', payload, true).then(data => data);
   }
-}
+};

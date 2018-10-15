@@ -124,6 +124,4 @@ module.exports = class Vatoms {
   trashVatom(vatomID) {
     return this.vatomApi.trashVatom(vatomID);
   }
-}
-
-
+};
