@@ -10,7 +10,7 @@
 //
 
 
-export default class Activity {
+module.exports = class Activity {
   constructor(activityApi) {
     this.activityApi = activityApi;
   }
@@ -41,4 +41,4 @@ export default class Activity {
   sendMessage(id, message) {
     return this.activityApi.sendMessage(id, message);
   }
-}
+};

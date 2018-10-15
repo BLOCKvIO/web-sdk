@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 
 
-export default class VatomApi {
+module.exports = class VatomApi {
   constructor(client) {
     this.client = client;
   }
@@ -190,4 +190,4 @@ export default class VatomApi {
     };
     return this.client.request('POST', '/v1/user/vatom/trash', payload, true).then(data => data);
   }
-}
+};

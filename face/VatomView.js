@@ -11,15 +11,15 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-import FaceSelection from './FaceSelection';
-import ImageFace from './faces/ImageFace';
+const FaceSelection = require('./FaceSelection');
+const ImageFace = require('./faces/ImageFace');
 
 // list registered faces
 let registeredFace = {
   'native://image': ImageFace,
 };
 
-export default class VatomView {
+module.exports = class VatomView {
   constructor(bv, vAtom, FSP, config) {
     this.blockv = bv;
     this.vatomObj = vAtom;

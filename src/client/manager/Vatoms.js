@@ -10,7 +10,7 @@
 //
 
 
-class Vatoms {
+module.exports = class Vatoms {
   constructor(vatomApi) {
     this.vatomApi = vatomApi;
   }
@@ -124,6 +124,4 @@ class Vatoms {
   trashVatom(vatomID) {
     return this.vatomApi.trashVatom(vatomID);
   }
-}
-
-export default Vatoms;
+};

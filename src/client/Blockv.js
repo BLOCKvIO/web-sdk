@@ -8,22 +8,22 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import Store from '../internal/repo/Store';
-import UserManager from './manager/UserManager';
-import UserApi from '../internal/net/rest/api/UserApi';
-import VatomApi from '../internal/net/rest/api/VatomApi';
-import Vatoms from './manager/Vatoms';
-import Activity from './manager/Activity';
-import ActivityApi from '../internal/net/rest/api/ActivityApi';
-import Client from '../internal/net/Client';
-import WebSockets from './manager/WebSockets';
+const Store = require('../internal/repo/Store');
+const UserManager = require('./manager/UserManager');
+const UserApi = require('../internal/net/rest/api/UserApi');
+const VatomApi = require('../internal/net/rest/api/VatomApi');
+const Vatoms = require('./manager/Vatoms');
+const Activity = require('./manager/Activity');
+const ActivityApi = require('../internal/net/rest/api/ActivityApi');
+const Client = require('../internal/net/Client');
+const WebSockets = require('./manager/WebSockets');
 
 
 /**
  * Created by LordCheddar on 2018/03/05.
  */
 
-class Blockv {
+module.exports = class Blockv {
   constructor(payload) {
     const prefix = payload.prefix || payload.appID;
     this.store = new Store(prefix);
@@ -42,6 +42,4 @@ class Blockv {
     this.UserManager = new UserManager(userApi, this.store);
     this.Vatoms = new Vatoms(vatomApi);
   }
-}
-
-export default Blockv;
+};

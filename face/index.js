@@ -9,10 +9,10 @@
 //  governing permissions and limitations under the License.
 //
 
-import VatomView from './VatomView';
-import FaceSelection from './FaceSelection';
+const VatomView = require('./VatomView');
+const FaceSelection = require('./FaceSelection');
+const BLOCKv = require('../src');
 
-module.exports = require('../src');
-
+module.exports = BLOCKv;
 module.exports.VatomView = VatomView;
 module.exports.FaceSelection = FaceSelection;

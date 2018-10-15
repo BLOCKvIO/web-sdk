@@ -8,8 +8,8 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import Blockv from './client/Blockv';
-import Discover from './client/Discover';
+const Blockv = require('./client/Blockv');
+const Discover = require('./client/Discover');
 
 module.exports = Blockv;
 module.exports.Discover = Discover;

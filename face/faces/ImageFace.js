@@ -8,9 +8,9 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import BaseFace from './BaseFace';
+const BaseFace = require('./BaseFace');
 
-export default class ImageFace extends BaseFace {
+module.exports = class ImageFace extends BaseFace {
   onLoad() {
     // eslint-disable-next-line
     return this.updateImage();

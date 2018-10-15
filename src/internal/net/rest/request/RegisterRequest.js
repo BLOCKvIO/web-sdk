@@ -8,7 +8,8 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-export default class RegisterRequest {
+
+module.export = class RegisterRequest {
   constructor(firstName, lastName, birthday, language, password, tokens, namePublic, avatarPublic) {
     this.first_name = firstName;
     this.last_name = lastName;
@@ -65,4 +66,4 @@ export default class RegisterRequest {
       },
     );
   }
-}
+};

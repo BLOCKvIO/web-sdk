@@ -8,9 +8,9 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import jwtDecode from 'jwt-decode';
+const jwtDecode = require('jwt-decode');
 
-class UserManager {
+module.exports = class UserManager {
   constructor(UserApi, store) {
     this.UserApi = UserApi;
     this.store = store;
@@ -214,6 +214,4 @@ class UserManager {
       return false;
     }
   }
-}
-
-export default UserManager;
+};
