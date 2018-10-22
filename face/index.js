@@ -12,7 +12,9 @@
 const VatomView = require('./VatomView');
 const FaceSelection = require('./FaceSelection');
 const BLOCKv = require('../src');
+const BaseFace = require('./faces/BaseFace');
 
 module.exports = BLOCKv;
 module.exports.VatomView = VatomView;
 module.exports.FaceSelection = FaceSelection;
+module.exports.BaseFace = BaseFace;
