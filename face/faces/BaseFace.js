@@ -25,7 +25,6 @@ module.exports = class BaseFace {
     this.element.style.height = '100%';
   }
 
-  onResize() {}
 
   onLoad() {}
 
