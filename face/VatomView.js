@@ -12,11 +12,13 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
 const FaceSelection = require('./FaceSelection');
+const ProgressImage = require('./faces/ProgressImage');
 const ImageFace = require('./faces/ImageFace');
 
 // list registered faces
 let registeredFace = {
   'native://image': ImageFace,
+  'native://progress-image-overlay': ProgressImage,
 };
 
 module.exports = class VatomView {
@@ -102,6 +104,7 @@ module.exports = class VatomView {
       // check if face is registered
       const du = st.properties.display_url.toLowerCase();
       let FaceClass = registeredFace[du];
+     
       // if there is no face registered in the array but we have a http link, show the web face
       if (FaceClass === undefined && du.indexOf('http') !== -1) {
         FaceClass = ImageFace;

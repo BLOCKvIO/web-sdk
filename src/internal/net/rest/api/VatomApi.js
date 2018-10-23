@@ -8,6 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 
+let Vatom = require('../../../../model/Vatom');
 
 module.exports = class VatomApi {
   constructor(client) {
@@ -68,17 +69,7 @@ module.exports = class VatomApi {
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType'];
         if (template !== 'vatomic::v1::vAtom::Avatar') {
-          const obj = {
-            id: v.id,
-            private: v.private,
-            unpublished: v.unpublished,
-            version: v.version,
-            when_created: v.when_created,
-            when_modified: v.when_modified,
-            properties: v['vAtom::vAtomType'],
-            faces: facesArray.filter(f => f.template === template),
-            actions: actionsArray.filter(a => a.template === template),
-          };
+          const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
           vatomsArray.push(obj);
         }
       }
@@ -116,17 +107,7 @@ module.exports = class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType'];
-        const obj = {
-          id: v.id,
-          private: v.private,
-          unpublished: v.unpublished,
-          version: v.version,
-          when_created: v.when_created,
-          when_modified: v.when_modified,
-          properties: v['vAtom::vAtomType'],
-          faces: facesArray.filter(f => f.template === template),
-          actions: actionsArray.filter(a => a.template === template),
-        };
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template)); 
         vatomsArray.push(obj);
       }
       return vatomsArray;
@@ -163,17 +144,7 @@ module.exports = class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType'];
-        const obj = {
-          id: v.id,
-          private: v.private,
-          unpublished: v.unpublished,
-          version: v.version,
-          when_created: v.when_created,
-          when_modified: v.when_modified,
-          properties: v['vAtom::vAtomType'],
-          faces: facesArray.filter(f => f.template === template),
-          actions: actionsArray.filter(a => a.template === template),
-        };
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
         vatomsArray.push(obj);
       }
       return vatomsArray;
