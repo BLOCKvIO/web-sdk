@@ -155,6 +155,43 @@ module.exports = class VatomApi {
     return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data);
   }
 
+  getVatomChildren(parentID){
+    return this.client.request('POST', '/v1/user/vatom/inventory', {"parent_id":parentID}, true).then(data => {
+      const { actions, faces, vatoms } = data;
+
+      const actionsArray = [];
+      const facesArray = [];
+      const vatomsArray = [];
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::');
+        const aKey = aName[0];
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties,
+        });
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType'];
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
+        vatomsArray.push(obj);
+      }
+      return vatomsArray;
+    })
+  }
+
   trashVatom(vatomID) {
     const payload = {
       'this.id': vatomID,
