@@ -117,6 +117,14 @@ module.exports = class Vatoms {
   }
 
   /**
+   * 
+   * @param {String} parentID   ID of the vatom that you would like to list the children  
+   */
+  getVatomChildren(parentID){
+    return this.vatomApi.getVatomChildren(parentID);
+  }
+
+  /**
    * Removes the specified vAtom from the current user's inventory
    * @param  {String} vatomID  Id of the vAtom you want to remove
    * @return {Promise<Object>} An object containing a success message

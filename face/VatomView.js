@@ -14,11 +14,15 @@
 const FaceSelection = require('./FaceSelection');
 const ProgressImage = require('./faces/ProgressImage');
 const ImageFace = require('./faces/ImageFace');
+const ImagePolicy = require('./faces/ImagePolicy');
+const LayeredImage = require('./faces/LayeredImage');
 
 // list registered faces
 let registeredFace = {
   'native://image': ImageFace,
   'native://progress-image-overlay': ProgressImage,
+  'native://image-policy': ImagePolicy,
+  'native://layered-image': LayeredImage
 };
 
 module.exports = class VatomView {
@@ -165,6 +169,7 @@ module.exports = class VatomView {
     while (view.firstChild) {
       view.removeChild(view.firstChild);
     }
+    
   }
 
   // register our own face
