@@ -62,7 +62,6 @@ module.exports = class ProgressImage extends BaseFace {
       let paddingEnd = parseFloat(this.face.properties.config && this.face.properties.config.padding_end || this.vatom.private.padding_end) || 0;
       const direction = (this.face.properties.config && this.face.properties.config.direction || this.vatom.private.direction || '').toLowerCase();
 
-      console.log("DIRECTION ===== ", direction);
 
       // Adjust padding to be percents instead of pixels of base image
       if (direction === 'up' || direction === 'down') {
