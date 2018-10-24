@@ -47,7 +47,7 @@ module.exports = class ProgressImage extends BaseFace {
     this.base.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value)})`;
 
     // Apply fill image
-    const activatedImg = (this.face.properties.config && this.face.properties.config.full_image && this.vatom.properties.resources[this.face.properties.config.full_image]) || this.vatom.properties.resources.find(r => r.name === 'ActivatedImage');
+    const activatedImg = (this.face.properties.config && this.face.properties.config.full_image && this.vatom.properties.resources.find(r => r.name === this.face.properties.config.full_image)) || this.vatom.properties.resources.find(r => r.name === 'ActivatedImage');
     if (!activatedImg) return Promise.reject(new Error('No ActivatedImage found.'));
     this.fill.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value)})`;
 
