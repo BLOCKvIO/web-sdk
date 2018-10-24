@@ -42,12 +42,12 @@ module.exports = class ProgressImage extends BaseFace {
   /** Refresh the face position and images. @returns Promise */
   refresh() {
     // Apply base image
-    const baseImg = (this.face.config && this.face.config.empty_image && this.vatom.properties.resources[this.face.config.empty_image]) || this.vatom.properties.resources.find(r => r.name === 'BaseImage');
+    const baseImg = (this.face.properties.config && this.face.properties.config.empty_image && this.vatom.properties.resources.find(r => r.name === this.face.properties.config.empty_image)) || this.vatom.properties.resources.find(r => r.name === 'BaseImage');
     if (!baseImg) return Promise.reject(new Error('No BaseImage found.'));
     this.base.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value)})`;
 
     // Apply fill image
-    const activatedImg = (this.face.config && this.face.config.full_image && this.vatom.properties.resources[this.face.config.full_image]) || this.vatom.properties.resources.find(r => r.name === 'ActivatedImage');
+    const activatedImg = (this.face.properties.config && this.face.properties.config.full_image && this.vatom.properties.resources[this.face.properties.config.full_image]) || this.vatom.properties.resources.find(r => r.name === 'ActivatedImage');
     if (!activatedImg) return Promise.reject(new Error('No ActivatedImage found.'));
     this.fill.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value)})`;
 
@@ -58,9 +58,9 @@ module.exports = class ProgressImage extends BaseFace {
     ]).then((imgs) => {
       // Get info
       const score = Math.min(1, Math.max(0, parseFloat(this.vatom.properties.cloning_score) || 0)) * 100;
-      let paddingStart = parseFloat( this.face.config && this.face.config.padding_start || this.vatom.private.padding_start) || 0;
-      let paddingEnd = parseFloat(this.face.config && this.face.config.padding_end || this.vatom.private.padding_end) || 0;
-      const direction = (this.face.config && this.face.config.direction || this.vatom.private.direction || '').toLowerCase();
+      let paddingStart = parseFloat( this.face.properties.config && this.face.properties.config.padding_start || this.vatom.private.padding_start) || 0;
+      let paddingEnd = parseFloat(this.face.properties.config && this.face.properties.config.padding_end || this.vatom.private.padding_end) || 0;
+      const direction = (this.face.properties.config && this.face.properties.config.direction || this.vatom.private.direction || '').toLowerCase();
 
       console.log("DIRECTION ===== ", direction);
 
