@@ -150,7 +150,10 @@ module.exports = class VatomView {
   }
 
   set vatom(vAtom) {
-    if (vAtom) {
+    if (vAtom && vAtom.id === this.vatomObj.id) {
+      this.vatomObj = vAtom;
+      this._currentFace.onVatomUpdated()
+    }else if(vAtom) { 
       this.vatomObj = vAtom;
       this.update();
     }
