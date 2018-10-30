@@ -16,9 +16,10 @@ module.exports = class ProgressImage extends BaseFace {
     // Set our element style
     this.element.style.overflow = 'hidden';
 
+
     // Create base image
     this.base = document.createElement('div');
-    this.base.style.cssText = 'position: relative; margin:0 auto; background-position: center; background-size: contain; background-repeat: no-repeat; ';
+    this.base.style.cssText = 'position: relative; background-position: center; background-size: contain; background-repeat: no-repeat; ';
     this.element.appendChild(this.base);
 
     // Create fill container element
@@ -28,7 +29,7 @@ module.exports = class ProgressImage extends BaseFace {
 
     // Create fill image
     this.fill = document.createElement('div');
-    this.fill.style.cssText = 'position: relative; margin: 0 auto; background-position: center; background-size: contain; background-repeat: no-repeat;';
+    this.fill.style.cssText = 'position: relative; background-position: center; background-size: contain; background-repeat: no-repeat;';
     this.fillContainer.appendChild(this.fill);
 
     // Create Image Percent Container
@@ -64,7 +65,7 @@ module.exports = class ProgressImage extends BaseFace {
     let bi = new Image();
     bi.onload = function(){
       let resp = ProgressImage.calculateAspectRatioFit(bi.width, bi.height, maxwidth, maxheight);
-      this.base.style.cssText += `width:${resp.width}px; height: ${resp.height}px`;
+      this.base.style.cssText += `width:${resp.width}px; height: ${resp.height}px; top:0; bottom:0; left:0; right:0; margin:auto;`;
     }.bind(this);
     bi.src = this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value);
     this.base.style.backgroundImage = `url(${bi.src})`;
@@ -79,7 +80,7 @@ module.exports = class ProgressImage extends BaseFace {
     let fi = new Image();
     fi.onload = function(){
       let resp = ProgressImage.calculateAspectRatioFit(fi.width, fi.height, maxwidth, maxheight);
-      this.fill.style.cssText += `width:${resp.width}px; height: ${resp.height}px`;
+      this.fill.style.cssText += `width:${resp.width}px; height: ${resp.height}px;  top:0; bottom:0; left:0; right:0; margin: auto;`;
     }.bind(this);
     fi.src = this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value);
     this.fill.style.backgroundImage = `url(${fi.src})`;
