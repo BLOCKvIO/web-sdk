@@ -90,7 +90,7 @@ module.exports = class ProgressImage extends BaseFace {
       ProgressImage.waitForImage(this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value)),
     ]).then((imgs) => {
       // Get info
-      const score = Math.min(1, Math.max(0, parseFloat(this.vatom.properties.cloning_score) || 0)) * 100;
+      const score = Math.floor(Math.min(1, Math.max(0, parseFloat(this.vatom.properties.cloning_score) || 0)) * 100);
       let paddingStart = parseFloat( this.face.properties.config && this.face.properties.config.padding_start || this.vatom.private.padding_start) || 0;
       let paddingEnd = parseFloat(this.face.properties.config && this.face.properties.config.padding_end || this.vatom.private.padding_end) || 0;
       const direction = (this.face.properties.config && this.face.properties.config.direction || this.vatom.private.direction || '').toLowerCase();
@@ -110,7 +110,7 @@ module.exports = class ProgressImage extends BaseFace {
       const range = 100 - paddingStart - paddingEnd;
       const paddedScore = Math.floor(score / 100 * range + paddingStart);
       if(this.face.properties.config && this.face.properties.config.show_percentage || this.vatom && this.vatom.private.show_percentage) {
-        this.percentContainer.innerText = paddedScore + '%';
+        this.percentContainer.innerText = score + '%';
       }
        
       // Apply styles to make it fill up
