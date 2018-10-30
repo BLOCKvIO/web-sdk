@@ -33,8 +33,8 @@ module.exports = class ProgressImage extends BaseFace {
 
     // Create Image Percent Container
     this.percentContainer = document.createElement('div');
-    this.percentContainer.style.cssText = 'position:absolute; top: 0px; right: 0px; width:auto; height:auto; padding:5px;';
-    this.base.appendChild(this.percentContainer);
+    this.percentContainer.style.cssText = 'position:absolute; top: 0px; right: 0px; width:auto; height:auto; padding:5px; font-size:9px; color: rgba(0,0,0,0.5)';
+    this.element.appendChild(this.percentContainer);
 
 
     // Reload images
