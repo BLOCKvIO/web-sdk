@@ -18,17 +18,17 @@ module.exports = class ProgressImage extends BaseFace {
 
     // Create base image
     this.base = document.createElement('div');
-    this.base.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);  background-position: center; background-size: contain; background-repeat: no-repeat; ';
+    this.base.style.cssText = 'position: relative; margin:0 auto; background-position: center; background-size: contain; background-repeat: no-repeat; ';
     this.element.appendChild(this.base);
 
     // Create fill container element
     this.fillContainer = document.createElement('div');
-    this.fillContainer.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden;';
+    this.fillContainer.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden;';
     this.element.appendChild(this.fillContainer);
 
     // Create fill image
     this.fill = document.createElement('div');
-    this.fill.style.cssText = 'position: absolute; top: 0px; left: 0px; background-position: center; background-size: contain; background-repeat: no-repeat;';
+    this.fill.style.cssText = 'position: relative; margin: 0 auto; background-position: center; background-size: contain; background-repeat: no-repeat;';
     this.fillContainer.appendChild(this.fill);
 
     // Create Image Percent Container
