@@ -69,7 +69,10 @@ module.exports = class VatomView {
       errorView.style.cssText = 'position: absolute; top: 0px; right: 0px; padding-right: 5px; padding-top: 5px;';
       errorView.innerHTML = '<img width="20" height="20" src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTkuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDQ5Ny40NzIgNDk3LjQ3MiIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNDk3LjQ3MiA0OTcuNDcyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgd2lkdGg9IjUxMnB4IiBoZWlnaHQ9IjUxMnB4Ij4KPGcgdHJhbnNmb3JtPSJtYXRyaXgoMS4yNSAwIDAgLTEuMjUgMCA0NSkiPgoJPGc+CgkJPGc+CgkJCTxwYXRoIHN0eWxlPSJmaWxsOiNGRkNDNEQ7IiBkPSJNMjQuMzc0LTM1Ny44NTdjLTIwLjk1OCwwLTMwLjE5NywxNS4yMjMtMjAuNTQ4LDMzLjgyNkwxODEuNDIxLDE3LjkyOCAgICAgYzkuNjQ4LDE4LjYwMywyNS40NjMsMTguNjAzLDM1LjEyMywwTDM5NC4xNC0zMjQuMDMxYzkuNjcxLTE4LjYwMywwLjQyMS0zMy44MjYtMjAuNTQ4LTMzLjgyNkgyNC4zNzR6Ii8+CgkJCTxwYXRoIHN0eWxlPSJmaWxsOiMyMzFGMjA7IiBkPSJNMTczLjYwNS04MC45MjJjMCwxNC44MTQsMTAuOTM0LDIzLjk4NCwyNS4zOTUsMjMuOTg0YzE0LjEyLDAsMjUuNDA3LTkuNTEyLDI1LjQwNy0yMy45ODQgICAgIFYtMjE2Ljc1YzAtMTQuNDYxLTExLjI4Ny0yMy45ODQtMjUuNDA3LTIzLjk4NGMtMTQuNDYxLDAtMjUuMzk1LDkuMTgyLTI1LjM5NSwyMy45ODRWLTgwLjkyMnogTTE3MS40ODktMjg5LjA1NiAgICAgYzAsMTUuMTY3LDEyLjM0NSwyNy41MTEsMjcuNTExLDI3LjUxMWMxNS4xNjcsMCwyNy41MjMtMTIuMzQ1LDI3LjUyMy0yNy41MTFjMC0xNS4xNzgtMTIuMzU2LTI3LjUyMy0yNy41MjMtMjcuNTIzICAgICBDMTgzLjgzNC0zMTYuNTc5LDE3MS40ODktMzA0LjIzNCwxNzEuNDg5LTI4OS4wNTYiLz4KCQk8L2c+Cgk8L2c+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==" />';
       
-      errorView.addEventListener('click', e => alert(err.message), false);
+      errorView.addEventListener('click', () => {
+        alert(err.message);
+        console.warn(err);
+      }, false);
 
      
       con.appendChild(errorView);
