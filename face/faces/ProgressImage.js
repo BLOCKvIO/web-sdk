@@ -12,28 +12,41 @@
 const BaseFace = require('./BaseFace');
 
 module.exports = class ProgressImage extends BaseFace {
+  constructor(vatomView, vatom, face){
+    super();
+    this.face = face;
+    this.vatom = vatom;
+    this.vatomView = vatomView;
+    this.biWidth = 0;
+    this.biHeight = 0;
+    this.fiWidth = 0;
+    this.fiHeight = 0;
+    
+    this.onResize = this.onResize.bind(this)
+    this.base = document.createElement('div');
+    this.fill = document.createElement('div');
+    this.fillContainer = document.createElement('div');
+    this.percentContainer = document.createElement('div');
+  }
+  
   onLoad() {
+    window.addEventListener("resize", this.onResize);
     // Set our element style
     this.element.style.overflow = 'hidden';
 
-
     // Create base image
-    this.base = document.createElement('div');
     this.base.style.cssText = 'position: relative; background-position: center; background-size: contain; background-repeat: no-repeat; ';
     this.element.appendChild(this.base);
 
     // Create fill container element
-    this.fillContainer = document.createElement('div');
     this.fillContainer.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden;';
     this.element.appendChild(this.fillContainer);
 
     // Create fill image
-    this.fill = document.createElement('div');
     this.fill.style.cssText = 'position: relative; background-position: center; background-size: contain; background-repeat: no-repeat;';
     this.fillContainer.appendChild(this.fill);
 
     // Create Image Percent Container
-    this.percentContainer = document.createElement('div');
     this.percentContainer.style.cssText = 'position:absolute; top: 0px; right: 0px; width:auto; height:auto; padding:5px; font-size:9px; color: rgba(0,0,0,0.5)';
     this.element.appendChild(this.percentContainer);
 
@@ -45,6 +58,8 @@ module.exports = class ProgressImage extends BaseFace {
   onVatomUpdated() {
     return this.refresh();
   }
+
+  
 
   static calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
 
@@ -64,6 +79,8 @@ module.exports = class ProgressImage extends BaseFace {
     const maxheight = this.element.clientHeight;
     let bi = new Image();
     bi.onload = function(){
+      this.biWidth = bi.width;
+      this.biHeight = bi.height;
       let resp = ProgressImage.calculateAspectRatioFit(bi.width, bi.height, maxwidth, maxheight);
       this.base.style.cssText += `width:${resp.width}px; height: ${resp.height}px; top:0; bottom:0; left:0; right:0; margin:auto;`;
     }.bind(this);
@@ -79,6 +96,8 @@ module.exports = class ProgressImage extends BaseFace {
     // get image then get dimensions and aspect ratio
     let fi = new Image();
     fi.onload = function(){
+      this.fiWidth = fi.width;
+      this.fiHeight = fi.height;
       let resp = ProgressImage.calculateAspectRatioFit(fi.width, fi.height, maxwidth, maxheight);
       this.fill.style.cssText += `width:${resp.width}px; height: ${resp.height}px;  top:0; bottom:0; left:0; right:0; margin: auto;`;
     }.bind(this);
@@ -95,8 +114,6 @@ module.exports = class ProgressImage extends BaseFace {
       let paddingStart = parseFloat( this.face.properties.config && this.face.properties.config.padding_start || this.vatom.private.padding_start) || 0;
       let paddingEnd = parseFloat(this.face.properties.config && this.face.properties.config.padding_end || this.vatom.private.padding_end) || 0;
       const direction = (this.face.properties.config && this.face.properties.config.direction || this.vatom.private.direction || '').toLowerCase();
-
-      console.log("DIRECTION!!! :" , direction);
 
       // Adjust padding to be percents instead of pixels of base image
       if (direction === 'up' || direction === 'down') {
@@ -116,7 +133,6 @@ module.exports = class ProgressImage extends BaseFace {
        
       // Apply styles to make it fill up
       const invertedScore = 100 - paddedScore;
-      console.log("Progress : ", paddedScore);
       if (direction === 'up') {
         // Filling from the bottom up
         this.fillContainer.style.top = `${invertedScore}%`;
@@ -153,5 +169,14 @@ module.exports = class ProgressImage extends BaseFace {
         onSuccess(img);
       }
     });
+  }
+
+  onResize() {
+    // get aspect ratios and resize accordingly
+    let baseAspectRatio = ProgressImage.calculateAspectRatioFit(this.biWidth, this.biHeight, this.element.clientWidth,this.element.clientHeight)
+    let fillAspectRatio = ProgressImage.calculateAspectRatioFit(this.fiWidth, this.fiHeight, this.element.clientWidth, this.element.clientHeight);
+    // set width and height of containers
+    this.base.style.cssText += `width: ${Math.floor(baseAspectRatio.width)}px; height: ${Math.floor(baseAspectRatio.height)}px`;
+    this.fill.style.cssText += `width: ${Math.floor(fillAspectRatio.width)}px; height: ${Math.floor(fillAspectRatio.height)}px`;
   }
 };
