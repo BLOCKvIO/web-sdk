@@ -35,7 +35,7 @@ module.exports = class Vatoms {
    */
 
   performAction(vatomId, action, payload) {
-    return this.vatomApi.performAction(action, { 'this.id': vatomId, ...payload });
+    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId}, payload));
   }
 
   /**

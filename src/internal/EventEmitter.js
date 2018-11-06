@@ -57,12 +57,12 @@ class EventEmitter {
   }
 
   /** Synonyms */
-  on(...args) {
-    return this.when(...args);
+  on() {
+    return this.when.apply(this, arguments);
   }
 
-  addEventListener(...args) {
-    return this.when(...args);
+  addEventListener() {
+    return this.when.apply(this, arguments);
   }
 
   /** Remove event listener */
@@ -82,13 +82,13 @@ class EventEmitter {
     }
   }
 
-  off(...args) {
-    return this.removeEventListener(...args);
+  off() {
+    return this.removeEventListener.apply(this, arguments);
   }
 
 
   /** Triggers an event. Each argument after the first one will be passed to event listeners */
-  emit(eventName, ...args) {
+  emit(eventName) {
     // Setup the once-off promise if one of it's events were triggered
     // if (eventName == "success" || eventName == "failed")
     // this._setupPromise();
@@ -98,7 +98,7 @@ class EventEmitter {
 
     // Call events
     callbacks.forEach((callback) => {
-      callback(...args);
+      callback(this, arguments);
     });
 
     // Remove callbacks that can only be called once
@@ -111,12 +111,12 @@ class EventEmitter {
   }
 
   /** Synonyms */
-  trigger(...args) {
-    return this.emit(...args);
+  trigger() {
+    return this.emit.apply(this, arguments);
   }
 
-  triggerEvent(...args) {
-    return this.emit(...args);
+  triggerEvent() {
+    return this.emit.apply(this, arguments);
   }
 };
 
