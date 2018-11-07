@@ -96,7 +96,7 @@ class EventEmitter {
     // Get list of callbacks
     const callbacks = (this.privateEventListeners && this.privateEventListeners[eventName]) || [];
     // Call events
-    var passArguments = Array.from(arguments).slice(1)
+    let passArguments = Array.from(arguments).slice(1)
     callbacks.forEach((callback) => {
       callback.apply(this, passArguments);
     });
