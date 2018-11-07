@@ -95,10 +95,10 @@ class EventEmitter {
 
     // Get list of callbacks
     const callbacks = (this.privateEventListeners && this.privateEventListeners[eventName]) || [];
-
     // Call events
+    var passArguments = Array.from(arguments).slice(1)
     callbacks.forEach((callback) => {
-      callback(this, arguments);
+      callback.apply(this, passArguments);
     });
 
     // Remove callbacks that can only be called once
