@@ -16,6 +16,7 @@ const ProgressImage = require('./faces/ProgressImage');
 const ImageFace = require('./faces/ImageFace');
 const ImagePolicy = require('./faces/ImagePolicy');
 const LayeredImage = require('./faces/LayeredImage');
+const WebFace = require('./faces/WebFace');
 
 // list registered faces
 let registeredFace = {
@@ -111,7 +112,7 @@ module.exports = class VatomView {
      
       // if there is no face registered in the array but we have a http link, show the web face
       if (FaceClass === undefined && du.indexOf('http') !== -1) {
-        FaceClass = ImageFace;
+        FaceClass = WebFace;
       } else if (FaceClass === undefined) {
         throw new Error('No Face Registered');
       }
