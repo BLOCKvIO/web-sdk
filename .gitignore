@@ -6,3 +6,4 @@ dist
 sample-app
 .DS_Store
 lib
+.cache

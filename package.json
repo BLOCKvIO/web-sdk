@@ -60,7 +60,6 @@
     "expect.js": "^0.3.1",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
-    "popsicle": "^10.0.1",
     "url-parse": "^1.4.3"
   },
   "repository": "github:BLOCKvIO/web-sdk",

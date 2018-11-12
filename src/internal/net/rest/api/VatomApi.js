@@ -35,7 +35,7 @@ module.exports = class VatomApi {
   }
 
   performAction(action, payload) {
-    return this.client.request('POST', `/v1/user/vatom/action/${action}`, payload, true).then(data => data.main.output);
+    return this.client.request('POST', `/v1/user/vatom/action/${action}`, payload, true).then(data => data.main && data.main.output || data.output);
   }
 
   getUserInventory(payload) {
@@ -107,7 +107,7 @@ module.exports = class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType'];
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template)); 
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
         vatomsArray.push(obj);
       }
       return vatomsArray;

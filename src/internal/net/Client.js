@@ -8,7 +8,6 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const popsicle = require('popsicle');
 const jwtDecode = require('jwt-decode');
 const BaseResponse = require('./rest/response/BaseResponse');
 
@@ -27,30 +26,45 @@ module.exports = class Client {
   }
 
 
-  authRequest(method, endpoint, payload, headers) {
-    const header = Object.assign({
-      'App-Id': this.store.appID,
-      Authorization: `Bearer ${this.store.token}`,
-      'Content-Type': 'application/json',
-    }, headers);
+  authRequest(method, endpoint, body, headers) {
 
-    return popsicle.request({
-      method,
-      url: this.store.server + endpoint,
-      body: payload,
-      headers: header,
+    // Add headers
+    headers = Object.assign({
+        'App-Id': this.store.appID,
+        'Authorization': `Bearer ${this.store.token}`
+    }, headers)
 
-    }).use(popsicle.plugins.parse('json'))
-      .then((res) => {
-        const response = Object.assign(new BaseResponse(), res.body);
-        response.httpStatus = res.status;
+    // Convert body to required type
+    if (!body) {
+
+        // If no body, make it undefined
+        body = undefined
+
+    } else if (body instanceof FormData) {
+
+        // Leave payload as-is
+
+    } else if (typeof body == 'object') {
+
+        // Convert to JSON
+        body = JSON.stringify(body)
+        headers['Content-Type'] = 'application/json'
+
+    }
+
+    var httpCode = 0
+    return fetch(this.store.server + endpoint, { method, body, headers }).then(r => {
+      httpCode = r.status
+      return r.json()
+  }).then((res) => {
+        const response = Object.assign(new BaseResponse(), res);
+        response.httpStatus = httpCode;
         return response;
       }).then((response) => {
         // Check for server error
         if (!response.payload) {
           const ErrorCodes = {
             2: 'Blank App ID',
-            11: 'Problem with payload',
             17: 'invalid App ID',
             401: 'Token has Expired',
             516: 'Invalid Payload',
