@@ -50,7 +50,6 @@ module.exports = class Client {
         if (!response.payload) {
           const ErrorCodes = {
             2: 'Blank App ID',
-            11: 'Problem with payload',
             17: 'invalid App ID',
             401: 'Token has Expired',
             516: 'Invalid Payload',
