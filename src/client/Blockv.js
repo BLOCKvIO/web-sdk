@@ -29,7 +29,7 @@ module.exports = class Blockv {
     this.store = new Store(prefix);
     this.store.appID = payload.appID;
     this.store.server = payload.server || 'https://api.blockv.io';
-    this.store.websocketAddress = payload.websocketAddress || 'wss://ws.blockv.io';
+    this.store.websocketAddress = payload.websocketAddress || 'wss://newws.blockv.io';
     this.client = new Client(this.store);
 
 
