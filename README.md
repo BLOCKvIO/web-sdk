@@ -73,22 +73,18 @@ Leaving the prefix out will force the sdk to use the appID as the prefix for any
 
 ### Registering a User
 
-#### register(payload)
-Registration can be done in two ways:
-- inline register('first name','last name', 'birthday', 'language', 'password', 'tokens', 'name public', 'avatar public')
-- or as an object
 
 #### Examples
 
 ```javascript
 
 let payload = {
-    firstName : 'John',
-    lastName : 'Smith',
+    first_name : 'John',
+    last_name : 'Smith',
     birthday : '1970-12-23',
     language : 'en',
     password : '',
-    tokens : [
+    user_tokens : [
       {
         token : '+44 123 9876',
         token_type : 'phone_number',
@@ -342,8 +338,8 @@ With the discover method you can search for vAtoms on the BLOCKv Platform. The s
 You construct a discover query using a DiscoverQueryBuilder. This class helps you to easily compose queries using a few components:
 
 1. Scope (required)
-1. Filters (optional)
-1. Returns (optional)
+2. Filters (optional)
+3. Returns (optional)
 
 #### Scope
 A scope must always be supplied. Scopes are defined using a key and value. The key specifies the property of the vAtom to search. The value is the search term.
