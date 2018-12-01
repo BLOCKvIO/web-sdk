@@ -5,9 +5,7 @@ module.exports = {
   },
   "rules": {
     "linebreak-style": 0,
-    "max-len": {
-      "ignoreStrings" : true,
-    }
+    "max-len": 0
   },
   "extends": "airbnb-base"
 };
