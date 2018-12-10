@@ -8,24 +8,22 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const jwtDecode = require('jwt-decode');
+const jwtDecode = require('jwt-decode')
 
 module.exports = class UserManager {
-  constructor(UserApi, store) {
-    this.UserApi = UserApi;
-    this.store = store;
+  constructor (UserApi, store) {
+    this.UserApi = UserApi
+    this.store = store
   }
-
 
   /**
    * An Alternate version of the register function
    * @param  {Object} registration An Object containing all the information to register a user.
    * @return {Promise<Object>} returns a success Object containing user specific information
    */
-  register(registration) {
-    return this.UserApi.register(registration);
+  register (registration) {
+    return this.UserApi.register(registration)
   }
-
 
   /**
      * Allows the user to login to the platform
@@ -34,8 +32,8 @@ module.exports = class UserManager {
      * @param  {String} password  The password that the user has set
      * @return {Promise<Object>} returns a object containing the user that has logged in.
      */
-  login(token, tokenType, password) {
-    return this.UserApi.login(token, tokenType, password);
+  login (token, tokenType, password) {
+    return this.UserApi.login(token, tokenType, password)
   }
 
   /**
@@ -44,32 +42,32 @@ module.exports = class UserManager {
      *                            A Guest account can be made into a registered account by patching
      * @return {Promise<Object>} A Object that contains  the guest user that was logged in.
      */
-  loginGuest(guestId) {
-    return this.UserApi.loginGuest(guestId);
+  loginGuest (guestId) {
+    return this.UserApi.loginGuest(guestId)
   }
 
   /**
      * Logs out the currently logged in user.
      * @return {Promise<Object>} Logout success message
      */
-  logout() {
-    return this.UserApi.logout();
+  logout () {
+    return this.UserApi.logout()
   }
 
   /**
      * Gets information about the currently logged in user.
      * @return {Promise<Object>} Contains the users information such as ID, Avatar, Name etc.
      */
-  getCurrentUser() {
-    return this.UserApi.getCurrentUser();
+  getCurrentUser () {
+    return this.UserApi.getCurrentUser()
   }
 
   /**
      * Returns a list of user tokens
      * @return {Promise<Object>} An Object containing a list of Email Address's and Phone Number's.
      */
-  getCurrentUserTokens() {
-    return this.UserApi.getUserTokens();
+  getCurrentUserTokens () {
+    return this.UserApi.getUserTokens()
   }
 
   /**
@@ -77,8 +75,8 @@ module.exports = class UserManager {
      * @param  {FormData} formData Uploads the FormData containing the new avatar for the user
      * @return {Promise<Object>}   An Object containing a upload success message
      */
-  uploadAvatar(formData) {
-    return this.UserApi.uploadAvatar(formData);
+  uploadAvatar (formData) {
+    return this.UserApi.uploadAvatar(formData)
   }
 
   /**
@@ -86,24 +84,24 @@ module.exports = class UserManager {
      * @param  {Object} payload A payload containg the fields to be changed for the user.
      * @return {Promise<Object>} returns a user Object containing the updated users info.
      */
-  updateUser(payload) {
-    return this.UserApi.updateUser(payload);
+  updateUser (payload) {
+    return this.UserApi.updateUser(payload)
   }
 
   /**
      * Returns the Access Token
      * @return {Promise<Object>} Returns a Object containing the Access Token String.
      */
-  getAccessToken() {
-    return this.UserApi.getAccessToken();
+  getAccessToken () {
+    return this.UserApi.getAccessToken()
   }
 
   /**
      * Automatically Encodes the Asset Provides URI's
      * @param {String} url The URL that needs to be encoded
      */
-  encodeAssetProvider(url) {
-    return this.UserApi.encodeAssetProvider(url);
+  encodeAssetProvider (url) {
+    return this.UserApi.encodeAssetProvider(url)
   }
 
   /**
@@ -112,17 +110,16 @@ module.exports = class UserManager {
      * @param  {String} token_type Description of the Token above ie. "phone_number" / "email"
      * @return {}   An Email / SMS will be sent to the token with a verification code.
      */
-  sendTokenVerification(token, tokenType) {
-    return this.UserApi.sendTokenVerification(token, tokenType);
+  sendTokenVerification (token, tokenType) {
+    return this.UserApi.sendTokenVerification(token, tokenType)
   }
 
-
-  getRefreshToken() {
-    return this.UserApi.getRefreshToken();
+  getRefreshToken () {
+    return this.UserApi.getRefreshToken()
   }
 
-  setRefreshToken(token) {
-    return this.UserApi.setRefreshToken(token);
+  setRefreshToken (token) {
+    return this.UserApi.setRefreshToken(token)
   }
 
   /**
@@ -131,8 +128,8 @@ module.exports = class UserManager {
      *           {"token" : "someone@blockv.org", "token_type" : "email", "verify_code" :  "00000" }
      * @return {Promise<Object>}  An Object containing the outcome of the verification of the token.
      */
-  verifyUserToken(verify) {
-    return this.UserApi.verifyUserToken(verify);
+  verifyUserToken (verify) {
+    return this.UserApi.verifyUserToken(verify)
   }
 
   /**
@@ -140,16 +137,16 @@ module.exports = class UserManager {
      * @param {Object} payload An Object containing the tokens that need to be added to the user.
      * @return {Promise<Object>}  An Object with the updated user profile.
      */
-  addUserToken(payload) {
-    return this.UserApi.addUserToken(payload);
+  addUserToken (payload) {
+    return this.UserApi.addUserToken(payload)
   }
 
   /**
      * Sets the token to be the primary option
      * @param {[type]} tokenID id of the token that needs to be set as the defualt
      */
-  setDefaultToken(tokenID) {
-    return this.UserApi.setDefaultToken(tokenID);
+  setDefaultToken (tokenID) {
+    return this.UserApi.setDefaultToken(tokenID)
   }
 
   /**
@@ -157,12 +154,12 @@ module.exports = class UserManager {
      * @param  {String} tokenId ID of the token that needs to be deleted
      * @return {Promise<Object>} A Success / Faile object with the outcome of the deletion.
      */
-  deleteUserToken(tokenId) {
-    return this.UserApi.deleteUserToken(tokenId);
+  deleteUserToken (tokenId) {
+    return this.UserApi.deleteUserToken(tokenId)
   }
 
-  getGuestToken() {
-    return this.UserApi.getGuestToken();
+  getGuestToken () {
+    return this.UserApi.getGuestToken()
   }
 
   /**
@@ -171,8 +168,8 @@ module.exports = class UserManager {
    * @param {String} token   The Token that needs to be reset (Phone Number / Email Address)
    * @param {String} token_type Description of the Token to be reset
    */
-  resetPassword(token, tokenType) {
-    return this.UserApi.resetPassword(token, tokenType);
+  resetPassword (token, tokenType) {
+    return this.UserApi.resetPassword(token, tokenType)
   }
 
   /**
@@ -180,38 +177,38 @@ module.exports = class UserManager {
      * @param  {String} userID Public User ID
      * @return {Promise<Object>}  Returns a Public User Object
      */
-  getPublicUserProfile(userID) {
-    return this.UserApi.getPublicUserProfile(userID);
+  getPublicUserProfile (userID) {
+    return this.UserApi.getPublicUserProfile(userID)
   }
 
-  addRedeemable(payload) {
-    return this.UserApi.addRedeemable(payload);
+  addRedeemable (payload) {
+    return this.UserApi.addRedeemable(payload)
   }
 
   /**
      * Checked to see if the refresh token is valid
      * @return {Boolean} returns True / False if the refresh token is valid
      */
-  get isLoggedIn() {
+  get isLoggedIn () {
     // define our vars
-    let decodedToken;
-    let nowDate;
-    let expirationTime;
-    const { refreshToken } = this.store;
+    let decodedToken
+    let nowDate
+    let expirationTime
+    const { refreshToken } = this.store
     // if no refreshToken
     if (!refreshToken) {
-      return false;
+      return false
     }
     try {
       // decode token
-      decodedToken = jwtDecode(refreshToken);
-      expirationTime = (decodedToken.exp * 1000);
-      nowDate = Date.now();
+      decodedToken = jwtDecode(refreshToken)
+      expirationTime = (decodedToken.exp * 1000)
+      nowDate = Date.now()
       // quick calc to determine if the token has expired
-      return nowDate < (expirationTime - 30000);
+      return nowDate < (expirationTime - 30000)
     } catch (e) {
       // decoding fails
-      return false;
+      return false
     }
   }
-};
+}

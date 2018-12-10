@@ -9,12 +9,10 @@
 //  governing permissions and limitations under the License.
 //
 
-
 module.exports = class Vatoms {
-  constructor(vatomApi) {
-    this.vatomApi = vatomApi;
+  constructor (vatomApi) {
+    this.vatomApi = vatomApi
   }
-
 
   /**
    * Returns a list of actions that can be performed on a template
@@ -22,8 +20,8 @@ module.exports = class Vatoms {
    * @return {[Promise<Object>]} returns a object containing a list of available actions
    */
 
-  getActions(templateID) {
-    return this.vatomApi.getActions(templateID);
+  getActions (templateID) {
+    return this.vatomApi.getActions(templateID)
   }
 
   /**
@@ -34,8 +32,8 @@ module.exports = class Vatoms {
    * @return {Promise<Object>}   json payload nested
    */
 
-  performAction(vatomId, action, payload) {
-    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId}, payload));
+  performAction (vatomId, action, payload) {
+    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId }, payload))
   }
 
   /**
@@ -44,14 +42,14 @@ module.exports = class Vatoms {
    * No parameters are required for this call
    */
 
-  getUserInventory() {
+  getUserInventory () {
     const payload = {
       parent_id: '.',
       page: 1,
-      limit: 1000,
-    };
+      limit: 1000
+    }
 
-    return this.vatomApi.getUserInventory(payload);
+    return this.vatomApi.getUserInventory(payload)
   }
 
   /**
@@ -59,11 +57,11 @@ module.exports = class Vatoms {
    * @param  {[String]} vatomId ID of the vAtom that is being searched for
    * @return {[Promise<Object>} returns a JSON Object containing the vAtom.
    */
-  getUserVatoms(vatomId) {
+  getUserVatoms (vatomId) {
     const payload = {
-      ids: vatomId,
-    };
-    return this.vatomApi.getUserVatoms(payload);
+      ids: vatomId
+    }
+    return this.vatomApi.getUserVatoms(payload)
   }
 
   /**
@@ -73,20 +71,20 @@ module.exports = class Vatoms {
    * @param  {[String]} filter     defaults to "all"
    * @return {[Promise<Object>}  returns a list of vAtoms, faces and actions
    */
-  geoDiscover(bottomLeft, topRight, filter = 'vatoms') {
+  geoDiscover (bottomLeft, topRight, filter = 'vatoms') {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
-        lon: bottomLeft.lon,
+        lon: bottomLeft.lon
       },
       top_right: {
         lat: topRight.lat,
-        lon: topRight.lon,
+        lon: topRight.lon
       },
-      filter,
-    };
+      filter
+    }
 
-    return this.vatomApi.geoDiscover(payload);
+    return this.vatomApi.geoDiscover(payload)
   }
 
   /**
@@ -99,29 +97,29 @@ module.exports = class Vatoms {
    * @param  {String} filter     defaults to all
    * @return {Promise<Object>}   Returns a list of groups
    */
-  geoDiscoverGroups(bottomLeft, topRight, precision = 2, filter = 'all') {
+  geoDiscoverGroups (bottomLeft, topRight, precision = 2, filter = 'all') {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
-        lon: bottomLeft.lon,
+        lon: bottomLeft.lon
       },
       top_right: {
         lat: topRight.lat,
-        lon: topRight.lon,
+        lon: topRight.lon
       },
       precision,
-      filter,
-    };
+      filter
+    }
 
-    return this.vatomApi.geoDiscoverGroups(payload);
+    return this.vatomApi.geoDiscoverGroups(payload)
   }
 
   /**
-   * 
-   * @param {String} parentID   ID of the vatom that you would like to list the children  
+   *
+   * @param {String} parentID   ID of the vatom that you would like to list the children
    */
-  getVatomChildren(parentID){
-    return this.vatomApi.getVatomChildren(parentID);
+  getVatomChildren (parentID) {
+    return this.vatomApi.getVatomChildren(parentID)
   }
 
   /**
@@ -129,7 +127,7 @@ module.exports = class Vatoms {
    * @param  {String} vatomID  Id of the vAtom you want to remove
    * @return {Promise<Object>} An object containing a success message
    */
-  trashVatom(vatomID) {
-    return this.vatomApi.trashVatom(vatomID);
+  trashVatom (vatomID) {
+    return this.vatomApi.trashVatom(vatomID)
   }
-};
+}

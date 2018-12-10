@@ -8,53 +8,53 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 
-let Vatom = require('../../../../model/Vatom');
+let Vatom = require('../../../../model/Vatom')
 
 module.exports = class VatomApi {
-  constructor(client) {
-    this.client = client;
+  constructor (client) {
+    this.client = client
   }
 
-  getActions(templateID) {
+  getActions (templateID) {
     return this.client.request('GET', `/v1/user/actions/${templateID}`, {}, true)
       .then((data) => {
-        const len = data.length;
-        const actions = [];
+        const len = data.length
+        const actions = []
         for (let i = 0; i < len;) {
-          const action = data[i].name.split('::Action::');
+          const action = data[i].name.split('::Action::')
           actions.push(
             {
               template_id: action[0],
-              action: action[1],
-            },
-          );
-          i += 1;
+              action: action[1]
+            }
+          )
+          i += 1
         }
-        return actions;
-      });
+        return actions
+      })
   }
 
-  performAction(action, payload) {
-    return this.client.request('POST', `/v1/user/vatom/action/${action}`, payload, true).then(data => data.main.output);
+  performAction (action, payload) {
+    return this.client.request('POST', `/v1/user/vatom/action/${action}`, payload, true).then(data => data.main.output)
   }
 
-  getUserInventory(payload) {
+  getUserInventory (payload) {
     return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then((data) => {
-      const { actions, faces, vatoms } = data;
+      const { actions, faces, vatoms } = data
 
-      const actionsArray = [];
-      const facesArray = [];
-      const vatomsArray = [];
+      const actionsArray = []
+      const facesArray = []
+      const vatomsArray = []
       // eslint-disable-next-line
       for (let a of actions) {
-        const aName = a.name.split('::Action::');
-        const aKey = aName[0];
+        const aName = a.name.split('::Action::')
+        const aKey = aName[0]
         actionsArray.push({
           template: aKey,
           action: aName[1],
           meta: a.meta,
-          properties: a.properties,
-        });
+          properties: a.properties
+        })
       }
       // eslint-disable-next-line
       for (let f of faces) {
@@ -62,140 +62,140 @@ module.exports = class VatomApi {
           template: f.template,
           id: f.id,
           meta: f.meta,
-          properties: f.properties,
-        });
+          properties: f.properties
+        })
       }
       // eslint-disable-next-line
       for (let v of vatoms) {
-        const { template } = v['vAtom::vAtomType'];
+        const { template } = v['vAtom::vAtomType']
         if (template !== 'vatomic::v1::vAtom::Avatar') {
-          const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
-          vatomsArray.push(obj);
+          const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+          vatomsArray.push(obj)
         }
       }
-      return vatomsArray;
-    });
-  }
-
-  getUserVatoms(payload) {
-    return this.client.request('POST', '/v1/user/vatom/get', payload, true).then((data) => {
-      const { actions, faces, vatoms } = data;
-
-      const actionsArray = [];
-      const facesArray = [];
-      const vatomsArray = [];
-      // eslint-disable-next-line
-      for (let a of actions) {
-        const aName = a.name.split('::Action::');
-        const aKey = aName[0];
-        actionsArray.push({
-          template: aKey,
-          action: aName[1],
-          meta: a.meta,
-          properties: a.properties,
-        });
-      }
-      // eslint-disable-next-line
-      for (let f of faces) {
-        facesArray.push({
-          template: f.template,
-          id: f.id,
-          meta: f.meta,
-          properties: f.properties,
-        });
-      }
-      // eslint-disable-next-line
-      for (let v of vatoms) {
-        const { template } = v['vAtom::vAtomType'];
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template)); 
-        vatomsArray.push(obj);
-      }
-      return vatomsArray;
-    });
-  }
-
-  geoDiscover(payload) {
-    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then((data) => {
-      const { actions, faces, vatoms } = data;
-
-      const actionsArray = [];
-      const facesArray = [];
-      const vatomsArray = [];
-      // eslint-disable-next-line
-      for (let a of actions) {
-        const aName = a.name.split('::Action::');
-        const aKey = aName[0];
-        actionsArray.push({
-          template: aKey,
-          action: aName[1],
-          meta: a.meta,
-          properties: a.properties,
-        });
-      }
-      // eslint-disable-next-line
-      for (let f of faces) {
-        facesArray.push({
-          template: f.template,
-          id: f.id,
-          meta: f.meta,
-          properties: f.properties,
-        });
-      }
-      // eslint-disable-next-line
-      for (let v of vatoms) {
-        const { template } = v['vAtom::vAtomType'];
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
-        vatomsArray.push(obj);
-      }
-      return vatomsArray;
-    });
-  }
-
-  geoDiscoverGroups(payload) {
-    return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data);
-  }
-
-  getVatomChildren(parentID){
-    return this.client.request('POST', '/v1/user/vatom/inventory', {"parent_id":parentID}, true).then(data => {
-      const { actions, faces, vatoms } = data;
-
-      const actionsArray = [];
-      const facesArray = [];
-      const vatomsArray = [];
-      // eslint-disable-next-line
-      for (let a of actions) {
-        const aName = a.name.split('::Action::');
-        const aKey = aName[0];
-        actionsArray.push({
-          template: aKey,
-          action: aName[1],
-          meta: a.meta,
-          properties: a.properties,
-        });
-      }
-      // eslint-disable-next-line
-      for (let f of faces) {
-        facesArray.push({
-          template: f.template,
-          id: f.id,
-          meta: f.meta,
-          properties: f.properties,
-        });
-      }
-      // eslint-disable-next-line
-      for (let v of vatoms) {
-        const { template } = v['vAtom::vAtomType'];
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template));
-        vatomsArray.push(obj);
-      }
-      return vatomsArray;
+      return vatomsArray
     })
   }
 
-  trashVatom(vatomID) {
-    const payload = {
-      'this.id': vatomID,
-    };
-    return this.client.request('POST', '/v1/user/vatom/trash', payload, true).then(data => data);
+  getUserVatoms (payload) {
+    return this.client.request('POST', '/v1/user/vatom/get', payload, true).then((data) => {
+      const { actions, faces, vatoms } = data
+
+      const actionsArray = []
+      const facesArray = []
+      const vatomsArray = []
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::')
+        const aKey = aName[0]
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties
+        })
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties
+        })
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType']
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+        vatomsArray.push(obj)
+      }
+      return vatomsArray
+    })
   }
-};
+
+  geoDiscover (payload) {
+    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then((data) => {
+      const { actions, faces, vatoms } = data
+
+      const actionsArray = []
+      const facesArray = []
+      const vatomsArray = []
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::')
+        const aKey = aName[0]
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties
+        })
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties
+        })
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType']
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+        vatomsArray.push(obj)
+      }
+      return vatomsArray
+    })
+  }
+
+  geoDiscoverGroups (payload) {
+    return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data)
+  }
+
+  getVatomChildren (parentID) {
+    return this.client.request('POST', '/v1/user/vatom/inventory', { 'parent_id': parentID }, true).then(data => {
+      const { actions, faces, vatoms } = data
+
+      const actionsArray = []
+      const facesArray = []
+      const vatomsArray = []
+      // eslint-disable-next-line
+      for (let a of actions) {
+        const aName = a.name.split('::Action::')
+        const aKey = aName[0]
+        actionsArray.push({
+          template: aKey,
+          action: aName[1],
+          meta: a.meta,
+          properties: a.properties
+        })
+      }
+      // eslint-disable-next-line
+      for (let f of faces) {
+        facesArray.push({
+          template: f.template,
+          id: f.id,
+          meta: f.meta,
+          properties: f.properties
+        })
+      }
+      // eslint-disable-next-line
+      for (let v of vatoms) {
+        const { template } = v['vAtom::vAtomType']
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+        vatomsArray.push(obj)
+      }
+      return vatomsArray
+    })
+  }
+
+  trashVatom (vatomID) {
+    const payload = {
+      'this.id': vatomID
+    }
+    return this.client.request('POST', '/v1/user/vatom/trash', payload, true).then(data => data)
+  }
+}
