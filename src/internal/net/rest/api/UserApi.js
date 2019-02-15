@@ -271,12 +271,12 @@ module.exports = class UserApi {
     * @param {Object} payload Object containing the redeemable information
     * @return {Promise<Object>} returns a Object containing the new redeemable
     */
-  addRedeemable (payload) {
+  async addRedeemable (payload) {
     const { userID } = this.store
     return this.client.request('POST', `/v1/users/${userID}/redeemables`, payload, true)
   }
 
-  getPublicUserProfile (userID) {
-    return this.client.request('GET', `/v1/users/${userID}`, {}, true)
+  async getPublicUserProfile (userID) {
+    return this.client.request('GET', `/v1/users/${userID}`, '', true)
   }
 }

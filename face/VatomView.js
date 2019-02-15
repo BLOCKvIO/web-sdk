@@ -16,6 +16,7 @@ const ProgressImage = require('./faces/ProgressImage')
 const ImageFace = require('./faces/ImageFace')
 const ImagePolicy = require('./faces/ImagePolicy')
 const LayeredImage = require('./faces/LayeredImage')
+const BaseWebFace = require('./faces/WebFace/BaseWebFace')
 
 // list registered faces
 let registeredFace = {
@@ -32,7 +33,7 @@ module.exports = class VatomView {
     this.fsp = FSP || FaceSelection.Icon
     this.config = config || {}
     // eslint-disable-next-line
-    this._currentFace = {}
+    this._currentFace = null
 
     // create a default view with a div container
     // eslint-disable-next-line
@@ -104,7 +105,8 @@ module.exports = class VatomView {
 
       // if there is no face registered in the array but we have a http link, show the web face
       if (FaceClass === undefined && du.indexOf('http') !== -1) {
-        FaceClass = ImageFace
+        console.log("Should actually show a webface here!");
+        FaceClass = BaseWebFace
       } else if (FaceClass === undefined) {
         throw new Error('No Face Registered')
       }
@@ -130,9 +132,11 @@ module.exports = class VatomView {
         rFace.element.style.opacity = 1
       }
     }).catch((err) => {
+      console.warn("ERRRRRRRRRRRRR: ", err);
       // remove current face
       this.element.appendChild(this.errorView = this.createErrorView(this.blockv, this.vatom, err))
-      if (rFace && rFace.element) {
+      if (rFace && rFace.element && rFace.element.parentNode) {
+        console.log(rFace.element)
         this.element.removeChild(rFace.element)
       }
       if (this.loader && this.loader.parentNode) {
@@ -144,7 +148,9 @@ module.exports = class VatomView {
   set vatom (vAtom) {
     if (vAtom && vAtom.id === this.vatomObj.id) {
       this.vatomObj.payload = vAtom.payload
-      this._currentFace.onVatomUpdated()
+      if (this._currentFace) {
+        this._currentFace.onVatomUpdated()
+      }
     } else if (vAtom) {
       this.vatomObj = vAtom
       this.update()
