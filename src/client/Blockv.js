@@ -18,9 +18,6 @@ const ActivityApi = require('../internal/net/rest/api/ActivityApi')
 const Client = require('../internal/net/Client')
 const WebSockets = require('./manager/WebSockets')
 
-/**
- * Created by LordCheddar on 2018/03/05.
- */
 
 module.exports = class Blockv {
   constructor (payload) {
