@@ -116,11 +116,7 @@ module.exports = class UserApi {
   uploadAvatar (request) {
     // get file
     // change to formData
-    // submit formData with new header
-    const avatarHeader = {
-      'Content-Type': 'multipart/form-data'
-    }
-    this.client.request('POST', '/v1/user/avatar', request, true, avatarHeader)
+    return this.client.request('POST', '/v1/user/avatar', request, true)
   }
 
   /**
