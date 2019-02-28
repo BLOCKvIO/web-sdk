@@ -132,11 +132,9 @@ module.exports = class VatomView {
         rFace.element.style.opacity = 1
       }
     }).catch((err) => {
-      console.warn("ERRRRRRRRRRRRR: ", err);
       // remove current face
       this.element.appendChild(this.errorView = this.createErrorView(this.blockv, this.vatom, err))
       if (rFace && rFace.element && rFace.element.parentNode) {
-        console.log(rFace.element)
         this.element.removeChild(rFace.element)
       }
       if (this.loader && this.loader.parentNode) {
