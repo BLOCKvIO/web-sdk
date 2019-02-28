@@ -63,7 +63,6 @@ module.exports = class BridgeV1 {
 
   getProfile (payload) {
     // Get user details
-    console.log(this.vatomView)
     return this.vatomView.blockv.UserManager.getCurrentUser().then(user => {
       // Got it, send response
       return {
@@ -88,7 +87,6 @@ module.exports = class BridgeV1 {
     let us = this.vatom.properties.owner
 
     return this.blockv.UserManager.getPublicUserProfile(us).then(pu => {
-      console.log("UUUUUUUUUU: ", pu)
       return this.encodeUser(pu)
     })
   }
@@ -96,9 +94,8 @@ module.exports = class BridgeV1 {
   encodeVatom (vatom) {
     // Create resource list
     var resources = {}
-    for (var res in vatom.properties.resources) {
-      console.log('RES : ', res)
-      // resources[res] = vatom.resources[res].value.value
+    for (let i = 0; i < vatom.properties.resources.length; i++) {
+      resources[vatom.properties.resources[i].name] =  this.blockv.UserManager.encodeAssetProvider(vatom.properties.resources[i].value.value)
     }
     // Create payload
     return {
