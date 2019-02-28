@@ -16,8 +16,6 @@ module.exports = class BridgeV2 {
     this.vatom = this.encodeVatom(vatom)
     this.face = face
     this.version = 2
-    console.log("VATOM COMING FROM V2", this.vatom)
-    console.log("FACE COMING FROM V2", this.face)
   }
 
   init () {
@@ -48,7 +46,7 @@ module.exports = class BridgeV2 {
       return this.blockv.Vatoms.performAction(payload.payload['this.id'], payload.action_name, payload.payload)
   }
 
-  getUserProfile () {
+  getUserProfile (payload) {
     return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(u => {
       return this.encodeUser(u)
     })
@@ -71,7 +69,6 @@ module.exports = class BridgeV2 {
   }
 
   customMessage (payload) {
-    console.log("This would be coming through", payload)
     return payload
   }
 
