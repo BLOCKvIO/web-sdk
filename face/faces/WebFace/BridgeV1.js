@@ -15,8 +15,6 @@ module.exports = class BridgeV1 {
     this.vatom = vatom
     this.face = face
     this.version = 1
-    console.log("VATOM COMING FROM V1", this.vatom)
-    console.log("FACE COMING FROM V1", this.face)
   }
 
   init () {
