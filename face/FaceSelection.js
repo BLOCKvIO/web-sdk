@@ -11,7 +11,7 @@
 /* eslint-disable no-use-before-define */
 module.exports = {
   Icon: vatom => start(vatom, 'icon'),
-  Engaged: vatom => start(vatom, 'engaged'),
+  Engaged: vatom => start(vatom, 'engaged') || start(vatom, 'icon'),
   Fullscreen: vatom => start(vatom, 'fullscreen'),
   Card: vatom => start(vatom, 'card')
 }
