@@ -89,7 +89,7 @@ module.exports = class BaseWebFace extends BaseFace {
         return this.BridgeV2.customMessage(payload)
       case 'viewer.view.close':
         return this.BridgeV2.customMessage(payload)
-      case 'viewer.url.open': 
+      case 'viewer.url.open':
         return this.BridgeV2.customMessage(payload)
       case 'viewer.scanner.show':
         return this.BridgeV2.customMessage(payload)
@@ -104,19 +104,13 @@ module.exports = class BaseWebFace extends BaseFace {
   }
 
   onIncomingBridgeMessage (event) {
-    console.log("EVENT : ", event)
     // Get payload
     let payload = event.data
     // Check source is from this face's iframe
     if (!payload || !this.iframe || event.source != this.iframe.contentWindow) {
       return
     }
-    console.log("Name being sent : ", payload.name)
-
-    if (payload.name.indexOf('viewer') !== -1) {
-      console.log('Viewer message was found!!!!');
-    }
-
+    
     // Check if there's a response ID, if so the web face is expecting a reply with that ID
     let responseID = null
     if (payload.responseID) {
@@ -155,7 +149,6 @@ module.exports = class BaseWebFace extends BaseFace {
   }
 
   sendV2Message (id, name, data, isRequest) {
-    console.log("sending v2 message through", id, name, data)
     // Check if iframe is setup
     if (!this.iframe || !this.iframe.contentWindow) {
       return
@@ -189,12 +182,10 @@ module.exports = class BaseWebFace extends BaseFace {
             faceProperties: this.face.properties
           }
         }
-        console.log('webview vatom state changed')
         this.sendv1Message('vatom.updated', data)
       }
     } else {
       if (vatom.id === this.vatom.id && this.face) {
-        console.log("VATOM IDS ARE THE SAME! ")
         this.vatom = vatom
         this.sendV2Message('res_1', 'core.vatom.update', { vatom: this.BridgeV2.encodeVatom(vatom) }, true)
       }  
