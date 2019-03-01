@@ -9,91 +9,91 @@
 //  governing permissions and limitations under the License.
 //
 module.exports = class Store {
-  constructor(prefix) {
-    this.prefix = prefix;
+  constructor (prefix) {
+    this.prefix = prefix
   }
 
-  get server() {
-    return this.serverAddress;
+  get server () {
+    return this.serverAddress
   }
 
-  set server(address) {
-    this.serverAddress = address;
+  set server (address) {
+    this.serverAddress = address
   }
 
-  set userID(userid) {
-    this.USERID = userid;
+  set userID (userid) {
+    this.USERID = userid
   }
 
-  get userID() {
-    return this.USERID;
+  get userID () {
+    return this.USERID
   }
 
-  get appID() {
-    return this.APPID;
+  get appID () {
+    return this.APPID
   }
 
-  set appID(appid) {
-    this.APPID = appid;
+  set appID (appid) {
+    this.APPID = appid
   }
 
-  get websocketAddress() {
-    return this.wssocketAddress;
+  get websocketAddress () {
+    return this.wssocketAddress
   }
 
-  set websocketAddress(websocAddress) {
-    this.wssocketAddress = websocAddress;
+  set websocketAddress (websocAddress) {
+    this.wssocketAddress = websocAddress
   }
 
-  set token(token) {
-    this.accessToken = token;
+  set token (token) {
+    this.accessToken = token
   }
 
-  get token() {
-    return this.accessToken;
+  get token () {
+    return this.accessToken
   }
 
-  set refreshToken(refresh) {
-    this.privateRefreshToken = refresh;
+  set refreshToken (refresh) {
+    this.privateRefreshToken = refresh
     if (typeof localStorage !== 'undefined') {
       // eslint-disable-next-line no-undef
-      localStorage.setItem(`${this.prefix}_refresh`, refresh);
+      localStorage.setItem(`${this.prefix}_refresh`, refresh)
     }
   }
 
-  get refreshToken() {
+  get refreshToken () {
     if (this.privateRefreshToken) {
-      return this.privateRefreshToken;
+      return this.privateRefreshToken
     }
     if (typeof localStorage !== 'undefined') {
       // eslint-disable-next-line no-undef
-      const rT = localStorage.getItem(`${this.prefix}_refresh`);
+      const rT = localStorage.getItem(`${this.prefix}_refresh`)
       if (rT) {
-        return rT;
+        return rT
       }
     }
-    return null;
+    return null
   }
 
-  set assetProvider(provider) {
-    this.privateAssetProvider = provider;
+  set assetProvider (provider) {
+    this.privateAssetProvider = provider
     if (typeof localStorage !== 'undefined') {
       // eslint-disable-next-line no-undef
-      localStorage.setItem(`${this.prefix}_asset_provider`, JSON.stringify(provider));
+      localStorage.setItem(`${this.prefix}_asset_provider`, JSON.stringify(provider))
     }
   }
 
-  get assetProvider() {
+  get assetProvider () {
     if (this.privateAssetProvider) {
-      return this.privateAssetProvider;
+      return this.privateAssetProvider
     }
     if (typeof localStorage !== 'undefined') {
       // eslint-disable-next-line no-undef
-      const aP = JSON.parse(localStorage.getItem(`${this.prefix}_asset_provider`) || 'undefined');
+      const aP = JSON.parse(localStorage.getItem(`${this.prefix}_asset_provider`) || 'undefined')
       if (aP) {
-        return aP;
+        return aP
       }
     }
-    return null;
+    return null
   }
-};
+}

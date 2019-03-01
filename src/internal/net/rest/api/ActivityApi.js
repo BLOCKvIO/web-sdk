@@ -8,30 +8,29 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 
-
 module.exports = class ActivityApi {
-  constructor(client) {
-    this.client = client;
+  constructor (client) {
+    this.client = client
   }
 
-  threads() {
-    return this.client.request('POST', '/v1/activity/mythreads', {}, true).then(data => data.threads);
+  threads () {
+    return this.client.request('POST', '/v1/activity/mythreads', {}, true).then(data => data.threads)
   }
 
-  threadMessages(name) {
+  threadMessages (name) {
     const payload = {
       name,
       cursor: '',
-      count: 100,
-    };
-    return this.client.request('POST', '/v1/activity/mythreadmessages', payload, true).then(data => data);
+      count: 100
+    }
+    return this.client.request('POST', '/v1/activity/mythreadmessages', payload, true).then(data => data)
   }
 
-  sendMessage(id, message) {
+  sendMessage (id, message) {
     const payload = {
       message,
-      id,
-    };
-    return this.client.request('POST', '/v1/user/message', payload, true).then(data => data);
+      id
+    }
+    return this.client.request('POST', '/v1/user/message', payload, true).then(data => data)
   }
-};
+}

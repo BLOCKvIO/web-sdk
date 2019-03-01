@@ -10,38 +10,37 @@
 //
 
 module.exports = class Vatom {
-    constructor(payload, faces, actions){
-        this.payload = payload;
-        this.faces = faces;
-        this.actions = actions;
-    }
+  constructor (payload, faces, actions) {
+    this.payload = payload
+    this.faces = faces
+    this.actions = actions
+  }
 
-    get id(){
-        return this.payload.id
-    }
+  get id () {
+    return this.payload.id
+  }
 
-    get private(){
-        return this.payload.private;
-    }
-    
-    get unpublished(){
-        return this.payload.unpublished;
-    }
+  get private () {
+    return this.payload.private
+  }
 
-    get version(){
-        return this.payload.version;
-    }
+  get unpublished () {
+    return this.payload.unpublished
+  }
 
-    get when_created(){
-        return this.payload.when_created;
-    }
+  get version () {
+    return this.payload.version
+  }
 
-    get when_modified(){
-        return this.payload.when_modified;
-    }
+  get whenCreated () {
+    return this.payload.when_created
+  }
 
-    get properties(){
-        return this.payload['vAtom::vAtomType'];
-    }
+  get whenModified () {
+    return this.payload.when_modified
+  }
 
+  get properties () {
+    return this.payload['vAtom::vAtomType']
+  }
 }

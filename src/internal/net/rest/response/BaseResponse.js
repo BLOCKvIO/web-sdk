@@ -9,10 +9,10 @@
 //  governing permissions and limitations under the License.
 //
 module.exports = class BaseResponse {
-  constructor(error, message, payload, status) {
-    this.status = status;
-    this.error = error;
-    this.message = message;
-    this.payload = payload;
+  constructor (error, message, payload, status) {
+    this.status = status
+    this.error = error
+    this.message = message
+    this.payload = payload
   }
-};
+}

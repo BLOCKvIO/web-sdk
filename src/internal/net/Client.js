@@ -8,9 +8,8 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const fetch = require('@brillout/fetch');
-const jwtDecode = require('jwt-decode');
-const BaseResponse = require('./rest/response/BaseResponse');
+const fetch = require('@brillout/fetch')
+const jwtDecode = require('jwt-decode')
 
 /* global FormData */
 
@@ -42,13 +41,13 @@ const ErrorCodes = {
   2567: 'Invalid Verification Code',
   2569: 'Invalid Token Type',
   2571: 'Invalid Email',
-  2572: 'Invalid Phone Number',
-};
+  2572: 'Invalid Phone Number'
+}
 
 module.exports = class Client {
   /** @private */
-  constructor(store) {
-    this.store = store;
+  constructor (store) {
+    this.store = store
   }
 
   /**
@@ -60,45 +59,45 @@ module.exports = class Client {
    * @param {object} headers Optional extra HTTP headers to add to the request.
    * @returns {Promise<object>} The server's response payload.
    */
-  async request(method, endpoint, payload, auth, headers) {
+  async request (method, endpoint, payload, auth, headers) {
     // Ensure our access token is up to date, if this is an authenticated request
-    if (auth) await this.checkToken();
+    if (auth) await this.checkToken()
 
     // Send request
-    return this.authRequest(method, endpoint, payload, headers);
+    return this.authRequest(method, endpoint, payload, headers)
   }
 
   /** @private */
-  async authRequest(method, endpoint, payload, extraHeaders) {
+  async authRequest (method, endpoint, payload, extraHeaders) {
     // Setup headers
     const headers = Object.assign({
       'App-Id': this.store.appID,
-      Authorization: `Bearer ${this.store.token}`,
-    }, extraHeaders);
+      Authorization: `Bearer ${this.store.token}`
+    }, extraHeaders)
 
     // Check payload type
-    let body = null;
+    let body = null
     if (!payload) {
       // If no body, make it undefined so that fetch() doesn't complain about having a payload on GET requests
-      body = undefined;
+      body = undefined
     } else if (typeof FormData !== 'undefined' && payload instanceof FormData) {
       // Don't add Content-Type header, fetch() adds it's own, which is required because it specifies the form data boundary
-      body = payload;
+      body = payload
     } else if (typeof body === 'object') {
       // Convert to JSON
-      body = JSON.stringify(payload);
-      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(payload)
+      headers['Content-Type'] = 'application/json'
     } else {
       // Unknown payload type, assume application/json content type, unless specified in extra headers
-      body = payload;
-      if (!extraHeaders['Content-Type']) headers['Content-Type'] = 'application/json';
+      body = payload
+      if (!extraHeaders['Content-Type']) headers['Content-Type'] = 'application/json'
     }
 
     // Send request
-    const response = await fetch(this.store.server + endpoint, { method, body, headers });
+    const response = await fetch(this.store.server + endpoint, { method, body, headers })
 
     // Decode JSON
-    const json = await response.json();
+    const json = await response.json()
 
     // Check for server error
     if (!json.payload && json.error === 2051) {
@@ -107,48 +106,48 @@ module.exports = class Client {
       // can login agin
 
       // HACK: Pull time from original server error string
-      const dateString = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g.exec(response.message);
-      response.lockedUntil = new Date(dateString);
+      const dateString = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g.exec(response.message)
+      response.lockedUntil = new Date(dateString)
 
       // Replace duration in the error message
-      let duration = response.lockedUntil.getTime() - Date.now();
-      if (duration < 2000) duration = 2000;
-      const seconds = Math.floor(duration / 1000);
-      const minutes = Math.floor(duration / 1000 / 60);
+      let duration = response.lockedUntil.getTime() - Date.now()
+      if (duration < 2000) duration = 2000
+      const seconds = Math.floor(duration / 1000)
+      const minutes = Math.floor(duration / 1000 / 60)
       if (seconds <= 90) {
-        response.message = response.message.replace('%DURATION%', seconds === 1 ? '1 second' : `${seconds}  seconds`);
+        response.message = response.message.replace('%DURATION%', seconds === 1 ? '1 second' : `${seconds}  seconds`)
       } else {
-        response.message = response.message.replace('%DURATION%', minutes === 1 ? '1 minute' : `${minutes} minutes`);
+        response.message = response.message.replace('%DURATION%', minutes === 1 ? '1 minute' : `${minutes} minutes`)
       }
       // Throw error
-      const error = new Error(`Too many login attempts, Try again at : ${response.lockedUntil}`);
-      error.code = json.error || response.status || 0;
-      error.httpStatus = response.status;
-      throw error;
+      const error = new Error(`Too many login attempts, Try again at : ${response.lockedUntil}`)
+      error.code = json.error || response.status || 0
+      error.httpStatus = response.status
+      throw error
     } else if (!json.payload) {
       // Throw the error returned by the server
-      const error = new Error(ErrorCodes[response.error] || json.message || 'An unknown server error has occurred');
-      error.code = json.error || response.status || 0;
-      error.httpStatus = response.status;
-      throw error;
+      const error = new Error(ErrorCodes[response.error] || json.message || 'An unknown server error has occurred')
+      error.code = json.error || response.status || 0
+      error.httpStatus = response.status
+      throw error
     }
 
     // No error, continue
-    return json.payload;
+    return json.payload
   }
 
   /**
   * Uses the refresh token to fetch and store a new access token from the backend.
   * @private
   */
-  async refreshToken() {
+  async refreshToken () {
     // Fetch new access token
     const data = await this.request('POST', '/v1/access_token', '', false, {
-      Authorization: `Bearer ${this.store.refreshToken}`,
-    });
+      Authorization: `Bearer ${this.store.refreshToken}`
+    })
 
     // Store it
-    this.store.token = data.access_token.token;
+    this.store.token = data.access_token.token
   }
 
   /**
@@ -156,26 +155,26 @@ module.exports = class Client {
    * @private
    * @returns {Promise} Resolves when the access token is valid.
    */
-  async checkToken() {
+  async checkToken () {
     // define our vars
-    let decodedToken;
-    let nowDate;
-    let expirationTime;
+    let decodedToken
+    let nowDate
+    let expirationTime
 
     // Catch errors with decoding the current access token
     try {
-      decodedToken = jwtDecode(this.store.token);
-      expirationTime = (decodedToken.exp * 1000);
-      nowDate = Date.now();
+      decodedToken = jwtDecode(this.store.token)
+      expirationTime = (decodedToken.exp * 1000)
+      nowDate = Date.now()
 
       // quick calc to determine if the token has expired
-      if ((nowDate + 5000) > expirationTime) throw new Error('Token expired.');
+      if ((nowDate + 5000) > expirationTime) throw new Error('Token expired.')
     } catch (e) {
       // There was an error with the access token. Fetch a new one.
-      return this.refreshToken();
+      return this.refreshToken()
     }
 
     // Done
-    return true;
+    return true
   }
-};
+}

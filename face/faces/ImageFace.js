@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const BaseFace = require('./BaseFace');
+const BaseFace = require('./BaseFace')
 
 module.exports = class ImageFace extends BaseFace {
   onLoad() {
@@ -18,38 +18,38 @@ module.exports = class ImageFace extends BaseFace {
 
   updateImage() {
     // Set image display options
-    this.element.style.backgroundSize = 'contain';
-    this.element.style.backgroundPosition = 'center';
-    this.element.style.backgroundRepeat = 'no-repeat';
+    this.element.style.backgroundSize = 'contain'
+    this.element.style.backgroundPosition = 'center'
+    this.element.style.backgroundRepeat = 'no-repeat'
 
     
     // Get resource name
-    const resourceName = this.face.properties.config && this.face.properties.config.image || this.face.properties.resources[0] || 'ActivatedImage';
+    const resourceName = this.face.properties.config && this.face.properties.config.image || this.face.properties.resources[0] || 'ActivatedImage'
 
     // Get resource
-    const resource = this.vatom.properties.resources.find(r => r.name === resourceName);
+    const resource = this.vatom.properties.resources.find(r => r.name === resourceName)
     // TODO: Show warning if no resource found
     if (!resource) {
-      return Promise.reject(new Error('No image found to display.'));
+      return Promise.reject(new Error('No image found to display.'))
     }
     // Display URL
-    const iurl = this.vatomView.blockv.UserManager.encodeAssetProvider(resource.value.value);
-    this.element.style.backgroundImage = `url('${iurl}')`;
+    const iurl = this.vatomView.blockv.UserManager.encodeAssetProvider(resource.value.value)
+    this.element.style.backgroundImage = `url('${iurl}')`
 
     // Return promise
-    return this.showImage(iurl);
+    return this.showImage(iurl)
   }
   // eslint-disable-next-line
   showImage(url) {
     return new Promise((onSuccess, onFail) => {
-      const img = document.createElement('img');
-      img.src = url;
-      img.onload = onSuccess;
-      img.onerror = onFail;
-    });
+      const img = document.createElement('img')
+      img.src = url
+      img.onload = onSuccess
+      img.onerror = onFail
+    })
   }
 
   static get url() {
-    return 'native://image';
+    return 'native://image'
   }
 }

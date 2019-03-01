@@ -23,6 +23,7 @@
   "author": "Blockv",
   "license": "BLOCKv AG",
   "devDependencies": {
+    "@babel/polyfill": "^7.0.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
@@ -32,8 +33,6 @@
     "copy": "^0.3.2",
     "css-loader": "^1.0.0",
     "eslint": "^5.2.0",
-    "eslint-config-airbnb": "^17.0.0",
-    "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.10.0",
@@ -54,6 +53,7 @@
   },
   "dependencies": {
     "@brillout/fetch": "^0.1.2",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-stage-0": "^6.24.1",
     "better-assert": "^1.0.2",
     "chai": "^4.1.2",
@@ -66,5 +66,10 @@
   "repository": "github:BLOCKvIO/web-sdk",
   "jest": {
     "bail": true
+  },
+  "standard": {
+    "globals": [
+      "WebSocket"
+    ]
   }
 }

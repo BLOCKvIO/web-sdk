@@ -12,23 +12,22 @@
 /* eslint-disable class-methods-use-this */
 
 module.exports = class BaseFace {
-  constructor(vatomView, vatom, face) {
+  constructor (vatomView, vatom, face) {
     // Store info
-    this.vatomView = vatomView;
-    this.vatom = vatom;
-    this.face = face;
+    this.vatomView = vatomView
+    this.vatom = vatom
+    this.face = face
 
     // Create element
-    this.element = document.createElement('div');
-    this.element.style.position = 'relative';
-    this.element.style.width = '100%';
-    this.element.style.height = '100%';
+    this.element = document.createElement('div')
+    this.element.style.position = 'relative'
+    this.element.style.width = '100%'
+    this.element.style.height = '100%'
   }
 
+  onLoad () {}
 
-  onLoad() {}
+  onUnload () {}
 
-  onUnload() {}
-
-  onVatomUpdated() {}
+  onVatomUpdated () {}
 }
