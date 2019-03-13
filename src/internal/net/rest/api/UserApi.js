@@ -275,4 +275,96 @@ module.exports = class UserApi {
   async getPublicUserProfile (userID) {
     return this.client.request('GET', `/v1/users/${userID}`, '', true)
   }
+
+  /**
+   * Logs the user in via OAuth in a browser popup window.
+   * NOTE: This is a private method, subject to change once more OAuth flows have been fully implemented on the backend.
+   * @private
+   * @returns {Promise<boolean>} `true` if login completed, or `false` if login was cancelled by the user.
+   */
+  async loginOAuthPopup() {
+    // Ensure SDK has been initialized
+    if (!this.store.appID) throw new Error('Please initialize the SDK and set your App ID first.');
+
+    // Generate random state ID
+    const stateID = Math.random().toString(36).substr(2);
+
+    // Generate the oauth URL
+    const redirectURI = encodeURIComponent('https://login.blockv.io/send-event.html');
+    const uri = `https://login.blockv.io/?response_type=token&client_id=${this.store.appID}&redirect_uri=${redirectURI}&scope=all&state=${stateID}`;
+
+    // Create popup window
+    const newWindow = window.open(uri, '_blank', 'left=200,top=200,width=360,height=480,chrome,centerscreen');
+
+    // Create pending promise
+    let promiseResolved = false;
+    let promiseSuccess = null;
+    let promiseFail = null;
+    const promise = new Promise((s, f) => {
+      promiseSuccess = s;
+      promiseFail = f;
+    });
+
+    // Create window close checker
+    const closeChecker = setInterval(() => {
+      // Check if window was closed
+      if (!newWindow.closed) return false;
+
+      // It was, cancel timer
+      clearInterval(closeChecker);
+
+      // If promise was never resolved, the user must have closed the popup before logging in. Resolve the promise.
+      if (!promiseResolved) promiseSuccess(false);
+    }, 250);
+
+    // Create message listener
+    const messageListener = async (e) => {
+      // Ensure it's from the correct origin
+      if (e.origin !== 'https://login.blockv.io') return false;
+
+      // Ensure the state matches
+      if (e.data.state !== stateID) return false;
+
+      // Ensure the action matches
+      if (e.data.action !== 'oauth-response') return false;
+
+      // Check response type
+      if (e.data.refresh_token) {
+        // We have our user data, store it
+        this.setRefreshToken(e.data.refresh_token);
+        this.store.token = e.data.access_token;
+
+        // Get user info and set the store properties
+        const profile = await this.getCurrentUser();
+        this.store.userID = profile.id;
+
+        // Get asset provider info and store it
+        const assetProviders = await this.client.request('GET', '/v1/user/asset_providers', null, true);
+        this.store.assetProvider = assetProviders.asset_provider;
+
+        // Done
+        promiseResolved = true;
+        promiseSuccess(true);
+      } else {
+        // Login failed, return error
+        const err = new Error(e.data.error_text || 'Unable to login.');
+        err.code = e.data.error;
+        promiseResolved = true;
+        promiseFail(err);
+      }
+
+      // Cleanup, remove event listener
+      newWindow.close();
+      window.removeEventListener('message', messageListener);
+      clearInterval(closeChecker);
+      return true;
+    };
+
+    // Attach message listener
+    window.addEventListener('message', messageListener);
+
+    // Done, return promise
+    return promise;
+  }
+
 }
