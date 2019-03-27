@@ -1,26 +1,6 @@
-const BaseFace = require('../BaseFace')
-/*
-core.init
-core.user.get
-core.vatom.get
-core.vatom.children.get
-core.action.perform
-core.resource.encode
-core.vatom.update
+import BaseFace from '../BaseFace'
 
-viewer.vatom.show
-viewer.qr.scan
-viewer.view.close
-viewer.url.open
-viewer.scanner.show
-viewer.<#custom_message#>
-
-*/
-module.exports = class WebFace extends BaseFace {
-  
-  
-
-  
+export default class WebFace extends BaseFace {
 
   processIncomingBridgeMessage (name, payload) {
     
