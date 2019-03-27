@@ -9,10 +9,10 @@
 //  governing permissions and limitations under the License.
 //
 
-const BaseFace = require('./BaseFace')
+import BaseFace from './BaseFace'
 
 /** This face displays an image depending on the policy defined in the vatom's properties. */
-module.exports = class ImagePolicy extends BaseFace {
+export default class ImagePolicy extends BaseFace {
 /** @override On load, refresh image */
   onLoad () {
     return this.refreshImage()
@@ -34,9 +34,9 @@ module.exports = class ImagePolicy extends BaseFace {
     return this.vatomView.blockv.Vatoms.getVatomChildren(this.vatom.id).then(children => {
       // Fetch policy
       // Log.debug("ImagePolicyFace", "Refreshing image, found " + children.length + " child vatoms...")
-      var policies = this.face.properties.config.image_policy || this.vatom.properties['image_policy'] || this.vatom.properties['icon_stages'] || []
+      let policies = (this.face.properties.config && this.face.properties.config.image_policy) || this.vatom.private['image_policy'] || this.vatom.properties['icon_stages'] || []
       // Find matching policy
-      for (var policy of policies) {
+      for (let policy of policies) {
         // Check policy type
         if (typeof policy.count_max !== 'undefined') {
           // Child count policy, check if count matches
@@ -68,7 +68,7 @@ module.exports = class ImagePolicy extends BaseFace {
         }
         var _url = this.vatomView.blockv.UserManager.encodeAssetProvider(res.value.value)
         // Display URL
-        this.element.style.backgroundImage = 'url(' + _url + ')'
+        this.element.style.backgroundImage = `url('${_url}')`
         this.element.style.backgroundSize = policy.mode || 'contain'
         // Return promise
         return ImagePolicy.waitForImage(_url)
@@ -80,10 +80,9 @@ module.exports = class ImagePolicy extends BaseFace {
         throw new Error('No policy found, and no ActivatedImage resource available.')
       }
       var _uri = this.vatomView.blockv.UserManager.encodeAssetProvider(resource.value.value)
-
       // Display URL
-      this.element.style.backgroundImage = 'url(' + _uri + ')'
-      this.element.style.backgroundSize = policy.mode || 'contain'
+      this.element.style.backgroundImage = `url(${_uri})`
+      this.element.style.backgroundSize = 'contain'
 
       // Return promise
       return ImagePolicy.waitForImage(_uri)
