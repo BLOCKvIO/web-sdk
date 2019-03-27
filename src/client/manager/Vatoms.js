@@ -9,9 +9,11 @@
 //  governing permissions and limitations under the License.
 //
 
-module.exports = class Vatoms {
-  constructor (vatomApi) {
-    this.vatomApi = vatomApi
+import VatomApi from '../../internal/net/rest/api/VatomApi'
+export default class Vatoms {
+  constructor (blockv) {
+    this.Blockv = blockv
+    this.vatomApi = new VatomApi(blockv.client)
   }
 
   /**
@@ -32,8 +34,95 @@ module.exports = class Vatoms {
    * @return {Promise<Object>}   json payload nested
    */
 
+  transferTo (user, actionName = 'Transfer', vatomId) {
+    // Check if user is a VatomUser
+    var payload = {}
+    if (typeof user === 'string') {
+      // Check if string is email or phone number
+      if (user.indexOf('@') !== -1) {
+        payload['new.owner.email'] = user
+      } else if (user.indexOf('+') === 0) {
+        payload['new.owner.phone_number'] = user
+      } else {
+        payload['new.owner.id'] = user
+      }
+    } else {
+      // This must be a VatomUser, fetch the identifying property
+      if (user.userID) {
+        payload['new.owner.id'] = user.userID
+      } else if (user.phoneNumber) {
+        payload['new.owner.phone_number'] = user.phoneNumber
+      } else if (user.email) {
+        payload['new.owner.email'] = user.email
+      } else {
+        return Promise.reject({ code: 'INVALID_PARAMETER', message: `The user object supplied didn't have any identifying fields. It must have either a userID, an email, or a phoneNumber.` })
+      }
+    }
+
+    // Send request
+    return this.performAction(vatomId, actionName, payload)
+  }
+
   performAction (vatomId, action, payload) {
-    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId }, payload))
+    console.log('We are checking this: ', this.vatomApi)
+    let undos = []
+    switch (action) {
+      case 'Transfer':
+        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.'))
+        break
+
+      case 'Drop':
+        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.geo_pos', payload))
+        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', true))
+        break
+
+      case 'Pickup':
+        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false))
+        break
+
+      case 'Redeem':
+        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.'))
+        break
+
+      default:
+        break
+    }
+
+    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId }, payload)).catch(err => {
+      undos.map(u => u())
+      throw err
+    })
+  }
+
+  /** Called to combine the specified vatom into this one. Note that some faces override the Combine action,
+   *  so in order to get those actions as well you should use `combineWith()` on `VatomView` instead. */
+  combineWith (vatom, otherVatom) {
+    // Pre-emptively set the parent ID
+    let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(otherVatom.id, 'vAtom::vAtomType.parent_id', vatom.id)
+    // Set parent
+    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [otherVatom.id], parent_id: vatom.id }, true).catch(err => {
+      // Failed, reset vatom reference
+      undo()
+      throw err
+    })
+  }
+
+  /** Called to remove all child vatoms from this vatom */
+  split (vatom) {
+    // Get all children
+    return this.getVatomChildren(vatom.id).then(children => {
+      // Remove parent IDs
+      return Promise.all(children.map(child => {
+        // Pre-emptively update parent ID
+        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', '.')
+        // Do patch
+        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: '.' }, true).catch(err => {
+          // Failed, reset vatom reference
+          undo()
+          throw err
+        })
+      }))
+    })
   }
 
   /**
@@ -43,13 +132,7 @@ module.exports = class Vatoms {
    */
 
   getUserInventory () {
-    const payload = {
-      parent_id: '.',
-      page: 1,
-      limit: 1000
-    }
-
-    return this.vatomApi.getUserInventory(payload)
+    return this.Blockv.dataPool.region('inventory').get()
   }
 
   /**
@@ -57,11 +140,30 @@ module.exports = class Vatoms {
    * @param  {[String]} vatomId ID of the vAtom that is being searched for
    * @return {[Promise<Object>} returns a JSON Object containing the vAtom.
    */
-  getUserVatoms (vatomId) {
-    const payload = {
-      ids: vatomId
+
+  async getUserVatoms (vatomIds) {
+    // Make sure it's an array
+    if (typeof vatomIds === 'string') {
+      vatomIds = [vatomIds]
     }
-    return this.vatomApi.getUserVatoms(payload)
+
+    // Load all from inventory
+    let vatoms = []
+    for (let id of vatomIds) {
+      let vatom = await this.Blockv.dataPool.region('inventory').getItem(id)
+      if (vatom) {
+        vatoms.push(vatom)
+      } else {
+        break
+      }
+    }
+    // If all found, stop
+    if (vatoms.length === vatomIds.length) {
+      return vatoms
+    }
+
+    // Not all the vatoms were in the inventory, create a new region
+    return this.dataPool.region('ids', vatomIds).get()
   }
 
   /**
@@ -119,7 +221,9 @@ module.exports = class Vatoms {
    * @param {String} parentID   ID of the vatom that you would like to list the children
    */
   getVatomChildren (parentID) {
-    return this.vatomApi.getVatomChildren(parentID)
+    return this.Blockv.dataPool.region('inventory').get().then(children => {
+      return children.filter(v => v.properties.parent_id === parentID)
+    })
   }
 
   /**
@@ -128,6 +232,11 @@ module.exports = class Vatoms {
    * @return {Promise<Object>} An object containing a success message
    */
   trashVatom (vatomID) {
-    return this.vatomApi.trashVatom(vatomID)
+    let undos = []
+    undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomID, 'vAtom::vAtomType.owner', '.'))
+    return this.vatomApi.trashVatom(vatomID).catch(err => { 
+      undos.map(u => u())
+      throw err
+    })
   }
 }
