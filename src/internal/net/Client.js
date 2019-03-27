@@ -8,8 +8,8 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const fetch = require('@brillout/fetch')
-const jwtDecode = require('jwt-decode')
+import fetch from '@brillout/fetch'
+import jwtDecode from 'jwt-decode'
 
 /* global FormData */
 
@@ -44,10 +44,11 @@ const ErrorCodes = {
   2572: 'Invalid Phone Number'
 }
 
-module.exports = class Client {
+export default class Client {
   /** @private */
-  constructor (store) {
-    this.store = store
+  constructor (bv) {
+    this.Blockv = bv
+    this.store = bv.store
   }
 
   /**

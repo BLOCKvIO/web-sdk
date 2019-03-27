@@ -107,8 +107,7 @@ export default class WebFace extends BaseFace {
     // Create resource list
     var resources = {}
     for (var res in vatom.properties.resources) {
-      console.log("RES : ", res);
-     // resources[res] = vatom.resources[res].value.value
+      resources[res] = vatom.properties.resources.find(r => r.res.value.value)
     }
     // Create payload
     return {
@@ -131,7 +130,6 @@ export default class WebFace extends BaseFace {
   }
 
   sendMessage (id, name, data) {
-    console.log("SENDING THIS ID :", id)
     // Check if iframe is setup
     if (!this.iframe || !this.iframe.contentWindow)
       return
@@ -158,7 +156,6 @@ export default class WebFace extends BaseFace {
   }
 
   vatomStateChanged (vatom) {
-    console.log("Vatom state changed : ",  vatom)
     if (vatom.id === this.vatomView.vatom.id && this.face) {
       this.vatom = vatom
       var resources = {}
@@ -182,7 +179,6 @@ export default class WebFace extends BaseFace {
 
   onVatomUpdated () {
     this.vatomStateChanged(this.vatomView.vatom)
-    // console.log(this.vatomView.vatom);
   }
   
 }

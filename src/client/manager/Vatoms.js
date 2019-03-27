@@ -64,7 +64,6 @@ export default class Vatoms {
   }
 
   performAction (vatomId, action, payload) {
-    console.log('We are checking this: ', this.vatomApi)
     let undos = []
     switch (action) {
       case 'Transfer':

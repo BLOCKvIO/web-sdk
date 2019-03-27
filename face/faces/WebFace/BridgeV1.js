@@ -35,7 +35,6 @@ export default class BridgeV1 {
 
   getChildren (payload) {
     return this.blockv.Vatoms.getVatomChildren(payload.id).then(children => {
-      console.log("Children : ", children)
       let vatomInfos = []
       for (let vatom of children) {
         vatomInfos.push(this.encodeVatom(vatom))
@@ -94,14 +93,6 @@ export default class BridgeV1 {
     for (let i = 0; i < vatom.properties.resources.length; i++) {
       resources[vatom.properties.resources[i].name] = this.blockv.UserManager.encodeAssetProvider(vatom.properties.resources[i].value.value)
     }
-    let test = {
-      'vatomInfo': {
-        'id': vatom.id,
-        'properties': vatom.properties,
-        'resources': resources
-      }
-    }
-    console.log(test)
     // Create payload
     return {
       'vatomInfo': {
