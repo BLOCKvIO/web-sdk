@@ -8,11 +8,11 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const jwtDecode = require('jwt-decode')
+import jwtDecode from 'jwt-decode'
 
 /* global window */
 
-module.exports = class UserManager {
+export default class UserManager {
   constructor (UserApi, store) {
     this.UserApi = UserApi
     this.store = store
@@ -62,12 +62,12 @@ module.exports = class UserManager {
    * @private
    * @returns {Promise<boolean>} `true` if login completed, or `false` if login was cancelled by the user.
    */
-  async loginOAuthPopup() {
+  async loginOAuthPopup () {
     // Ensure SDK has been initialized
     if (!this.store.appID) throw new Error('Please initialize the SDK and set your App ID first.');
 
     // Generate random state ID
-    const stateID = Math.random().toString(36).substr(2);
+    const stateID = Math.random().toString(36).substr(2)
 
     // Generate the oauth URL
     const redirectURI = encodeURIComponent('https://login.blockv.io/send-event.html');

@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-module.exports = class Activity {
+export default class Activity {
   constructor (activityApi) {
     this.activityApi = activityApi
   }
