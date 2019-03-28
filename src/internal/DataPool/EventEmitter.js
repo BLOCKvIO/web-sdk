@@ -77,7 +77,7 @@ export default class EventEmitter {
 		this._eventListeners[eventName] = this._eventListeners[eventName] || [];
 
         // Find and remove it
-        for (var i = 0 ; i < this._eventListeners[eventName] ; i++)
+        for (var i = 0 ; i < this._eventListeners[eventName].length ; i++)
             if (this._eventListeners[eventName][i] == callback)
                 this._eventListeners[eventName].splice(i--, 1)
 
