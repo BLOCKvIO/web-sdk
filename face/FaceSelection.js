@@ -9,7 +9,8 @@
 //  governing permissions and limitations under the License.
 //
 /* eslint-disable no-use-before-define */
-module.exports = {
+
+export default {
   Icon: vatom => start(vatom, 'icon'),
   Engaged: vatom => start(vatom, 'engaged') || start(vatom, 'icon'),
   Fullscreen: vatom => start(vatom, 'fullscreen'),

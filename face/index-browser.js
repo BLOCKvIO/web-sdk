@@ -9,7 +9,14 @@
 //  governing permissions and limitations under the License.
 //
 
-export { default as VatomView } from './VatomView'
-export { default as FaceSelection } from './FaceSelection'
-export { default } from '../src'
-export { default as BaseFace } from './faces/BaseFace'
+import Blockv from '../src/client/Blockv'
+import Discover from '../src/client/Discover'
+import VatomView from './VatomView'
+import FaceSelection from './FaceSelection'
+import BaseFace from './faces/BaseFace'
+
+window.Blockv = Blockv
+window.Discover = Discover
+window.VatomView = VatomView
+window.FaceSelection = FaceSelection
+window.BaseFace = BaseFace

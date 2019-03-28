@@ -1,26 +1,6 @@
-const BaseFace = require('../BaseFace')
-/*
-core.init
-core.user.get
-core.vatom.get
-core.vatom.children.get
-core.action.perform
-core.resource.encode
-core.vatom.update
+import BaseFace from '../BaseFace'
 
-viewer.vatom.show
-viewer.qr.scan
-viewer.view.close
-viewer.url.open
-viewer.scanner.show
-viewer.<#custom_message#>
-
-*/
-module.exports = class WebFace extends BaseFace {
-  
-  
-
-  
+export default class WebFace extends BaseFace {
 
   processIncomingBridgeMessage (name, payload) {
     
@@ -127,8 +107,7 @@ module.exports = class WebFace extends BaseFace {
     // Create resource list
     var resources = {}
     for (var res in vatom.properties.resources) {
-      console.log("RES : ", res);
-     // resources[res] = vatom.resources[res].value.value
+      resources[res] = vatom.properties.resources.find(r => r.res.value.value)
     }
     // Create payload
     return {
@@ -151,7 +130,6 @@ module.exports = class WebFace extends BaseFace {
   }
 
   sendMessage (id, name, data) {
-    console.log("SENDING THIS ID :", id)
     // Check if iframe is setup
     if (!this.iframe || !this.iframe.contentWindow)
       return
@@ -178,7 +156,6 @@ module.exports = class WebFace extends BaseFace {
   }
 
   vatomStateChanged (vatom) {
-    console.log("Vatom state changed : ",  vatom)
     if (vatom.id === this.vatomView.vatom.id && this.face) {
       this.vatom = vatom
       var resources = {}
@@ -202,7 +179,6 @@ module.exports = class WebFace extends BaseFace {
 
   onVatomUpdated () {
     this.vatomStateChanged(this.vatomView.vatom)
-    // console.log(this.vatomView.vatom);
   }
   
 }

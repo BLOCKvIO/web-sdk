@@ -8,9 +8,9 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const BaseFace = require('./BaseFace')
+import BaseFace from './BaseFace'
 
-module.exports = class LayeredImage extends BaseFace {
+export default class LayeredImage extends BaseFace {
   /** @private @override Called on startup */
   onLoad () {
     // Reload images
@@ -86,7 +86,7 @@ module.exports = class LayeredImage extends BaseFace {
     // Create it
     let div = document.createElement('div')
     div.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background-position: center; background-size: contain; background-repeat: no-repeat; '
-    div.style.backgroundImage = 'url(" + url + ")'
+    div.style.backgroundImage = `url(${url})`
     return div
   }
 

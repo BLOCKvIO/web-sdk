@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 
-module.exports = class ActivityApi {
+export default class ActivityApi {
   constructor (client) {
     this.client = client
   }

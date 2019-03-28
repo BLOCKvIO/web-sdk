@@ -8,9 +8,9 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 
-let Vatom = require('../../../../model/Vatom')
+import Vatom from '../../../../model/Vatom'
 
-module.exports = class VatomApi {
+export default class VatomApi {
   constructor (client) {
     this.client = client
   }

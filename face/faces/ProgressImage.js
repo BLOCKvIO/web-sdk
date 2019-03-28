@@ -9,9 +9,9 @@
 //  governing permissions and limitations under the License.
 //
 
-const BaseFace = require('./BaseFace')
+import BaseFace from './BaseFace'
 
-module.exports = class ProgressImage extends BaseFace {
+export default class ProgressImage extends BaseFace {
   onLoad () {
     // Set our element style
     this.element.style.overflow = 'hidden'

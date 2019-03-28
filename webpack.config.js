@@ -19,6 +19,7 @@ module.exports.output = {
   path: path.join(__dirname, '/dist/'),
   filename: 'blockv-sdk.min.js',
   libraryTarget: 'var',
+  libraryExport: 'default',
   library: 'Blockv'
 }
 // Output a sourcemap

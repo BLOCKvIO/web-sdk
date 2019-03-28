@@ -8,7 +8,10 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-module.exports = class Store {
+
+import jwtDecode from 'jwt-decode'
+
+export default class Store {
   constructor (prefix) {
     this.prefix = prefix
   }
@@ -22,11 +25,17 @@ module.exports = class Store {
   }
 
   set userID (userid) {
-    this.USERID = userid
+    // this.USERID = userid
   }
 
   get userID () {
-    return this.USERID
+    try {
+      let dCode = jwtDecode(this.refreshToken)
+      return dCode.user_id
+    } catch (err) {
+      console.warn("Decoding failed!")
+    }
+
   }
 
   get appID () {

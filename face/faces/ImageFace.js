@@ -8,23 +8,22 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const BaseFace = require('./BaseFace')
+import BaseFace from './BaseFace'
 
-module.exports = class ImageFace extends BaseFace {
-  onLoad() {
+export default class ImageFace extends BaseFace {
+  onLoad () {
     // eslint-disable-next-line
     return this.updateImage();
   }
 
-  updateImage() {
+  updateImage () {
     // Set image display options
     this.element.style.backgroundSize = 'contain'
     this.element.style.backgroundPosition = 'center'
     this.element.style.backgroundRepeat = 'no-repeat'
 
-    
     // Get resource name
-    const resourceName = this.face.properties.config && this.face.properties.config.image || this.face.properties.resources[0] || 'ActivatedImage'
+    const resourceName = this.face.properties.config && this.face.properties.config.image || 'ActivatedImage'
 
     // Get resource
     const resource = this.vatom.properties.resources.find(r => r.name === resourceName)
@@ -45,11 +44,11 @@ module.exports = class ImageFace extends BaseFace {
       const img = document.createElement('img')
       img.src = url
       img.onload = onSuccess
-      img.onerror = onFail
+      img.onerror = e => onFail(new Error("Couldn't load image"))
     })
   }
 
-  static get url() {
+  static get url () {
     return 'native://image'
   }
 }
