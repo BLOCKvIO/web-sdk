@@ -31,7 +31,7 @@ module.exports.module.rules.push({
   exclude: /node_modules/,
   loader: 'babel-loader',
   options: {
-    presets: ['env', 'stage-0']
+    presets: ['@babel/preset-env']
   }
 })
 

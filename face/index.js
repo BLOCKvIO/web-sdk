@@ -9,6 +9,8 @@
 //  governing permissions and limitations under the License.
 //
 
+// This is the entry point when importing into a web app via `import { ... } from '@blockv/sdk/face'
+
 export { default as VatomView } from './VatomView'
 export { default as FaceSelection } from './FaceSelection'
 export { default } from '../src'

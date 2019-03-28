@@ -9,17 +9,10 @@
 //  governing permissions and limitations under the License.
 //
 
-// This file is used as the entry point when compiling a minified build to be imported via a <script> tag.
-// It exposes all classes as global objects.
+// This is the entry point when importing this library from Node.
 
-import Blockv from '../src/client/Blockv'
-import Discover from '../src/client/Discover'
-import VatomView from './VatomView'
-import FaceSelection from './FaceSelection'
-import BaseFace from './faces/BaseFace'
+import Blockv from './client/Blockv'
+import Discover from './client/Discover'
 
-window.Blockv = Blockv
-window.Discover = Discover
-window.VatomView = VatomView
-window.FaceSelection = FaceSelection
-window.BaseFace = BaseFace
+module.exports = Blockv
+module.exports.Discover = Discover
