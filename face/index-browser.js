@@ -8,11 +8,18 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-export default class BaseResponse {
-  constructor (error, message, payload, status) {
-    this.status = status
-    this.error = error
-    this.message = message
-    this.payload = payload
-  }
-}
+
+// This file is used as the entry point when compiling a minified build to be imported via a <script> tag.
+// It exposes all classes as global objects.
+
+import Blockv from '../src/client/Blockv'
+import Discover from '../src/client/Discover'
+import VatomView from './VatomView'
+import FaceSelection from './FaceSelection'
+import BaseFace from './faces/BaseFace'
+
+window.Blockv = Blockv
+window.Discover = Discover
+window.VatomView = VatomView
+window.FaceSelection = FaceSelection
+window.BaseFace = BaseFace

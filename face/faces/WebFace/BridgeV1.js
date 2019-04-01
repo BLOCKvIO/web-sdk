@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-module.exports = class BridgeV1 {
+export default class BridgeV1 {
   constructor (bv, vatom, face) {
     this.blockv = bv
     this.vatom = vatom
@@ -34,13 +34,11 @@ module.exports = class BridgeV1 {
   }
 
   getChildren (payload) {
-    return this.blockv.Vatoms.getVatomChildren(payload.id).then(vatoms => {
-    // Create list of vatom info
+    return this.blockv.Vatoms.getVatomChildren(payload.id).then(children => {
       let vatomInfos = []
-      for (let i = 0; i < vatoms.length; i++) {
-        vatomInfos.push(this.encodeVatom(vatoms[i]))
+      for (let vatom of children) {
+        vatomInfos.push(this.encodeVatom(vatom))
       }
-      // Done
       return {
         'items': vatomInfos,
         _responseName: 'vatom.children.get-response'
@@ -93,7 +91,7 @@ module.exports = class BridgeV1 {
     // Create resource list
     var resources = {}
     for (let i = 0; i < vatom.properties.resources.length; i++) {
-      resources[vatom.properties.resources[i].name] =  this.blockv.UserManager.encodeAssetProvider(vatom.properties.resources[i].value.value)
+      resources[vatom.properties.resources[i].name] = this.blockv.UserManager.encodeAssetProvider(vatom.properties.resources[i].value.value)
     }
     // Create payload
     return {

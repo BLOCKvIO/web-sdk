@@ -8,11 +8,11 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const BaseFace = require('../BaseFace')
-const BridgeV1 = require('./BridgeV1')
-const BridgeV2 = require('./BridgeV2')
+import BaseFace from '../BaseFace'
+import BridgeV1 from './BridgeV1'
+import BridgeV2 from './BridgeV2'
 
-module.exports = class BaseWebFace extends BaseFace {
+export default class BaseWebFace extends BaseFace {
   /** @private Called on startup */
   onLoad () {
     // Create iframe

@@ -11,13 +11,12 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
-const FaceSelection = require('./FaceSelection')
-const ProgressImage = require('./faces/ProgressImage')
-const ImageFace = require('./faces/ImageFace')
-const ImagePolicy = require('./faces/ImagePolicy')
-const LayeredImage = require('./faces/LayeredImage')
-const BaseWebFace = require('./faces/WebFace/BaseWebFace')
-
+import FaceSelection from './FaceSelection'
+import ProgressImage from './faces/ProgressImage'
+import ImageFace from './faces/ImageFace'
+import ImagePolicy from './faces/ImagePolicy'
+import LayeredImage from './faces/LayeredImage'
+import BaseWebFace from './faces/WebFace/BaseWebFace'
 
 // list registered faces
 let registeredFace = {
@@ -27,7 +26,7 @@ let registeredFace = {
   'native://layered-image': LayeredImage
 }
 
-module.exports = class VatomView {
+export default class VatomView {
   constructor (bv, vAtom, FSP, config) {
     this.blockv = bv
     this.vatomObj = vAtom
@@ -35,7 +34,6 @@ module.exports = class VatomView {
     this.config = config || {}
     // eslint-disable-next-line
     this._currentFace = null
-
     // create a default view with a div container
     // eslint-disable-next-line
     this.element = document.createElement('div')
@@ -53,8 +51,7 @@ module.exports = class VatomView {
 
     this.createErrorView = this.config.errorView || function (bvi, v, err) {
       let con = document.createElement('div')
-      const rN = 'ActivatedImage'
-      const rs = v.properties.resources.find(r => r.name === rN)
+      const rs = v.properties.resources.find(r => r.name === 'ActivatedImage')
       const du = rs && bvi.UserManager.encodeAssetProvider(rs.value.value)
       con.style.backgroundSize = 'contain'
       con.style.backgroundPosition = 'center'
@@ -100,13 +97,18 @@ module.exports = class VatomView {
     Promise.resolve(() => null).then(() => {
     // start the face selection procedure
       const st = this.fsp(this.vatomObj)
+      let FaceClass = null
       // check if face is registered
       const du = st.properties.display_url.toLowerCase()
-      let FaceClass = registeredFace[du]
-
+      let excludedFaces = this.config.excludedFaces
+      
+      if (excludedFaces.includes(du)) {
+        FaceClass = ImageFace
+      } else {
+        FaceClass = registeredFace[du]
+      }
       // if there is no face registered in the array but we have a http link, show the web face
       if (FaceClass === undefined && du.indexOf('http') !== -1) {
-        console.log("Should actually show a webface here!");
         FaceClass = BaseWebFace
       } else if (FaceClass === undefined) {
         throw new Error('No Face Registered')
@@ -133,6 +135,7 @@ module.exports = class VatomView {
         rFace.element.style.opacity = 1
       }
     }).catch((err) => {
+      console.warn('Error from catch', err)
       // remove current face
       this.element.appendChild(this.errorView = this.createErrorView(this.blockv, this.vatom, err))
       if (rFace && rFace.element && rFace.element.parentNode) {

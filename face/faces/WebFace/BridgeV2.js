@@ -8,9 +8,9 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const _ = require('lodash')
+import _ from 'lodash'
 
-module.exports = class BridgeV2 {
+export default class BridgeV2 {
   constructor (bv, vatom, face) {
     this.blockv = bv
     this.vatom = this.encodeVatom(vatom)
@@ -34,7 +34,7 @@ module.exports = class BridgeV2 {
   }
 
   getVatomChildren () {
-   return this.blockv.Vatoms.getVatomChildren(this.vatom.id).then(v => {
+    return this.blockv.Vatoms.getVatomChildren(this.vatom.id).then(v => {
       return {
         vatoms: v
       }

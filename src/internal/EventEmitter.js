@@ -73,7 +73,7 @@ class EventEmitter {
     this.privateEventListeners[eventName] = this.privateEventListeners[eventName] || []
 
     // Find and remove it
-    for (let i = 0; i < this.privateEventListeners[eventName]; i += 1) {
+    for (let i = 0; i < this.privateEventListeners[eventName].length; i += 1) {
       if (this.privateEventListeners[eventName][i] === callback) {
         this.privateEventListeners[eventName].splice(i, 1)
         i -= 1

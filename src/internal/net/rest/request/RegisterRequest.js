@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-module.export = class RegisterRequest {
+export default class RegisterRequest {
   constructor (firstName, lastName, birthday, language, password, tokens, namePublic, avatarPublic) {
     this.first_name = firstName
     this.last_name = lastName

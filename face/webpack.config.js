@@ -12,14 +12,15 @@ module.exports = {
   }
 }
 // The app's starting file
-module.exports.entry = ['@babel/polyfill', path.join(__dirname, 'index.js')]
+module.exports.entry = ['@babel/polyfill', path.join(__dirname, 'index-browser.js')]
 
 // The final app's JS output file
 module.exports.output = {
   path: path.join(__dirname, '../dist/'),
   filename: 'blockv-faces.min.js',
-  libraryTarget: 'var',
-  library: 'Blockv'
+  // libraryTarget: 'var',
+  // libraryExport: ['Blockv', 'VatomView', 'FaceSelection', 'BaseFace'],
+  // library: 'Blockv'
 }
 // Output a sourcemap
 module.exports.devtool = 'source-map'
@@ -30,7 +31,7 @@ module.exports.module.rules.push({
   exclude: /node_modules/,
   loader: 'babel-loader',
   options: {
-    presets: ['env', 'stage-0']
+    presets: ['@babel/preset-env']
   }
 })
 

@@ -8,13 +8,16 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const urlParse = require('url-parse')
-const User = require('../../../../model/User')
 
-module.exports = class UserApi {
-  constructor (client, store) {
-    this.client = client
-    this.store = store
+import urlParse from 'url-parse'
+import User from '../../../../model/User'
+
+export default class UserApi {
+  constructor (bv) {
+    this.Blockv = bv
+    this.client = bv.client
+    this.store = bv.store
+    this.dataPool = bv.dataPool
   }
 
   /**
@@ -51,6 +54,7 @@ module.exports = class UserApi {
           this.store.refreshToken = data.refresh_token.token
           this.store.assetProvider = data.asset_provider
           this.store.userID = data.user.id
+          this.dataPool.setSessionInfo({ userID: data.user.id })
           return data
         }
       ).then(data => new User(data.user))
@@ -86,6 +90,7 @@ module.exports = class UserApi {
           this.store.refreshToken = data.refresh_token.token
           this.store.assetProvider = data.asset_provider
           this.store.userID = data.user.id
+          this.dataPool.setSessionInfo({ userID: data.user.id, client: this.client })
           return data
         }
       }
@@ -108,6 +113,7 @@ module.exports = class UserApi {
         this.store.token = data.access_token.token
         this.store.refreshToken = data.refresh_token.token
         this.store.assetProvider = data.asset_provider
+        this.dataPool.setSessionInfo({ userID: data.user.id })
         return data
       }
     ).then(data => new User(data.user))
@@ -210,10 +216,12 @@ module.exports = class UserApi {
     return this.client.request('POST', '/v1/user/logout', params, true).then(() => {
       this.store.token = ''
       this.store.refreshToken = ''
+      this.dataPool.setSessionInfo(null)
     }).catch((err) => {
       console.warn(err)
       this.store.token = ''
       this.store.refreshToken = ''
+      this.DataPool.setSessionInfo(null)
       throw err
     })
   }

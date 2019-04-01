@@ -9,12 +9,9 @@
 //  governing permissions and limitations under the License.
 //
 
-const VatomView = require('./VatomView')
-const FaceSelection = require('./FaceSelection')
-const BLOCKv = require('../src')
-const BaseFace = require('./faces/BaseFace')
+// This is the entry point when importing into a web app via `import { ... } from '@blockv/sdk/face'
 
-module.exports = BLOCKv
-module.exports.VatomView = VatomView
-module.exports.FaceSelection = FaceSelection
-module.exports.BaseFace = BaseFace
+export { default as VatomView } from './VatomView'
+export { default as FaceSelection } from './FaceSelection'
+export { default } from '../src'
+export { default as BaseFace } from './faces/BaseFace'

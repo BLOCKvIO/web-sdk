@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-module.exports = class Vatom {
+export default class Vatom {
   constructor (payload, faces, actions) {
     this.payload = payload
     this.faces = faces
@@ -42,5 +42,58 @@ module.exports = class Vatom {
 
   get properties () {
     return this.payload['vAtom::vAtomType']
+  }
+
+  /** True if this is a folder vatom */
+  get isFolder () {
+    return this.properties['root_type'].indexOf('ContainerType') !== -1
+  }
+
+  /** True if this is a defined folder vatom, ie a folder that can only accept certain types of child vatoms. */
+  get isDefinedFolder () {
+    return this.properties['root_type'].indexOf('DefinedFolderContainerType') !== -1
+  }
+
+  /** True if this is a discover folder vatom, ie a folder whose contents are fetched by performing the `Discover` action on it. */
+  get isDiscoverFolder () {
+    return this.properties['root_type'].indexOf('DiscoverFolderContainerType') != -1
+  }
+
+  canCombineWith (otherVatom) {
+    // Stop if null or ourselves
+    if (!otherVatom || this.id === otherVatom.id) {
+      return false
+    }
+
+    // If it's not a folder, deny
+    if (!this.isFolder) {
+      return false
+    }
+
+    // If it's not a defined folder, allow
+    if (!this.isDefinedFolder) {
+      return true
+    }
+
+    // Get child policies
+    let policies = this.properties['child_policy'] || []
+
+    // Make child policies a little easier for us to understand
+    policies = policies.map(p => ({
+      templateVariation: p.template_variation,
+      maxCount: (p.creation_policy && p.creation_policy.policy_count_max) || 9999,
+      enforceMaxCount: (p.creation_policy && p.creation_policy.enforce_policy_count_max) || false
+    }))
+
+    // Make sure we have a match
+    for (let policy of policies) {
+      // Check if template variation matches
+      if (policy.templateVariation === otherVatom.templateVariation) {
+        return true
+      }
+    }
+
+    // No match found, deny
+    return false
   }
 }

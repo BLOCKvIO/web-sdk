@@ -8,8 +8,8 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-const Blockv = require('./client/Blockv')
-const Discover = require('./client/Discover')
 
-module.exports = Blockv
-module.exports.Discover = Discover
+// This is the entry point when importing this library into a web app.
+
+export { default } from './client/Blockv'
+export { default as Discover } from './client/Discover'

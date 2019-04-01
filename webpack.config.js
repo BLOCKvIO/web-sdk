@@ -19,6 +19,7 @@ module.exports.output = {
   path: path.join(__dirname, '/dist/'),
   filename: 'blockv-sdk.min.js',
   libraryTarget: 'var',
+  libraryExport: 'default',
   library: 'Blockv'
 }
 // Output a sourcemap
@@ -30,7 +31,7 @@ module.exports.module.rules.push({
   exclude: /node_modules/,
   loader: 'babel-loader',
   options: {
-    presets: ['env', 'stage-0']
+    presets: ['@babel/preset-env']
   }
 })
 

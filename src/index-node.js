@@ -8,11 +8,11 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-export default class BaseResponse {
-  constructor (error, message, payload, status) {
-    this.status = status
-    this.error = error
-    this.message = message
-    this.payload = payload
-  }
-}
+
+// This is the entry point when importing this library from Node.
+
+import Blockv from './client/Blockv'
+import Discover from './client/Discover'
+
+module.exports = Blockv
+module.exports.Discover = Discover

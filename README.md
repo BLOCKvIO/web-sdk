@@ -4,45 +4,44 @@ This is the official BLOCKv Web SDK. It allows you to easily integrate your own 
 
 ## Prerequisite: Request an App ID
 
-If you have not already done so, please request an App ID using the developer access page.
-
-Open the developer access page
-Fill out the registration form with your company and project details
-Submit the form for review
-The BLOCKv team will review your registration request, and if successful, send through your App ID. You will need this App ID to run the endpoints explored in the examples below.
+If you have not already done so, you can sign up for free on [developer.blockv.io](https://developer.blockv.io) and get an App ID. You will need this App ID to run the endpoints explored in the examples below.
 
 ## Installation
 
-You can import the SDK with or without Face Module support.
+You can import the SDK with or without Face Module support, which provides utilities for rendering vatoms in the browser.
 
 Install from npm
 
-```javascript
+```console
 npm install @blockv/sdk
 ```
-
-Use from the browser
-```javascript
-<script src="https://npmcdn.com/@blockv/sdk/dist/blockv-sdk.min.js"></script>
-- or - 
-<script src="https://npmcdn.com/@blockv/sdk/dist/blockv-faces.min.js"></script>
-```
-
-> When importing via the script tag, all classes will have a `Blockv.` prefix.
 
 In Node.js
 
 ```javascript
-var Blockv = require('@blockv/sdk')
-- or -
-var Blockv = require('@blockv/sdk/face')
+const Blockv = require('@blockv/sdk')
 ```
 
-ES6 & ES7
+In the browser via ES6 imports
 ```javascript
+// Core SDK only
 import Blockv from '@blockv/sdk'
-- or -
-import Blockv from '@blockv/sdk/face'
+```
+
+```javascript
+// Core SDK plus Face Module support
+import Blockv, { VatomView } from '@blockv/sdk/face'
+```
+
+In the browser from a script tag
+```html
+<!-- Core SDK only -->
+<script src="https://npmcdn.com/@blockv/sdk/dist/blockv-sdk.min.js"></script>
+```
+
+```html
+<!-- Core SDK plus Face Module support -->
+<script src="https://npmcdn.com/@blockv/sdk/dist/blockv-faces.min.js"></script>
 ```
 
 
@@ -52,11 +51,11 @@ Before running any of the web APIs you need to initialise the BLOCKv application
 
 ```javascript
 let bv = new Blockv({
-      "appID" : {{APPID}},
-      "server" : "https://api.blockv.io/",
-      "websocketAddress" : "wss://ws.blockv.io",
-      "prefix" : "blockv"
-    });
+  "appID" : {{APPID}},
+  "server" : "https://api.blockv.io/",
+  "websocketAddress" : "wss://ws.blockv.io",
+  "prefix" : "blockv"
+});
 ```
 
 The SDK supports multiple instances of `Blockv` to be initialised.
@@ -81,7 +80,6 @@ Registration can be done in two ways:
 #### Examples
 
 ```javascript
-
 let payload = {
     firstName : 'John',
     lastName : 'Smith',
