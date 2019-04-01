@@ -43,12 +43,18 @@ function start (vatom, viewmode) {
         rate -= 1
         break
     }
+
     // additional rating bonus
-    if (face.properties.constraints.view_mode === viewmode) {
+    if (face.properties.constraint.view_mode === 'engaged') {
+      rate += 10
+    } else if (face.properties.constraints.view_mode === viewmode) {
       rate += 2
+    } else if (face.proeprties.constraint.view_mode === 'icon') {
+      rate += 0
     } else {
       rate -= 1
     }
+
     // filter out non-rated items or items that are not benificial for our platform
     if (rate > 0) {
       bf.push({ face, rate })
