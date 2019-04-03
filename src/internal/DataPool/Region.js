@@ -55,16 +55,14 @@ export default class Region extends EventEmitter {
      */
   synchronize () {
     // Stop if already running
-    if (this._syncPromise)
-      {return this._syncPromise}
+    if (this._syncPromise) { return this._syncPromise }
 
     // Remove pending error
     this.error = null
     this.emit('updated')
 
     // Stop if already in sync
-    if (this.synchronized)
-      {return Promise.resolve()}
+    if (this.synchronized) { return Promise.resolve() }
 
     // Call load
     console.log(`[DataPool > Region] Starting synchronization for region ${this.stateKey}`)
@@ -74,8 +72,7 @@ export default class Region extends EventEmitter {
         let keysToRemove = []
         for (let id of this.objects.keys()) {
           // Check if it's in our list
-          if (!loadedIDs.includes(id))
-            {keysToRemove.push(id)}
+          if (!loadedIDs.includes(id)) { keysToRemove.push(id) }
         }
 
         // Remove vatoms
@@ -173,12 +170,10 @@ export default class Region extends EventEmitter {
     }
 
     // Notify updated
-    if (objects.length > 0)
-      {this.emit('updated')}
+    if (objects.length > 0) { this.emit('updated') }
 
     // Save soon
-    if (objects.length > 0)
-      {this.save()}
+    if (objects.length > 0) { this.save() }
   }
 
   /**
@@ -193,12 +188,10 @@ export default class Region extends EventEmitter {
     for (let obj of objects) {
       // Fetch existing object
       let existingObject = this.objects.get(obj.id)
-      if (!existingObject)
-        {continue}
+      if (!existingObject) { continue }
 
       // Stop if existing object doesn't have the full data
-      if (!existingObject.data)
-        {continue}
+      if (!existingObject.data) { continue }
 
       // Notify
       this.willUpdateFields(existingObject, obj.new_data)
@@ -215,12 +208,10 @@ export default class Region extends EventEmitter {
     }
 
     // Notify updated
-    if (didUpdate)
-      {this.emit('updated')}
+    if (didUpdate) { this.emit('updated') }
 
     // Save soon
-    if (didUpdate)
-      {this.save()}
+    if (didUpdate) { this.save() }
   }
 
   /**
@@ -245,12 +236,10 @@ export default class Region extends EventEmitter {
     }
 
     // Notify updated
-    if (didUpdate)
-      {this.emit('updated')}
+    if (didUpdate) { this.emit('updated') }
 
     // Save soon
-    if (didUpdate)
-      {this.save()}
+    if (didUpdate) { this.save() }
   }
 
   /**
@@ -294,12 +283,10 @@ export default class Region extends EventEmitter {
       }
 
       // Stop if no mapped object
-      if (!mapped)
-        {continue}
+      if (!mapped) { continue }
 
       // Call callback, stop if they returned false
-      if (callback(mapped) === false)
-        {break}
+      if (callback(mapped) === false) { break }
     }
   }
 
@@ -311,8 +298,9 @@ export default class Region extends EventEmitter {
      */
   get (waitUntilStable = true) {
     // Synchronize now
-    if (waitUntilStable)
-      {return this.synchronize().then(e => this.get(false))}
+    if (waitUntilStable) {
+      return this.synchronize().then(e => this.get(false))
+    }
 
     // Create an array of all data objects
     let items = []
@@ -325,8 +313,9 @@ export default class Region extends EventEmitter {
 
       // Map to the plugin's intended type
       let mapped = this.map(object)
-      if (!mapped)
-        {continue}
+      if (!mapped) {
+        continue
+      }
 
       // Cache it
       object.cached = mapped
@@ -347,22 +336,22 @@ export default class Region extends EventEmitter {
      */
   getItem (id, waitUntilStable = true) {
     // Synchronize now
-    if (waitUntilStable)
-      {return this.synchronize().then(e => this.getItem(id, false))}
+    if (waitUntilStable) {
+      return this.synchronize().then(e => this.getItem(id, false))
+    }
 
     // Get object
     let object = this.objects.get(id)
-    if (!object)
-      {return null}
+    if (!object) {
+      return null
+    }
 
     // Check for cached object
-    if (object.cached)
-      {return object.cached}
+    if (object.cached) { return object.cached }
 
     // Map to the plugin's intended type
     let mapped = this.map(object)
-    if (!mapped)
-      {return null}
+    if (!mapped) { return null }
 
     // Cache it
     object.cached = mapped
@@ -384,8 +373,7 @@ export default class Region extends EventEmitter {
   /** Load objects from local storage */
   loadFromCache () {
     // Skip if not allowed
-    if (this.noCache)
-      {return}
+    if (this.noCache) { return }
 
     // Load local cached objects
     try {
@@ -395,16 +383,16 @@ export default class Region extends EventEmitter {
       let txt = ''
 
       // Stop if no data
-      if (!compressed)
-        {return}
+      if (!compressed) { return }
 
       // Decompress it if needed
-      if (compressed.substring(0, 1) == 'c')
-        {txt = LZString.decompress(compressed.substring(1))}
-      else if (compressed.substring(0, 1) == 'u')
-        {txt = compressed.substring(1)}
-      else
-        {txt = '[]'}
+      if (compressed.substring(0, 1) === 'c') {
+        txt = LZString.decompress(compressed.substring(1))
+      } else if (compressed.substring(0, 1) === 'u') {
+        txt = compressed.substring(1)
+      } else {
+        txt = '[]'
+      }
 
       // Decode text
       let json = JSON.parse(txt)
@@ -427,12 +415,12 @@ export default class Region extends EventEmitter {
      */
   save () {
     // Skip if not allowed
-    if (this.noCache)
-      {return}
+    if (this.noCache) { return }
 
     // Clear previous pending save request
-    if (this.saveTimer)
-      {clearTimeout(this.saveTimer)}
+    if (this.saveTimer) {
+      clearTimeout(this.saveTimer)
+    }
 
     // Create save timer
     this.saveTimer = setTimeout(e => {
@@ -477,8 +465,7 @@ export default class Region extends EventEmitter {
   preemptiveChange (id, keyPath, value) {
     // Get object. If it doesn't exist, do nothing and return an undo function which does nothing.
     let object = this.objects.get(id)
-    if (!object)
-      {return function() {}}
+    if (!object) { return function () {} }
 
     // Get current value
     let oldValue = get(object.data, keyPath)
@@ -512,8 +499,7 @@ export default class Region extends EventEmitter {
   preemptiveRemove (id) {
     // Get object. If it doesn't exist, do nothing and return an undo function which does nothing.
     let object = this.objects.get(id)
-    if (!object)
-      {return function() {}}
+    if (!object) { return function () {} }
 
     // Notify
     this.willRemove(object)
@@ -525,8 +511,7 @@ export default class Region extends EventEmitter {
     // Return undo function
     return e => {
       // Check that a new object wasn't added in the mean time
-      if (this.objects.has(id))
-        {return}
+      if (this.objects.has(id)) { return }
 
       // Notify
       this.willAdd(object)

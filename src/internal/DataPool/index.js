@@ -11,7 +11,7 @@ export default class DataPool {
     // Region plugins
     this.plugins = [
       require('./plugins/InventoryRegion').default,
-      // require('./plugins/VatomIDRegion').default,
+      require('./plugins/VatomIDRegion').default,
       require('./plugins/VatomChildrenRegion').default,
       require('./plugins/GeoPosRegion').default
     ]

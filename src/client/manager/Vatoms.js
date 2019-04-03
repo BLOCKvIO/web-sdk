@@ -162,7 +162,7 @@ export default class Vatoms {
     }
 
     // Not all the vatoms were in the inventory, create a new region
-    return this.dataPool.region('ids', vatomIds).get()
+    return this.Blockv.dataPool.region('ids', vatomIds).get()
   }
 
   /**
