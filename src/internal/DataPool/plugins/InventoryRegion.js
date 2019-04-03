@@ -81,7 +81,6 @@ export default class InventoryRegion extends BLOCKvRegion {
         loadedIDs.push(a.name)
         newObjects.push(new DataObject('action', a.name, a))
       }
-
       // Update the pool
       this.addObjects(newObjects)
 
@@ -103,12 +102,11 @@ export default class InventoryRegion extends BLOCKvRegion {
 
   /** @override Called on WebSocket message. */
   async processMessage (msg) {
-    /*
     // Call super
     super.processMessage(msg)
 
     // We only handle inventory update messages after this.
-    if (msg.msg_type != 'inventory') {
+    if (msg.msg_type !== 'inventory') {
       return
     }
 
@@ -123,7 +121,7 @@ export default class InventoryRegion extends BLOCKvRegion {
       this.removeObjects([vatomID])
     } else if (msg.payload.old_owner !== this.currentUserID && msg.payload.new_owner === this.currentUserID) {
       // Vatom is now our inventory! Fetch vatom payload
-      let response = await Request.post('/user/vatom/get', { ids: [vatomID] })
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] })
 
       // Add vatom to new objects list
       let objects = []
@@ -141,6 +139,5 @@ export default class InventoryRegion extends BLOCKvRegion {
       // Logic error, old owner and new owner cannot be the same
       console.warn(`[DataPool > BVWebSocketRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same: ${vatomRef.id}`)
     }
-  */
   }
 }
