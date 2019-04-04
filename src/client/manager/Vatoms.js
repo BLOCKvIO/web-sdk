@@ -233,7 +233,7 @@ export default class Vatoms {
   trashVatom (vatomID) {
     let undos = []
     undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomID, 'vAtom::vAtomType.owner', '.'))
-    return this.vatomApi.trashVatom(vatomID).catch(err => { 
+    return this.vatomApi.trashVatom(vatomID).catch(err => {
       undos.map(u => u())
       throw err
     })
