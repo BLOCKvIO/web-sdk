@@ -33,7 +33,7 @@ export default class BLOCKvRegion extends Region {
     super.close()
 
     // Remove listeners
-    Events.removeEventListener('websocket.raw', this.onWebSocketMessage)
+    this.dataPool.Blockv.WebSockets.removeEventListener('websocket.raw', this.onWebSocketMessage)
     DataObjectAnimator.removeRegion(this)
   }
 

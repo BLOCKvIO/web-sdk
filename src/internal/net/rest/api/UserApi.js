@@ -350,6 +350,9 @@ export default class UserApi {
         const assetProviders = await this.client.request('GET', '/v1/user/asset_providers', null, true);
         this.store.assetProvider = assetProviders.asset_provider;
 
+        // Inform data pool that the current user changed
+        this.dataPool.setSessionInfo({ userID: profile.id })
+
         // Done
         promiseResolved = true;
         promiseSuccess(true);
