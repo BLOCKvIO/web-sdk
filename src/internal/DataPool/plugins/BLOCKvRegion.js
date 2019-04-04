@@ -2,7 +2,6 @@
 import Region from '../Region'
 import Vatom from '../../../model/Vatom'
 import DataObjectAnimator from '../DataObjectAnimator'
-import Events from '../EventEmitter'
 import { merge } from 'lodash'
 import Delayer from '../Delayer'
 
@@ -24,13 +23,9 @@ export default class BLOCKvRegion extends Region {
 
     // Add listeners for the WebSocket
     this.socket = this.dataPool.Blockv.WebSockets
-    this.socket.connect().then(socketFeed => {
-      console.log('WebSocket was init from BLOCKvRegion')
-      socketFeed.addEventListener('websocket.raw', this.onWebSocketMessage)
-      socketFeed.addEventListener('inventory', this.onWebSocketMessage)
-      socketFeed.addEventListener('stateUpdate', this.onWebSocketMessage)
-    })
-    
+    this.socket.connect()
+    this.socket.addEventListener('websocket.raw', this.onWebSocketMessage)
+
     // Monitor for timed updates
     DataObjectAnimator.addRegion(this)
   }
@@ -38,9 +33,8 @@ export default class BLOCKvRegion extends Region {
   /** Called when this region is going to be shut down */
   close () {
     super.close()
-
     // Remove listeners
-    Events.removeEventListener('websocket.raw', this.onWebSocketMessage)
+    this.socket.removeEventListener('websocket.raw', this.onWebSocketMessage)
     DataObjectAnimator.removeRegion(this)
   }
 
@@ -172,9 +166,7 @@ export default class BLOCKvRegion extends Region {
   willAdd (object) {
     // Notify parent as well
     let parent = object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].parent_id
-    console.log("ADD OOBJECT HAS BEEN TRIGGERED")
     if (parent) {
-      console.log("Parent is true: ", parent)
       Delayer.run(e => this.emit('object.updated', parent))
     }
     // If our DataObjectAnimator has a scheduled update for this object, include that change now. This is to work around map objects jumping around when a new region is created.
