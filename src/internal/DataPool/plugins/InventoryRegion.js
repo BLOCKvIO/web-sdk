@@ -104,7 +104,6 @@ export default class InventoryRegion extends BLOCKvRegion {
   async processMessage (msg) {
     // Call super
     super.processMessage(msg)
-
     // We only handle inventory update messages after this.
     if (msg.msg_type !== 'inventory') {
       return
@@ -117,22 +116,23 @@ export default class InventoryRegion extends BLOCKvRegion {
     }
     // Check if this is an incoming or outgoing vatom
     if (msg.payload.old_owner === this.currentUserID && msg.payload.new_owner !== this.currentUserID) {
+
       // Vatom is no longer owned by us
       this.removeObjects([vatomID])
     } else if (msg.payload.old_owner !== this.currentUserID && msg.payload.new_owner === this.currentUserID) {
+
       // Vatom is now our inventory! Fetch vatom payload
       let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] })
-
+      let objects = []     
       // Add vatom to new objects list
-      let objects = []
-      objects.push(new DataObject('vatom', response.vatoms[0].id, response.vatoms[0]))
+
+      response.vatoms.map(v => new DataObject('vatom', v.id, v)).forEach(v => objects.push(v))
 
       // Add faces to new objects list
       response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
 
       // Add actions to new objects list
       response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
-
       // Add new objects
       this.addObjects(objects)
     } else {

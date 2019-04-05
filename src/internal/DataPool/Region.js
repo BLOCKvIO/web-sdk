@@ -1,4 +1,4 @@
-
+/* global localStorage */
 import EventEmitter from './EventEmitter'
 import DataObject from './DataObject'
 import Filter from './Filter'

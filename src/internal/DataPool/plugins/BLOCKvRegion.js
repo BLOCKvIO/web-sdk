@@ -2,7 +2,6 @@
 import Region from '../Region'
 import Vatom from '../../../model/Vatom'
 import DataObjectAnimator from '../DataObjectAnimator'
-import Events from '../EventEmitter'
 import { merge } from 'lodash'
 import Delayer from '../Delayer'
 
@@ -23,7 +22,10 @@ export default class BLOCKvRegion extends Region {
     this.onWebSocketMessage = this.onWebSocketMessage.bind(this)
 
     // Add listeners for the WebSocket
-    this.dataPool.Blockv.WebSockets.addEventListener('websocket.raw', this.onWebSocketMessage)
+    this.socket = this.dataPool.Blockv.WebSockets
+    this.socket.connect()
+    this.socket.addEventListener('websocket.raw', this.onWebSocketMessage)
+
     // Monitor for timed updates
     DataObjectAnimator.addRegion(this)
   }
@@ -31,9 +33,8 @@ export default class BLOCKvRegion extends Region {
   /** Called when this region is going to be shut down */
   close () {
     super.close()
-
     // Remove listeners
-    this.dataPool.Blockv.WebSockets.removeEventListener('websocket.raw', this.onWebSocketMessage)
+    this.socket.removeEventListener('websocket.raw', this.onWebSocketMessage)
     DataObjectAnimator.removeRegion(this)
   }
 
