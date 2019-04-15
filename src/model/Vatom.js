@@ -59,6 +59,10 @@ export default class Vatom {
     return this.properties['root_type'].indexOf('DiscoverFolderContainerType') != -1
   }
 
+  canPerformAction (action) {
+    return this.actions.find(a => a.name.indexOf(action) !== -1)
+  }
+
   canCombineWith (otherVatom) {
     // Stop if null or ourselves
     if (!otherVatom || this.id === otherVatom.id) {
@@ -95,5 +99,20 @@ export default class Vatom {
 
     // No match found, deny
     return false
+  }
+
+  /** Checks if this vatom has an icon face */
+  containsIconFace () {
+    return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'icon')
+  }
+
+  /** Checks if this vatom has a card face */
+  containsCardFace () {
+    return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'card')
+  }
+
+  /** Checks if this vatom has a fullscreen face */
+  containsFullscreenFace () {
+    return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'fullscreen')
   }
 }
