@@ -103,7 +103,7 @@ export default class Vatom {
 
   /** Checks if this vatom has an icon face */
   containsIconFace () {
-    return !!this.faces.find(f => f.properties.constraints.platform === 'web' && f.properties.constraints.view_mode === 'icon')
+    return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'icon')
   }
 
   /** Checks if this vatom has a card face */
