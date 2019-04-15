@@ -31,7 +31,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
     // Listen for events
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
-    // Events.registerEvent('websocket.open', this.onWebSocketOpen)
+    this.socket.addEventListener('connected', this.onWebSocketOpen)
   }
 
   /** Called when this region is going to be shut down */
@@ -39,7 +39,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
     super.close()
 
     // Remove listeners
-    Events.removeEventListener('websocket.open', this.onWebSocketOpen)
+    this.socket.removeEventListener('connected', this.onWebSocketOpen)
   }
 
   /** Called when the WebSocket connection re-opens */
