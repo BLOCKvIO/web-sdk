@@ -113,6 +113,6 @@ export default class Vatom {
 
   /** Checks if this vatom has a fullscreen face */
   containsFullscreenFace () {
-    return !!this.faces.find(f => f.properties.constraints.platform === 'web' && f.properties.constraints.view_mode === 'fullscreen')
+    return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'fullscreen')
   }
 }
