@@ -116,14 +116,12 @@ export default class InventoryRegion extends BLOCKvRegion {
     }
     // Check if this is an incoming or outgoing vatom
     if (msg.payload.old_owner === this.currentUserID && msg.payload.new_owner !== this.currentUserID) {
-
       // Vatom is no longer owned by us
       this.removeObjects([vatomID])
     } else if (msg.payload.old_owner !== this.currentUserID && msg.payload.new_owner === this.currentUserID) {
-
       // Vatom is now our inventory! Fetch vatom payload
       let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] })
-      let objects = []     
+      let objects = []
       // Add vatom to new objects list
 
       response.vatoms.map(v => new DataObject('vatom', v.id, v)).forEach(v => objects.push(v))
