@@ -116,6 +116,8 @@ export default class Vatom {
     return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'fullscreen')
   }
 
+  /** TO DO: Implement in next release
+
   static mapString (o) {
     return Object.keys(o).map(key => `${key}=${o[key]}`).join('&')
   }
@@ -139,4 +141,5 @@ export default class Vatom {
     let payloadResource = (customPath || this.payload['vAtom::vAtomType'].resources).find(r => r.name === resourceName)
     return this.encodeResource(payloadResource.value.value)
   }
+  */
 }
