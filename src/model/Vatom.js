@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-
+import urlParse from 'url-parse'
 export default class Vatom {
   constructor (payload, faces, actions) {
     this.payload = payload
@@ -92,7 +92,7 @@ export default class Vatom {
     // Make sure we have a match
     for (let policy of policies) {
       // Check if template variation matches
-      if (policy.templateVariation === otherVatom.templateVariation) {
+      if (policy.templateVariation === otherVatom.properties.template_variation) {
         return true
       }
     }
@@ -114,5 +114,29 @@ export default class Vatom {
   /** Checks if this vatom has a fullscreen face */
   containsFullscreenFace () {
     return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'fullscreen')
+  }
+
+  static mapString (o) {
+    return Object.keys(o).map(key => `${key}=${o[key]}`).join('&')
+  }
+
+  encodeResource (url) {
+    const aP = this.store.assetProvider
+    const aPlen = aP.length
+    const compare = urlParse(url)
+    for (let i = 0; i < aPlen; i += 1) {
+      const comparethis = urlParse(aP[i].uri)
+      if (compare.hostname === comparethis.hostname) {
+        // same uri so get the policy signature and key and append
+        const queryString = Vatom.mapString(aP[i].descriptor)
+        return `${url}?${queryString}`
+      }
+    }
+    return url
+  }
+
+  getResource (resourceName, customPath) {
+    let payloadResource = (customPath || this.payload['vAtom::vAtomType'].resources).find(r => r.name === resourceName)
+    return this.encodeResource(payloadResource.value.value)
   }
 }
