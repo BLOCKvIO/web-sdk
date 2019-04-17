@@ -34,6 +34,7 @@ export default class VatomView {
     this.config = config || {}
     // eslint-disable-next-line
     this._currentFace = null
+    this.blockv.dataPool.region('inventory').addEventListener('object.updated', this.onVatomUpdated.bind(this))
     // create a default view with a div container
     // eslint-disable-next-line
     this.element = document.createElement('div')
@@ -166,11 +167,21 @@ export default class VatomView {
   free () {
     if (this._currentFace && this._currentFace.onUnload) {
       this._currentFace.onUnload()
+      this.blockv.dataPool.region('inventory').removeEventListener('object.updated')
     }
 
     const view = this.element
     while (view.firstChild) {
       view.removeChild(view.firstChild)
+    }
+  }
+
+  onVatomUpdated (id) {
+    if (id !== this.vatomObj.id) {
+      return
+    }
+    if (this._currentFace && this._currentFace.onVatomUpdated) {
+      this._currentFace.onVatomUpdated()
     }
   }
 
