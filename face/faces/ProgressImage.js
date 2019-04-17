@@ -32,9 +32,9 @@ export default class ProgressImage extends BaseFace {
     this.fillContainer.appendChild(this.fill)
 
     // Create Image Percent Container
+    this.percentContainer = document.createElement('div')
     this.percentContainer.style.cssText = 'position:absolute; top: 0px; right: 0px; width:auto; height:auto; padding:5px; font-size:9px; color: rgba(0,0,0,0.5)';
-    this.element.appendChild(this.percentContainer);
-
+    this.element.appendChild(this.percentContainer)
 
     // Reload images
     return this.refresh()
@@ -44,13 +44,9 @@ export default class ProgressImage extends BaseFace {
     return this.refresh()
   }
 
-  
-
-  static calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
-
-    let ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-
-    return { width: srcWidth*ratio, height: srcHeight*ratio };
+  static calculateAspectRatioFit (srcWidth, srcHeight, maxWidth, maxHeight) {
+    let ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight)
+    return { width: srcWidth * ratio, height: srcHeight * ratio }
   }
 
   /** Refresh the face position and images. @returns Promise */
