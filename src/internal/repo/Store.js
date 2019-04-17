@@ -63,6 +63,7 @@ export default class Store {
   }
 
   set refreshToken (refresh) {
+    this.token = ''
     this.privateRefreshToken = refresh
     if (typeof localStorage !== 'undefined') {
       // eslint-disable-next-line no-undef
