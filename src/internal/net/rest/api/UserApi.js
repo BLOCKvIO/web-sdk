@@ -54,29 +54,30 @@ export default class UserApi {
           this.store.refreshToken = data.refresh_token.token
           this.store.assetProvider = data.asset_provider
           this.store.userID = data.user.id
-          this.dataPool.setSessionInfo({ userID: data.user.id })
+          this.dataPool.setSessionInfo({
+            userID: data.user.id
+          })
           return data
         }
       ).then(data => new User(data.user))
   }
 
   /**
-    * Logs a user into the Blockv platform. Accepts a user token (phone or email).
-    *
-    * @param token the user's phone(E.164) or email
-    * @param tokenType the type of the token (phone or email)
-    * @param password the user's password.
-    * @return JSON Object
-    */
+   * Logs a user into the Blockv platform. Accepts a user token (phone or email).
+   *
+   * @param token the user's phone(E.164) or email
+   * @param tokenType the type of the token (phone or email)
+   * @param password the user's password.
+   * @return JSON Object
+   */
 
   login (token, tokenType, password) {
     const payload = {
       token,
       token_type: tokenType,
-      auth_data:
-          {
-            password
-          }
+      auth_data: {
+        password
+      }
     }
 
     return this.client.request('POST', '/v1/user/login', payload, false).then(
@@ -90,7 +91,10 @@ export default class UserApi {
           this.store.refreshToken = data.refresh_token.token
           this.store.assetProvider = data.asset_provider
           this.store.userID = data.user.id
-          this.dataPool.setSessionInfo({ userID: data.user.id, client: this.client })
+          this.dataPool.setSessionInfo({
+            userID: data.user.id,
+            client: this.client
+          })
           return data
         }
       }
@@ -98,11 +102,11 @@ export default class UserApi {
   }
 
   /**
-    * Logs a user into the Blockv platform. Accepts a guest id
-    *
-    * @param guestId the user's guest id.
-    * @return JSON Object
-    */
+   * Logs a user into the Blockv platform. Accepts a guest id
+   *
+   * @param guestId the user's guest id.
+   * @return JSON Object
+   */
   loginGuest (guestId) {
     const payload = {
       token: guestId,
@@ -113,7 +117,9 @@ export default class UserApi {
         this.store.token = data.access_token.token
         this.store.refreshToken = data.refresh_token.token
         this.store.assetProvider = data.asset_provider
-        this.dataPool.setSessionInfo({ userID: data.user.id })
+        this.dataPool.setSessionInfo({
+          userID: data.user.id
+        })
         return data
       }
     ).then(data => new User(data.user))
@@ -126,13 +132,13 @@ export default class UserApi {
   }
 
   /**
-    * Fetches the current user's profile information from the Blockv platform.
-    *
-    * @return JSON Object
-    */
+   * Fetches the current user's profile information from the Blockv platform.
+   *
+   * @return JSON Object
+   */
 
   getCurrentUser (payload) {
-  // get the current authenticated in user
+    // get the current authenticated in user
     return this.client.request('GET', '/v1/user', payload, true).then(data => new User(data))
   }
 
@@ -147,9 +153,9 @@ export default class UserApi {
   }
 
   /**
-    * Gets a list of the current users tokens
-    * @return JSON Object
-    */
+   * Gets a list of the current users tokens
+   * @return JSON Object
+   */
 
   getUserTokens () {
     return this.client.request('GET', '/v1/user/tokens', '', true)
@@ -246,14 +252,14 @@ export default class UserApi {
   }
 
   addUserToken (payload) {
-  /**
-      * payload is
-      * {
-      * "token": "another.email@domain.com",
-      * "token_type": "email",
-      * "is_primary": false
-      * }
-      */
+    /**
+     * payload is
+     * {
+     * "token": "another.email@domain.com",
+     * "token_type": "email",
+     * "is_primary": false
+     * }
+     */
     return this.client.request('POST', '/v1/user/tokens', payload, true)
   }
 
@@ -262,19 +268,19 @@ export default class UserApi {
   }
 
   /**
-     * Deletes a Users Token
-     * @param  {String} tokenId
-     * @return {Promise<Object>} returns a success
-     */
+   * Deletes a Users Token
+   * @param  {String} tokenId
+   * @return {Promise<Object>} returns a success
+   */
   deleteUserToken (tokenId) {
     return this.client.request('DELETE', `/v1/user/tokens/${tokenId}`, null, true)
   }
 
   /**
-    * Adds a redeemable the users account
-    * @param {Object} payload Object containing the redeemable information
-    * @return {Promise<Object>} returns a Object containing the new redeemable
-    */
+   * Adds a redeemable the users account
+   * @param {Object} payload Object containing the redeemable information
+   * @return {Promise<Object>} returns a Object containing the new redeemable
+   */
   async addRedeemable (payload) {
     const { userID } = this.store
     return this.client.request('POST', `/v1/users/${userID}/redeemables`, payload, true)
@@ -290,92 +296,129 @@ export default class UserApi {
    * @private
    * @returns {Promise<boolean>} `true` if login completed, or `false` if login was cancelled by the user.
    */
-  async loginOAuthPopup() {
+  async loginOAuthPopup () {
     // Ensure SDK has been initialized
-    if (!this.store.appID) throw new Error('Please initialize the SDK and set your App ID first.');
+    if (!this.store.appID) throw new Error('Please initialize the SDK and set your App ID first.')
 
     // Generate random state ID
-    const stateID = Math.random().toString(36).substr(2);
+    const stateID = Math.random().toString(36).substr(2)
 
     // Generate the oauth URL
-    const redirectURI = encodeURIComponent('https://login.blockv.io/send-event.html');
-    const uri = `https://login.blockv.io/?response_type=token&client_id=${this.store.appID}&redirect_uri=${redirectURI}&scope=all&state=${stateID}`;
+    const redirectURI = 'https://login.blockv.io/send-event.html'
+    const uri = `https://login.blockv.io/?response_type=code&client_id=${this.store.appID}&redirect_uri=${encodeURIComponent(redirectURI)}&scope=all&state=${stateID}`
 
     // Create popup window
-    const newWindow = window.open(uri, '_blank', 'left=200,top=200,width=360,height=480,chrome,centerscreen');
-
+    const newWindow = window.open(uri, '_blank', 'left=200,top=200,width=360,height=480,chrome,centerscreen')
+    if (!newWindow) {
+      throw new Error('Unable to login, popups have been blocked')
+    }
     // Create pending promise
-    let promiseResolved = false;
-    let promiseSuccess = null;
-    let promiseFail = null;
-    const promise = new Promise((s, f) => {
-      promiseSuccess = s;
-      promiseFail = f;
-    });
+    let promiseResolved = false
+    let promiseSuccess = null
+    let promiseFail = null
+    const promise = new Promise((resolve, reject) => {
+      promiseSuccess = resolve
+      promiseFail = reject
+    })
 
     // Create window close checker
     const closeChecker = setInterval(() => {
       // Check if window was closed
-      if (!newWindow.closed) return false;
+      if (!newWindow.closed) return false
 
       // It was, cancel timer
-      clearInterval(closeChecker);
+      clearInterval(closeChecker)
 
       // If promise was never resolved, the user must have closed the popup before logging in. Resolve the promise.
-      if (!promiseResolved) promiseSuccess(false);
-    }, 250);
+      if (!promiseResolved) promiseSuccess(false)
+    }, 250)
 
     // Create message listener
     const messageListener = async (e) => {
       // Ensure it's from the correct origin
-      if (e.origin !== 'https://login.blockv.io') return false;
+      if (e.origin !== 'https://login.blockv.io') return false
 
       // Ensure the state matches
-      if (e.data.state !== stateID) return false;
+      if (e.data.state !== stateID) return false
 
       // Ensure the action matches
-      if (e.data.action !== 'oauth-response') return false;
-
+      if (e.data.action !== 'oauth-response') return false
+      console.log(e.data)
       // Check response type
-      if (e.data.refresh_token) {
+      if (e.data.code) {
+        let oauthObj = {
+          'grant_type': 'authorization_code',
+          'client_id': this.Blockv.store.appID,
+          'code': e.data.code,
+          'redirect_uri': redirectURI
+        }
+        let oa = await this.Blockv.client.request('POST', 'v1/oauth/token', oauthObj, false)
         // We have our user data, store it
-        this.setRefreshToken(e.data.refresh_token);
-        this.store.token = e.data.access_token;
+        this.setRefreshToken(oa.refresh_token.token)
+        this.store.token = oa.access_token.token
 
         // Get user info and set the store properties
-        const profile = await this.getCurrentUser();
-        this.store.userID = profile.id;
+        const profile = await this.getCurrentUser()
+        this.store.userID = profile.id
 
         // Get asset provider info and store it
-        const assetProviders = await this.client.request('GET', '/v1/user/asset_providers', null, true);
-        this.store.assetProvider = assetProviders.asset_provider;
+        const assetProviders = await this.client.request('GET', 'v1/user/asset_providers', null, true)
+        this.store.assetProvider = assetProviders.asset_provider
 
         // Inform data pool that the current user changed
-        this.dataPool.setSessionInfo({ userID: profile.id })
+        this.dataPool.setSessionInfo({
+          userID: profile.id
+        })
 
         // Done
-        promiseResolved = true;
-        promiseSuccess(true);
+        promiseResolved = true
+        promiseSuccess(true)
       } else {
         // Login failed, return error
-        const err = new Error(e.data.error_text || 'Unable to login.');
-        err.code = e.data.error;
-        promiseResolved = true;
-        promiseFail(err);
+        const err = new Error(e.data.error_text || 'Unable to login.')
+        err.code = e.data.error
+        promiseResolved = true
+        promiseFail(err)
       }
 
       // Cleanup, remove event listener
-      newWindow.close();
-      window.removeEventListener('message', messageListener);
-      clearInterval(closeChecker);
-      return true;
-    };
+      newWindow.close()
+      window.removeEventListener('message', messageListener)
+      clearInterval(closeChecker)
+      return true
+    }
 
     // Attach message listener
-    window.addEventListener('message', messageListener);
+    window.addEventListener('message', messageListener)
 
     // Done, return promise
-    return promise;
+    return promise
   }
 
+  // Used for manual OAuth Login flow
+  async loginOauthCode (redirectURI, code) {
+    let oauthObj = {
+      'grant_type': 'authorization_code',
+      'client_id': this.store.appID,
+      'code': code,
+      'redirect_uri': redirectURI
+    }
+    let oa = await this.Blockv.client.request('POST', 'v1/oauth/token', oauthObj, false)
+    // We have our user data, store it
+    this.setRefreshToken(oa.refresh_token.token)
+    this.store.token = oa.access_token.token
+
+    // Get user info and set the store properties
+    const profile = await this.getCurrentUser()
+    this.store.userID = profile.id
+
+    // Get asset provider info and store it
+    const assetProviders = await this.client.request('GET', 'v1/user/asset_providers', null, true)
+    this.store.assetProvider = assetProviders.asset_provider
+
+    // Inform data pool that the current user changed
+    this.dataPool.setSessionInfo({
+      userID: profile.id
+    })
+  }
 }
