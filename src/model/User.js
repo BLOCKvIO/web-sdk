@@ -26,6 +26,8 @@ export default class User {
     this.isMerchant = user.system_properties.is_merchant
     this.lastLogin = user.system_properties.last_login
     this.pubFqdn = user.system_properties.pub_fqdn
+    this.rawPayload = user
+    this.consents = user.properties.user_consents
     this.meta = {
       createdBy: user.meta.created_by,
       dataType: user.meta.data_type,
