@@ -55,6 +55,11 @@ export default class WebSockets extends EventEmitter {
   handleMessage (e) {
     const ed = JSON.parse(e.data)
     this.trigger('websocket.raw', ed)
+
+    // if the message is a RPC message
+    if (ed.msg_type === 'rpc') {
+      this.trigger('websocket.rpc', ed)
+    }
     // if the user only wants state updates
     if (ed.msg_type === 'state_update') {
       this.trigger('stateUpdate', ed)
