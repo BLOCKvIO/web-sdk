@@ -39,7 +39,15 @@ export default class Vatoms {
     var payload = {}
     if (typeof user === 'string') {
       // Check if string is email or phone number
-      if (user.indexOf('@') !== -1) {
+      if (/^0x[a-fA-F0-9]{40}$/.test(user)) {
+        // HACK: Sending to an Ethereum address, append "Eth" to the action name
+        if (!actionName.startsWith('Eth')) {
+          actionName = 'Eth' + actionName
+        }
+
+        // Use this address
+        payload['new.owner.eth_address'] = user
+      } else if (user.indexOf('@') !== -1) {
         payload['new.owner.email'] = user
       } else if (user.indexOf('+') === 0) {
         payload['new.owner.phone_number'] = user
