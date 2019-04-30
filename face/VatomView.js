@@ -45,15 +45,15 @@ export default class VatomView {
     // create loader
     this.createLoader = this.config.loader || function () {
 
-      var css = '.spinner {margin: 0px auto;width: 70px;text-align: center; margin-top: -50%;}';
+      let css = '.spinner {margin: 0px auto;width: 70px;text-align: center; margin-top: -50%;}';
           css += '.spinner > div {width: 12px;height: 12px;margin: 0px 3px;border-radius: 100%;display: inline-block;-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;animation: sk-bouncedelay 1.4s infinite ease-in-out both;}'
           css += '.spinner .bounce1 {-webkit-animation-delay: -0.32s;animation-delay: -0.32s;}';
           css += '.spinner .bounce2 {-webkit-animation-delay: -0.16s;animation-delay: -0.16s;}';
           css += '@-webkit-keyframes sk-bouncedelay {0%, 80%, 100% { -webkit-transform: scale(0) }40% { -webkit-transform: scale(1.0) }}';
           css += '@keyframes sk-bouncedelay {0%, 80%, 100% {-webkit-transform: scale(0);transform: scale(0);} 40% {-webkit-transform: scale(1.0);transform: scale(1.0);}}'
 
-      var head = document.head || document.getElementsByTagName('head')[0]
-      var style = document.createElement('style');
+      let head = document.head || document.getElementsByTagName('head')[0]
+      let style = document.createElement('style');
       head.appendChild(style);
 
       style.type = 'text/css';
