@@ -44,11 +44,31 @@ export default class VatomView {
 
     // create loader
     this.createLoader = this.config.loader || function () {
+
+      var css = '.spinner {margin: 0px auto;width: 70px;text-align: center; margin-top: -50%;}';
+          css += '.spinner > div {width: 12px;height: 12px;margin: 0px 3px;border-radius: 100%;display: inline-block;-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;animation: sk-bouncedelay 1.4s infinite ease-in-out both;}'
+          css += '.spinner .bounce1 {-webkit-animation-delay: -0.32s;animation-delay: -0.32s;}';
+          css += '.spinner .bounce2 {-webkit-animation-delay: -0.16s;animation-delay: -0.16s;}';
+          css += '@-webkit-keyframes sk-bouncedelay {0%, 80%, 100% { -webkit-transform: scale(0) }40% { -webkit-transform: scale(1.0) }}';
+          css += '@keyframes sk-bouncedelay {0%, 80%, 100% {-webkit-transform: scale(0);transform: scale(0);} 40% {-webkit-transform: scale(1.0);transform: scale(1.0);}}'
+
+      var head = document.head || document.getElementsByTagName('head')[0]
+      var style = document.createElement('style');
+      head.appendChild(style);
+
+      style.type = 'text/css';
+      if (style.styleSheet){
+        // This is required for IE8 and below.
+        style.styleSheet.cssText = css;
+      } else {
+        style.appendChild(document.createTextNode(css));
+      }
+
       let loader = document.createElement('div')
-      loader.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;'
-      loader.innerHTML = '<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="lds-double-ring"><circle cx="50" cy="50" ng-attr-r="{{config.radius}}" ng-attr-stroke-width="{{config.width}}" ng-attr-stroke="{{config.c1}}" ng-attr-stroke-dasharray="{{config.dasharray}}" fill="none" stroke-linecap="round" r="40" stroke-width="4" stroke="#456caa" stroke-dasharray="62.83185307179586 62.83185307179586" transform="rotate(305.714 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></circle><circle cx="50" cy="50" ng-attr-r="{{config.radius2}}" ng-attr-stroke-width="{{config.width}}" ng-attr-stroke="{{config.c2}}" ng-attr-stroke-dasharray="{{config.dasharray2}}" ng-attr-stroke-dashoffset="{{config.dashoffset2}}" fill="none" stroke-linecap="round" r="35" stroke-width="4" stroke="#88a2ce" stroke-dasharray="54.97787143782138 54.97787143782138" stroke-dashoffset="54.97787143782138" transform="rotate(-305.714 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;-360 50 50" keyTimes="0;1" dur="1s" begin="0s" repeatCount="indefinite"></animateTransform></circle></svg>'
+      
+      loader.innerHTML = '<div class="spinner"><div class="bounce1" style="background-color: #333;"></div><div class="bounce2" style="background-color: #333;"></div><div class="bounce3" style="background-color: #333;"></div></div>' 
       return loader
-    }
+  }
 
     this.createErrorView = this.config.errorView || function (bvi, v, err) {
       let con = document.createElement('div')
