@@ -18,12 +18,20 @@ export default class ImageFace extends BaseFace {
 
   updateImage () {
     // Set image display options
-    this.element.style.backgroundSize = 'contain'
+    this.element.style.backgroundSize = this.face.properties.constraints.view_mode === 'card' ? 'cover' : 'contain'
     this.element.style.backgroundPosition = 'center'
     this.element.style.backgroundRepeat = 'no-repeat'
 
+
+    // If face config specifies the scale mode, set it now
+    if (this.face.properties.config && this.face.properties.config.scale === 'fill') {
+      this.element.style.backgroundSize = 'cover'
+    } else if (this.face.properties.config && this.face.properties.config.scale === 'fit') {
+      this.element.style.backgroundSize = 'contain'
+    }
+
     // Get resource name
-    const resourceName = this.face.properties.config && this.face.properties.config.image || 'ActivatedImage'
+    const resourceName = (this.face.properties.config && this.face.properties.config.image) || 'ActivatedImage'
 
     // Get resource
     const resource = this.vatom.properties.resources.find(r => r.name === resourceName)
@@ -40,11 +48,11 @@ export default class ImageFace extends BaseFace {
   }
   // eslint-disable-next-line
   showImage(url) {
-    return new Promise((onSuccess, onFail) => {
+    return new Promise((resolve, reject) => {
       const img = document.createElement('img')
       img.src = url
-      img.onload = onSuccess
-      img.onerror = e => onFail(new Error("Couldn't load image"))
+      img.onload = resolve
+      img.onerror = e => reject(new Error("Couldn't load image"))
     })
   }
 
