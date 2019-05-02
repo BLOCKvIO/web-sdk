@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-
+import _ from 'lodash'
 export default class BridgeV1 {
   constructor (bv, vatom, face) {
     this.blockv = bv
@@ -97,7 +97,7 @@ export default class BridgeV1 {
     return {
       'vatomInfo': {
         'id': vatom.id,
-        'properties': vatom.properties,
+        'properties': _.merge({}, vatom.properties, vatom.private),
         'resources': resources
       }
     }
