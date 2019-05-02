@@ -352,7 +352,7 @@ export default class UserApi {
           'code': e.data.code,
           'redirect_uri': redirectURI
         }
-        let oa = await this.Blockv.client.request('POST', 'v1/oauth/token', oauthObj, false)
+        let oa = await this.Blockv.client.request('POST', '/v1/oauth/token', oauthObj, false)
         // We have our user data, store it
         this.setRefreshToken(oa.refresh_token.token)
         this.store.token = oa.access_token.token
@@ -362,7 +362,7 @@ export default class UserApi {
         this.store.userID = profile.id
 
         // Get asset provider info and store it
-        const assetProviders = await this.client.request('GET', 'v1/user/asset_providers', null, true)
+        const assetProviders = await this.client.request('GET', '/v1/user/asset_providers', null, true)
         this.store.assetProvider = assetProviders.asset_provider
 
         // Inform data pool that the current user changed
@@ -403,7 +403,7 @@ export default class UserApi {
       'code': code,
       'redirect_uri': redirectURI
     }
-    let oa = await this.Blockv.client.request('POST', 'v1/oauth/token', oauthObj, false)
+    let oa = await this.Blockv.client.request('POST', '/v1/oauth/token', oauthObj, false)
     // We have our user data, store it
     this.setRefreshToken(oa.refresh_token.token)
     this.store.token = oa.access_token.token
@@ -413,7 +413,7 @@ export default class UserApi {
     this.store.userID = profile.id
 
     // Get asset provider info and store it
-    const assetProviders = await this.client.request('GET', 'v1/user/asset_providers', null, true)
+    const assetProviders = await this.client.request('GET', '/v1/user/asset_providers', null, true)
     this.store.assetProvider = assetProviders.asset_provider
 
     // Inform data pool that the current user changed
