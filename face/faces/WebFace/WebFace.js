@@ -71,15 +71,11 @@ export default class WebFace extends BaseFace {
           vatom: this.vatomView.vatom,
           face: this.face
         }
-      
+
       case 'core.user.get':
         let us = this.vatomView.vatom.properties.owner
-      
-        this.vatomView.blockv.UserManager.getPublicUserProfile(us).then(pu => {
-          console.log(pu);
-          
-        })
-      
+        return this.vatomView.blockv.UserManager.getPublicUserProfile(us)
+
       case 'core.vatom.children.get':
         // Fetch children
         return this.vatomView.blockv.Vatoms.getVatomChildren(payload.id).then(vatoms => {
