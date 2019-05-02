@@ -133,6 +133,17 @@ export default class Client {
       throw error
     }
 
+    // Check for main reactor error payload
+    if (json.payload && json.payload.main && json.payload.main.error) {
+      // Reactor error
+      var err = json.payload.main.error.Code || response.status || 0
+      const error = new Error(ErrorCodes[err] || json.payload.main.error.Msg || 'An unknown server error occurred.')
+      error.code = err
+      error.serverMessage = json.payload.main.error.Msg || ''
+      error.httpStatus = response.status
+      throw error
+    }
+
     // No error, continue
     return json.payload
   }
