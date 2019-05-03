@@ -25,7 +25,9 @@ export default class BaseFace {
     this.element.style.width = '100%'
     this.element.style.height = '100%'
   }
-
+  /** Called when the view is resized */
+  onResize () {}
+  
   onLoad () {}
 
   onUnload () {}
