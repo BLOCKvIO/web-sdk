@@ -31,7 +31,7 @@ export default class ImageFace extends BaseFace {
     }
 
     // Get resource name
-    const resourceName = (this.face.properties.config && this.face.properties.config.image) || 'ActivatedImage'
+    const resourceName = (this.face.properties.config && this.face.properties.config.image) || (this.face.properties.resources && this.face.properties.resources[0]) || 'ActivatedImage'
 
     // Get resource
     const resource = this.vatom.properties.resources.find(r => r.name === resourceName)
