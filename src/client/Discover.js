@@ -19,6 +19,7 @@ export default class Discover {
     this.filters = []
     this.groupBy = [Discover.FieldTemplateVariation]
     this.scope = null
+    this.auth = true
 
     // The default scope returns vatoms that the user owns only
     this.setScopeToOwnedVatomsOnly()
@@ -106,7 +107,7 @@ export default class Discover {
   /** Execute the discover query, returning an array of Vatoms. @returns Promise<[Vatom]> */
   execute () {
     // Send request
-    return this.bv.client.request('POST', '/v1/vatom/discover', this.getPayload(), true).then((data) => {
+    return this.bv.client.request('POST', '/v1/vatom/discover', this.getPayload(), this.auth).then((data) => {
       const { actions, faces, results } = data
 
       const actionsArray = []
@@ -149,7 +150,7 @@ export default class Discover {
     payload.return.type = 'count'
 
     // Send request
-    return this.bv.client.request('POST', '/v1/vatom/discover', payload, true)
+    return this.bv.client.request('POST', '/v1/vatom/discover', payload, this.auth)
       .then(data => data.count || 0)
   }
 }
