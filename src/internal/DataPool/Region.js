@@ -5,6 +5,7 @@ import Filter from './Filter'
 import LZString from 'lz-string'
 import { merge, get, set } from 'lodash'
 import Delayer from './Delayer'
+import DatabaseMap from './DatabaseMap'
 
 /**
  * Base class for a region.
@@ -25,9 +26,6 @@ export default class Region extends EventEmitter {
     /** Store reference to the data pool */
     this.dataPool = dataPool
 
-    /** All current data objects */
-    this.objects = new Map()
-
     /** True if data in this region is entirely in sync with the backend */
     this.synchronized = false
 
@@ -37,6 +35,19 @@ export default class Region extends EventEmitter {
     // Try to make region stable immediately
     this._syncPromise = null
     Delayer.run(e => this.synchronize())
+  }
+
+  /** Lazy load the objects database */
+  get objects() {
+
+    // Check if loaded already
+    if (this._objects)
+      return this._objects
+
+    // Create DB
+    this._objects = new DatabaseMap(this.stateKey, this.noCache)
+    return this._objects
+
   }
 
   /**
@@ -64,26 +75,8 @@ export default class Region extends EventEmitter {
     // Stop if already in sync
     if (this.synchronized) { return Promise.resolve() }
 
-    // Call load
-    console.log(`[DataPool > Region] Starting synchronization for region ${this.stateKey}`)
-    this._syncPromise = this.load().then(loadedIDs => {
-      // If the subclass load() returned an array of IDs, we can remove everything which is not in that list.
-      if (loadedIDs && typeof loadedIDs.length === 'number') {
-        let keysToRemove = []
-        for (let id of this.objects.keys()) {
-          // Check if it's in our list
-          if (!loadedIDs.includes(id)) { keysToRemove.push(id) }
-        }
-
-        // Remove vatoms
-        this.removeObjects(keysToRemove)
-      }
-
-      // All data is up to date!
-      this.synchronized = true
-      this._syncPromise = null
-      console.log(`[DataPool > Region] Region '${this.stateKey}' is now in sync!`)
-    }).catch(err => {
+    // Do the sync
+    this._syncPromise = this._synchronize().catch(err => {
       // Error handling, notify listeners of an error
       this._syncPromise = null
       this.error = err
@@ -93,6 +86,38 @@ export default class Region extends EventEmitter {
 
     // Return promise
     return this._syncPromise
+
+  }
+
+  async _synchronize() {
+
+    // Sync start
+    console.log(`[DataPool > Region] Starting synchronization for region ${this.stateKey}`)
+
+    // Create and load the database
+    await this.objects.load()
+    this.emit('updated')
+
+    // Allow plugin to start loading content
+    let loadedIDs = await this.load()
+
+    // If the subclass load() returned an array of IDs, we can remove everything which is not in that list.
+    if (loadedIDs && typeof loadedIDs.length === 'number') {
+      let keysToRemove = []
+      for (let id of this.objects.keys()) {
+        // Check if it's in our list
+        if (!loadedIDs.includes(id)) { keysToRemove.push(id) }
+      }
+
+      // Remove vatoms
+      this.removeObjects(keysToRemove)
+    }
+
+    // All data is up to date!
+    this.synchronized = true
+    this._syncPromise = null
+    console.log(`[DataPool > Region] Region '${this.stateKey}' is now in sync!`)
+    
   }
 
   /**
@@ -171,9 +196,6 @@ export default class Region extends EventEmitter {
 
     // Notify updated
     if (objects.length > 0) { this.emit('updated') }
-
-    // Save soon
-    if (objects.length > 0) { this.save() }
   }
 
   /**
@@ -209,9 +231,6 @@ export default class Region extends EventEmitter {
 
     // Notify updated
     if (didUpdate) { this.emit('updated') }
-
-    // Save soon
-    if (didUpdate) { this.save() }
   }
 
   /**
@@ -237,9 +256,6 @@ export default class Region extends EventEmitter {
 
     // Notify updated
     if (didUpdate) { this.emit('updated') }
-
-    // Save soon
-    if (didUpdate) { this.save() }
   }
 
   /**
@@ -368,90 +384,6 @@ export default class Region extends EventEmitter {
      */
   has (id) {
     return this.objects.has(id)
-  }
-
-  /** Load objects from local storage */
-  loadFromCache () {
-    // Skip if not allowed
-    if (this.noCache) { return }
-
-    // Load local cached objects
-    try {
-      // Fetch JSON from disk
-      let startTime = Date.now()
-      let compressed = localStorage['datapool.cache.' + this.stateKey]
-      let txt = ''
-
-      // Stop if no data
-      if (!compressed) { return }
-
-      // Decompress it if needed
-      if (compressed.substring(0, 1) === 'c') {
-        txt = LZString.decompress(compressed.substring(1))
-      } else if (compressed.substring(0, 1) === 'u') {
-        txt = compressed.substring(1)
-      } else {
-        txt = '[]'
-      }
-
-      // Decode text
-      let json = JSON.parse(txt)
-
-      // Add objects
-      let newObjects = json.map(i => new DataObject(i[0], i[1], i[2]))
-      this.addObjects(newObjects)
-
-      // Done
-      console.debug(`[DataPool > Region] Loaded cached object pool, ${Math.floor(txt.length / 1000)} KB (${Math.floor(compressed.length / 1000)} KB compressed) in ${Date.now() - startTime} ms`)
-    } catch (err) {
-      console.warn(`[DataPool > Region] Unable to recover locally cached objects`, err)
-    }
-  }
-
-  /**
-     * Saves the region to local storage.
-     *
-     * @private Called by the Region superclass.
-     */
-  save () {
-    // Skip if not allowed
-    if (this.noCache) { return }
-
-    // Clear previous pending save request
-    if (this.saveTimer) {
-      clearTimeout(this.saveTimer)
-    }
-
-    // Create save timer
-    this.saveTimer = setTimeout(e => {
-      // Remove save timer
-      this.saveTimer = null
-
-      try {
-        // Save all items to local storage
-        let startTime = Date.now()
-        let txt = JSON.stringify(Array.from(this.objects.values()).map(o => [o.type, o.id, o.data]))
-
-        // Try save uncompressed
-        try {
-          // Save
-          localStorage['datapool.cache.' + this.stateKey] = 'u' + txt
-
-          // Done
-          console.debug(`[DataPool > Region] Saved to local cache, size is ${Math.floor(txt.length / 1000)} KB, saved in ${Date.now() - startTime} ms`)
-        } catch (noSpaceError) {
-          // Compress and store text
-          let compressed = LZString.compress(txt)
-          localStorage['datapool.cache.' + this.stateKey] = 'c' + compressed
-
-          // Done
-          console.debug(`[DataPool > Region] Saved to local cache, size is ${Math.floor(txt.length / 1000)} KB, ${Math.floor(compressed.length / 1000)} KB compressed, saved in ${Date.now() - startTime} ms`)
-        }
-      } catch (err) {
-        // Error
-        console.warn(`[DataPool > Region] Unable to save local cache`, err)
-      }
-    }, 15000)
   }
 
   /**
