@@ -44,9 +44,6 @@ export default class DataPool {
     region = new Region(this, descriptor)
     this.regions.push(region)
 
-    // Make sure region has loaded from it's cache
-    region.loadFromCache()
-
     // Return new region
     return region
   }

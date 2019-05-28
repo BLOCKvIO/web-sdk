@@ -12,6 +12,9 @@ export default class DataObject {
         /** Object identifier */
         this.id = id
 
+        /** Object revision, if any */
+        this.rev = null
+
         /** Object payload, if any */
         this.data = data
 

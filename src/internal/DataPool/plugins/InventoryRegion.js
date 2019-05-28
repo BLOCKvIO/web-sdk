@@ -47,25 +47,17 @@ export default class InventoryRegion extends BLOCKvRegion {
     while (true) {
       // Fetch all vatoms the user owns, via a Discover call
       console.debug(`[DataPool > InventoryRegion] Fetching owned vatoms, page ${pageCount}...`)
-      let filter = {
-        'scope': {
-          'key': 'vAtom::vAtomType.owner',
-          'value': '$currentuser'
-        },
-        'limit': 1000,
-        'page': pageCount,
-        'return': {
-          'type': '*',
-          'fields': []
-        }
-      }
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/discover', filter, true)
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/inventory', { 
+        parent_id: "*",
+        limit: 1000,
+        page: pageCount
+      }, true)
 
       // Create list of new objects
       let newObjects = []
 
       // Add vatoms to the list
-      for (let v of response.results) {
+      for (let v of response.vatoms) {
         loadedIDs.push(v.id)
         newObjects.push(new DataObject('vatom', v.id, v))
       }
