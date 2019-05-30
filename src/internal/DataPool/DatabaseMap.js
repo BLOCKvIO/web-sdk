@@ -132,7 +132,7 @@ export default class Database {
                 return
 
             // Remove document
-            await this.pouch.remove(result._id, result._rev)
+            await this.pouch.remove(key, revision)
 
         })
 
@@ -226,7 +226,7 @@ class Queue {
 
         /** True if currently executing an action */
         this.isRunning = null
-        
+
         // this.timer = setInterval(this.log.bind(this), 250)
 
     }
