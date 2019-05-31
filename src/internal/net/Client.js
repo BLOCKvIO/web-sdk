@@ -152,14 +152,33 @@ export default class Client {
   * Uses the refresh token to fetch and store a new access token from the backend.
   * @private
   */
-  async refreshToken () {
-    // Fetch new access token
-    const data = await this.request('POST', '/v1/access_token', '', false, {
+  refreshToken () {
+
+    // Check if currently fetching an access token
+    if (this.tokenFetchPromise)
+      return this.tokenFetchPromise
+
+    // Start fetching
+    this.tokenFetchPromise = this.request('POST', '/v1/access_token', '', false, {
       Authorization: `Bearer ${this.store.refreshToken}`
+    }).then(data => {
+
+      // Store it
+      this.store.token = data.access_token.token
+      this.tokenFetchPromise = null
+
+    }).catch(err => {
+
+      // Failed to fetch the token! Keep throwing the error up the chain
+      console.warn('Failed to fetch a fresh access token from the backend.', err)
+      this.tokenFetchPromise = null
+      throw err
+
     })
 
-    // Store it
-    this.store.token = data.access_token.token
+    // Return promise
+    return this.tokenFetchPromise
+
   }
 
   /**
