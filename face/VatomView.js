@@ -44,31 +44,30 @@ export default class VatomView {
 
     // create loader
     this.createLoader = this.config.loader || function () {
-
-      let css = '.spinner {margin: 0px auto;width: 70px;text-align: center; margin-top: -50%;}';
-          css += '.spinner > div {width: 12px;height: 12px;margin: 0px 3px;border-radius: 100%;display: inline-block;-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;animation: sk-bouncedelay 1.4s infinite ease-in-out both;}'
-          css += '.spinner .bounce1 {-webkit-animation-delay: -0.32s;animation-delay: -0.32s;}';
-          css += '.spinner .bounce2 {-webkit-animation-delay: -0.16s;animation-delay: -0.16s;}';
-          css += '@-webkit-keyframes sk-bouncedelay {0%, 80%, 100% { -webkit-transform: scale(0) }40% { -webkit-transform: scale(1.0) }}';
-          css += '@keyframes sk-bouncedelay {0%, 80%, 100% {-webkit-transform: scale(0);transform: scale(0);} 40% {-webkit-transform: scale(1.0);transform: scale(1.0);}}'
+      let css = '.spinner {margin: 0px auto;width: 70px;text-align: center; margin-top: -50%;}'
+      css += '.spinner > div {width: 12px;height: 12px;margin: 0px 3px;border-radius: 100%;display: inline-block;-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;animation: sk-bouncedelay 1.4s infinite ease-in-out both;}'
+      css += '.spinner .bounce1 {-webkit-animation-delay: -0.32s;animation-delay: -0.32s;}'
+      css += '.spinner .bounce2 {-webkit-animation-delay: -0.16s;animation-delay: -0.16s;}'
+      css += '@-webkit-keyframes sk-bouncedelay {0%, 80%, 100% { -webkit-transform: scale(0) }40% { -webkit-transform: scale(1.0) }}'
+      css += '@keyframes sk-bouncedelay {0%, 80%, 100% {-webkit-transform: scale(0);transform: scale(0);} 40% {-webkit-transform: scale(1.0);transform: scale(1.0);}}'
 
       let head = document.head || document.getElementsByTagName('head')[0]
-      let style = document.createElement('style');
-      head.appendChild(style);
+      let style = document.createElement('style')
+      head.appendChild(style)
 
-      style.type = 'text/css';
-      if (style.styleSheet){
+      style.type = 'text/css'
+      if (style.styleSheet) {
         // This is required for IE8 and below.
-        style.styleSheet.cssText = css;
+        style.styleSheet.cssText = css
       } else {
-        style.appendChild(document.createTextNode(css));
+        style.appendChild(document.createTextNode(css))
       }
 
       let loader = document.createElement('div')
-      
-      loader.innerHTML = '<div class="spinner"><div class="bounce1" style="background-color: #333;"></div><div class="bounce2" style="background-color: #333;"></div><div class="bounce3" style="background-color: #333;"></div></div>' 
+
+      loader.innerHTML = '<div class="spinner"><div class="bounce1" style="background-color: #333;"></div><div class="bounce2" style="background-color: #333;"></div><div class="bounce3" style="background-color: #333;"></div></div>'
       return loader
-  }
+    }
 
     this.createErrorView = this.config.errorView || function (bvi, v, err) {
       let con = document.createElement('div')
@@ -122,9 +121,9 @@ export default class VatomView {
       // check if face is registered
       const du = st.properties.display_url.toLowerCase()
       let excludedFaces = this.config.excludedFaces
-      
+
       if (excludedFaces.includes(du)) {
-        FaceClass = ImageFace
+        throw new Error('This face is not allowed to run in this view mode. [excluded : ' + du + ']')
       } else {
         FaceClass = registeredFace[du]
       }
