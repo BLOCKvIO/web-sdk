@@ -3,10 +3,16 @@
 /**
  * Singleton. Responsible for storing and exeucting changes to objects over time.
  */
-export default new class DataObjectAnimator {
-
+export default class DataObjectAnimator {
+    static withBlockv (bv) {
+        if (!bv.animator)
+         bv.animator = new DataObjectAnimator(bv)
+         return bv.animator
+    }
     /** Constructor */
-    constructor() {
+    constructor(bv) {
+        // blockv
+        this.blockv = bv
 
         // Store regions
         this.regions = []
