@@ -73,7 +73,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
     // Send it up
     console.log('Sending WS command: ' + JSON.stringify(cmd))
-    // this.dataPool.Blockv.WebSockets.sendMessage(cmd)
+    this.dataPool.Blockv.WebSockets.sendMessage(cmd)
   }
 
   /** Our state key is the region */

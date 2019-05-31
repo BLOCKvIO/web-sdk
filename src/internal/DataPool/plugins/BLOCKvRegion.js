@@ -27,7 +27,7 @@ export default class BLOCKvRegion extends Region {
     this.socket.addEventListener('websocket.raw', this.onWebSocketMessage)
 
     // Monitor for timed updates
-    DataObjectAnimator.addRegion(this)
+    DataObjectAnimator.withBlockv(dataPool.Blockv).addRegion(this)
   }
 
   /** Called when this region is going to be shut down */
@@ -35,7 +35,7 @@ export default class BLOCKvRegion extends Region {
     super.close()
     // Remove listeners
     this.socket.removeEventListener('websocket.raw', this.onWebSocketMessage)
-    DataObjectAnimator.removeRegion(this)
+    DataObjectAnimator.withBlockv(this.dataPool.Blockv).removeRegion(this)
   }
 
   /**
@@ -170,7 +170,7 @@ export default class BLOCKvRegion extends Region {
       Delayer.run(e => this.emit('object.updated', parent))
     }
     // If our DataObjectAnimator has a scheduled update for this object, include that change now. This is to work around map objects jumping around when a new region is created.
-    let nextUpdate = DataObjectAnimator.changes.find(u => u.id === object.id)
+    let nextUpdate = DataObjectAnimator.withBlockv(this.dataPool.Blockv).changes.find(u => u.id === object.id)
     if (nextUpdate) {
       merge(object.data, nextUpdate.new_data)
     }
