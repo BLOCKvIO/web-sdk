@@ -46,6 +46,16 @@ export default class WebSockets extends EventEmitter {
   }
 
   /**
+   * This sends a message through the web socket
+   * @param {*} cmd
+   */
+  sendMessage (cmd) {
+    if (this.socket && this.socket.readyState === 1) {
+      this.socket.send(JSON.stringify(cmd))
+    }
+  }
+
+  /**
    * The handleMessage function allows the different types of messages to be returned:
    * stateUpdate, inventory, activity, and, info.
    * @private
