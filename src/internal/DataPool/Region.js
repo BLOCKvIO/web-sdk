@@ -14,6 +14,7 @@ import DatabaseMap from './DatabaseMap'
  * @event object.updated When a data object changes. Called with the ID of the changed object.
  * @event object.removed When a data object is removed. Called with the ID of the removed object.
  * @event error When an error occurs.
+ * @event closed When the inventory is closed. eg. When the user is logged out
  */
 export default class Region extends EventEmitter {
   /** @private Subclasses should use this to update and start monitoring the region */
@@ -149,6 +150,7 @@ export default class Region extends EventEmitter {
   close () {
     // Notify data pool we have closed
     this.dataPool.removeRegion(this)
+    this.emit('closed')
   }
 
   /**
