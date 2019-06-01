@@ -172,6 +172,9 @@ export default class Client {
       // Failed to fetch the token! Keep throwing the error up the chain
       console.warn('Failed to fetch a fresh access token from the backend.', err)
       this.tokenFetchPromise = null
+      if (err.code == '2049') {
+        this.Blockv.UserManager.logout()
+      }
       throw err
 
     })
