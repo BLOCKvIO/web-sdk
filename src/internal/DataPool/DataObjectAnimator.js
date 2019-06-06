@@ -6,8 +6,8 @@
 export default class DataObjectAnimator {
     static withBlockv (bv) {
         if (!bv.animator)
-         bv.animator = new DataObjectAnimator(bv)
-         return bv.animator
+          bv.animator = new DataObjectAnimator(bv)
+        return bv.animator
     }
     /** Constructor */
     constructor(bv) {
@@ -28,7 +28,8 @@ export default class DataObjectAnimator {
 
         // Add listeners for the WebSocket
         this.onWebSocketMessage = this.onWebSocketMessage.bind(this)
-       // window.blockv.WebSockets.addEventListener('websocket.raw', this.onWebSocketMessage)
+        this.blockv.WebSockets.addEventListener('websocket.raw', this.onWebSocketMessage)
+
 
     }
 
