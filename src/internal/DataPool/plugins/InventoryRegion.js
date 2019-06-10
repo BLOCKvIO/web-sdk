@@ -130,4 +130,20 @@ export default class InventoryRegion extends BLOCKvRegion {
       console.warn(`[DataPool > BVWebSocketRegion] Logic error in WebSocket message, old_owner and new_owner shouldn't be the same: ${vatomRef.id}`)
     }
   }
+
+  /** 
+   * Override the get() function to not return vatoms with a different owner. This can happen during a preemptive transfer,
+   * where the vatom is given a new owner ID but not removed entirely from this region. The host app should still see it as removed though.
+   */
+  get(waitUntilStable = true) {
+
+    // Pass on if we should wait
+    if (waitUntilStable)
+      return super.get(true)
+
+    // Filter array of vatoms
+    return super.get(false).filter(v => v.properties.owner == this.currentUserID)
+
+  }
+
 }
