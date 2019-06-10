@@ -227,7 +227,7 @@ export default class UserApi {
       console.warn(err)
       this.store.token = ''
       this.store.refreshToken = ''
-      this.DataPool.setSessionInfo(null)
+      this.dataPool.setSessionInfo(null)
       throw err
     })
   }
