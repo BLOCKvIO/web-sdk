@@ -218,18 +218,27 @@ export default class UserApi {
    * scoped requests on the Blockv platfrom.
    * @return new JSON
    */
-  logout (params) {
-    return this.client.request('POST', '/v1/user/logout', params, true).then(() => {
+  logout (noRequest = false) {
+    this.Blockv.emit('logout')
+    console.log('trying to logout')
+    if(noRequest) {
       this.store.token = ''
       this.store.refreshToken = ''
       this.dataPool.setSessionInfo(null)
-    }).catch((err) => {
-      console.warn(err)
-      this.store.token = ''
-      this.store.refreshToken = ''
-      this.dataPool.setSessionInfo(null)
-      throw err
-    })
+    } else {
+      return this.client.request('POST', '/v1/user/logout', {}, true).then(() => {
+        this.store.token = ''
+        this.store.refreshToken = ''
+        this.dataPool.setSessionInfo(null)
+      }).catch((err) => {
+        console.warn(err)
+        this.store.token = ''
+        this.store.refreshToken = ''
+        this.dataPool.setSessionInfo(null)
+        throw err
+      })
+    }
+    
   }
 
   static mapString (o) {
