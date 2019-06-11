@@ -39,6 +39,7 @@ export default class WebSockets extends EventEmitter {
       this.isOpen = true
       this.socket.addEventListener('open', this.handleConnected.bind(this))
       this.socket.addEventListener('message', this.handleMessage.bind(this))
+      this.socket.addEventListener('error', console.log)
       this.socket.addEventListener('close', this.handleClose.bind(this))
       // return class
       return this
@@ -114,9 +115,8 @@ export default class WebSockets extends EventEmitter {
    */
   retryConnection () {
     // set Time x 2
-    //
     setTimeout(() => {
-      if (!this.isOpen) {
+      if (this.isOpen) {
         return
       }
       if (this.socket.readyState === 3) {
