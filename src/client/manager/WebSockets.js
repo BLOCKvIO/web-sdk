@@ -16,34 +16,53 @@ export default class WebSockets extends EventEmitter {
     super()
     this.store = store
     this.client = client
+
+    /** The WebSocket connection */
     this.socket = null
-    this.isOpen = false
+
+    /** Time until the next retry */
     this.delayTime = 1000
+
+    /** If true, the websocket will continue to retry the connection if it fails */
+    this.shouldRetry = false
+  }
+
+  /** This will be true if the connection is ready to send and receive messages */
+  get isOpen () {
+    return this.socket && this.socket.readyState === 1
   }
 
   /**
    * The connect function establishes a connection the Web socket.
    * @public
-   * @return {Promise<WebSocket>}
+   * @return {Promise<WebSockets>}
    */
-  connect () {
-    // before we connect, make sure the token is valid
+  async connect () {
+    // Stay connected after this point
+    this.shouldRetry = true
+    // if the websocket is connected or connecting already, then stop
     if (this.socket && this.socket.readyState !== 3) {
-      // if the websocket is connected already
-      return Promise.resolve(this)
+      return this
     }
 
-    return this.client.checkToken(this.store.accessToken).then(() => {
-      const url = `${this.store.wssocketAddress}/ws?app_id=${encodeURIComponent(this.store.appID)}&token=${encodeURIComponent(this.store.token)}`
-      this.socket = new WebSocket(url)
-      this.isOpen = true
-      this.socket.addEventListener('open', this.handleConnected.bind(this))
-      this.socket.addEventListener('message', this.handleMessage.bind(this))
-      this.socket.addEventListener('error', console.log)
-      this.socket.addEventListener('close', this.handleClose.bind(this))
-      // return class
+    // before we connect, make sure the token is valid, or else retry again soon
+    try {
+      await this.client.checkToken()
+    } catch (err) {
+      this.retryConnection()
       return this
-    }).catch(() => this.retryConnection())
+    }
+
+    // Create the websocket
+    const url = `${this.store.wssocketAddress}/ws?app_id=${encodeURIComponent(this.store.appID)}&token=${encodeURIComponent(this.store.token)}`
+    this.socket = new WebSocket(url)
+    this.socket.addEventListener('open', this.handleConnected.bind(this))
+    this.socket.addEventListener('message', this.handleMessage.bind(this))
+    this.socket.addEventListener('error', this.handleError.bind(this))
+    this.socket.addEventListener('close', this.handleClose.bind(this))
+
+    // Done
+    return this
   }
 
   /**
@@ -114,19 +133,38 @@ export default class WebSockets extends EventEmitter {
    * @return {Promise<WebSockets>} returns the connection function
    */
   retryConnection () {
-    // set Time x 2
-    setTimeout(() => {
-      if (this.isOpen) {
+    // Clear previous retry timer
+    if (this.retryTimer) {
+      clearTimeout(this.retryTimer)
+    }
+
+    // Create a new retry timer
+    this.retryTimer = setTimeout(() => {
+      // Clear timer
+      this.retryTimer = null
+
+      // Check if we want to be connected
+      if (!this.shouldRetry) {
         return
       }
-      if (this.socket.readyState === 3) {
-        this.connect()
-      }
-    }, this.delayTime)
 
-    if (this.delayTime < 8000) {
-      this.delayTime *= 2
-    }
+      // Increase retry delay for next time
+      if (this.delayTime < 8000) {
+        this.delayTime *= 2
+      }
+
+      // connect again
+      this.connect()
+    }, this.delayTime)
+  }
+
+  /**
+   * Handles the Web socket error event. We don't need to retry, because handleClose is also called on errors.
+   * @private
+   * @param {Error} err The error that happened
+   */
+  handleError (err) {
+    console.warn('[WebSocket] Connection failed: ' + err.message)
   }
 
   /**
@@ -144,11 +182,19 @@ export default class WebSockets extends EventEmitter {
      Note: Socket will be set to null. Auto connect will be disabled.
    */
   close () {
-    if (!this.socket) {
-      return
+    // Prevent retrying
+    this.shouldRetry = false
+
+    // Cancel retry timer if there is one
+    if (this.retryTimer) {
+      clearTimeout(this.retryTimer)
+      this.retryTimer = null
     }
-    this.isOpen = false
-    this.socket.close()
-    this.socket = null
+
+    // Close socket if it's open
+    if (this.socket) {
+      this.socket.close()
+      this.socket = null
+    }
   }
 }

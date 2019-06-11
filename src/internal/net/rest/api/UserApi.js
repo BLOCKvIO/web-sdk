@@ -220,8 +220,9 @@ export default class UserApi {
    */
   logout (noRequest = false) {
     this.Blockv.emit('logout')
+    this.Blockv.WebSockets.close()
     console.log('trying to logout')
-    if(noRequest) {
+    if (noRequest) {
       this.store.token = ''
       this.store.refreshToken = ''
       this.dataPool.setSessionInfo(null)
