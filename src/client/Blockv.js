@@ -17,9 +17,11 @@ import Activity from './manager/Activity'
 import ActivityApi from '../internal/net/rest/api/ActivityApi'
 import Client from '../internal/net/Client'
 import WebSockets from './manager/WebSockets'
+import EventEmitter from '../internal/EventEmitter';
 
-export default class Blockv {
+export default class Blockv extends EventEmitter {
   constructor (payload) {
+    super()
     const prefix = payload.prefix || payload.appID
 
     this.store = new Store(prefix)

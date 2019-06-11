@@ -52,8 +52,8 @@ export default class UserManager {
      * Logs out the currently logged in user.
      * @return {Promise<Object>} Logout success message
      */
-  logout () {
-    return this.UserApi.logout()
+  logout (noRequest = false) {
+    return this.UserApi.logout(noRequest)
   }
 
   /**
