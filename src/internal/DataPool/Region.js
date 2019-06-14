@@ -412,6 +412,9 @@ export default class Region extends EventEmitter {
     this.emit('object.updated', id)
     this.emit('updated')
 
+    // Notify database of change
+    this.objects.set(id, object)
+
     // Return undo function
     return e => {
       // Notify

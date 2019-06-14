@@ -147,9 +147,6 @@ export default class Database {
         if (!this.pouch)
             return this.cache.set(key, value)
 
-        // Get previous object
-        let previousObject = this.cache.get(key)
-
         // Set it in the memory cache
         this.cache.set(key, value)
 
