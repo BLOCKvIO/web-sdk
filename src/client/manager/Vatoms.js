@@ -234,6 +234,22 @@ export default class Vatoms {
   }
 
   /**
+   * 
+   * @param {*} vatomIds Array of vatoms that will be changed 
+   * @param {*} parentId ID or . to set the children to
+   */
+  setParent (payload) {
+    let parentPayload = {
+      ids: [payload.id],
+      parent_id: payload.parent_id
+    }
+    return this.vatomApi.setParent(parentPayload)
+  }
+
+  observeChildren (vatomId) {
+    return this.vatomApi.observeChildren(vatomId)
+  }
+  /**
    * Removes the specified vAtom from the current user's inventory
    * @param  {String} vatomID  Id of the vAtom you want to remove
    * @return {Promise<Object>} An object containing a success message
