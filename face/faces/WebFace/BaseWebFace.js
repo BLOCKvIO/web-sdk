@@ -72,10 +72,16 @@ export default class BaseWebFace extends BaseFace {
         return this.BridgeV2.init(payload)
       case 'core.user.get':
         return this.BridgeV2.getUserProfile(payload)
+      case 'core.user.current.get':
+        return this.BridgeV2.getCurrentUser(payload)
       case 'core.vatom.get':
         return this.BridgeV2.getVatom()
       case 'core.vatom.children.get':
         return this.BridgeV2.getVatomChildren(payload)
+      case 'core.vatom.parent.set':
+        return this.BridgeV2.vatomParentSet(payload)
+      case 'core.vatom.children.observe':
+        return this.BridgeV2.observeChildren(payload)
       case 'core.action.perform':
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
