@@ -49,7 +49,7 @@ export default class VatomIDRegion extends BLOCKvRegion {
     this.pauseMessages()
 
     // Fetch data
-    let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: this.ids })
+    let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: this.ids }, true)
 
     // Add vatom to new objects list
     let objects = []
