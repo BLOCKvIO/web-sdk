@@ -172,7 +172,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.pauseMessages()
 
     // Fetch vatom payload
-    this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }).then(response => {
+    this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true).then(response => {
       // Add vatom to new objects list
       let objects = []
       objects.push(new DataObject('vatom', response.vatoms[0].id, response.vatoms[0]))
