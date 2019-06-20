@@ -41,14 +41,51 @@ export default class BridgeV2 {
     })
   }
 
+  vatomParentSet (payload) {
+    console.log('trying to set the parent herer: ', payload)
+    return this.blockv.Vatoms.setParent(payload).then(pId => {
+      return {
+        new_parent_id: pId
+      }
+    })
+  }
+
+  observeChildren (payload) {
+    let vId = payload
+    return this.blockv.Vatoms.observeChildren(payload.id).then(v => {
+      return {
+        id: vId,
+        vatoms: v
+      }
+    })
+  }
+
   performAction (payload) { 
-    if (this.vatom.id === payload.payload['this.id'])
+    if (this.vatom.id === payload.payload['this.id']) {
       return this.blockv.Vatoms.performAction(payload.payload['this.id'], payload.action_name, payload.payload)
+    }
   }
 
   getUserProfile (payload) {
     return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(u => {
       return this.encodeUser(u)
+    })
+  }
+
+  getCurrentUser (payload) {
+    return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(user => {
+      console.log(user)
+       return {
+        user : {
+         id: user.id,
+         properties: {
+           avatar_uri: user.properties.avatar_uri,
+           first_name: user.properties.first_name,
+           last_name: user.properties.last_name,
+           is_guest: user.properties.guest_id ? true : false
+         }
+        }
+      }
     })
   }
 
