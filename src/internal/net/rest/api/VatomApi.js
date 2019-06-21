@@ -193,7 +193,7 @@ export default class VatomApi {
   }
 
   setParent (payload) {
-    return this.client.request('PATCH', '/v1/vatoms/', payload, true).then(data => data)
+    return this.client.request('PATCH', '/v1/vatoms', payload, true).then(data => data)
   }
 
   observeChildren (vatomId) {
