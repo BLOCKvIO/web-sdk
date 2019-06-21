@@ -42,7 +42,6 @@ export default class BridgeV2 {
   }
 
   vatomParentSet (payload) {
-    console.log('trying to set the parent herer: ', payload)
     return this.blockv.Vatoms.setParent(payload).then(pId => {
       return {
         new_parent_id: pId
