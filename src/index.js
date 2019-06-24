@@ -13,3 +13,8 @@
 
 export { default } from './client/Blockv'
 export { default as Discover } from './client/Discover'
+
+// Attach SDK version information to the window
+if (typeof window != 'undefined') window.BlockvSDKInfo = {
+    version: require('../package.json').version
+}
