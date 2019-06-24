@@ -50,35 +50,35 @@ export default class LayeredImage extends BaseFace {
     // Load image promises
     var imagePromises = [LayeredImage.waitForImage(resource)]
 
-    // List children
-    return this.vatomView.blockv.Vatoms.getVatomChildren(this.vatom.id).then(children => {
-      // Go through each child vatom
-      for (let child of children) {
-        // Get activated image resource
-        let res = this.getLayerImage(child)
-        if (!res) {
-          continue
-        }
-        // Create new image layer
-        newImages.push(this.createImageNode(res))
+    // Fetch vatom children
+    var children = this.vatomView.blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id == this.vatom.id)
 
-        // Add to image loader array
-        imagePromises.push(LayeredImage.waitForImage(res))
+    // Go through each child vatom
+    for (let child of children) {
+      // Get activated image resource
+      let res = this.getLayerImage(child)
+      if (!res) {
+        continue
       }
-    }).then(e => {
-      // All done, remove old images
-      for (let img of this.images || []) {
-        img.parentNode.removeChild(img)
-      }
-      // Add new images
-      this.images = newImages
-      for (let imgs of newImages) {
-        this.element.appendChild(imgs)
-      }
-    }).then(e => {
-      // Wait for all images to load
-      return Promise.all(imagePromises)
-    })
+      // Create new image layer
+      newImages.push(this.createImageNode(res))
+
+      // Add to image loader array
+      imagePromises.push(LayeredImage.waitForImage(res))
+    }
+
+    // All done, remove old images
+    for (let img of this.images || []) {
+      img.parentNode.removeChild(img)
+    }
+    // Add new images
+    this.images = newImages
+    for (let imgs of newImages) {
+      this.element.appendChild(imgs)
+    }
+    
+    // Wait for all images to load
+    return Promise.all(imagePromises)
   }
 
   /** Creates the dom node to display an image */
