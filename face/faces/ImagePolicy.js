@@ -31,62 +31,62 @@ export default class ImagePolicy extends BaseFace {
     this.element.style.backgroundRepeat = 'no-repeat'
 
     // Fetch vatom children
-    return this.vatomView.blockv.Vatoms.getVatomChildren(this.vatom.id).then(children => {
-      // Fetch policy
-      // Log.debug("ImagePolicyFace", "Refreshing image, found " + children.length + " child vatoms...")
-      let policies = (this.face.properties.config && this.face.properties.config.image_policy) || this.vatom.private['image_policy'] || this.vatom.properties['icon_stages'] || []
-      // Find matching policy
-      for (let policy of policies) {
-        // Check policy type
-        if (typeof policy.count_max !== 'undefined') {
-          // Child count policy, check if count matches
-          if (children.length > policy.count_max) {
-            continue
-          }
-        } else if (policy.field) {
-          // Field value policy, get key path
-          let keyPath = policy.field.split('.')
-          // Follow key path and get the value
-          let keyValue = this.vatom.payload
-          while (keyPath.length > 0) {
-            keyValue = keyValue[keyPath[0]]
-            keyPath.splice(0, 1)
-            if (!keyValue) {
-              break
-            }
-          }
-          // Check if value matches
-          if (policy.value !== keyValue) {
-            continue
-          }
-        }
-
-        // Found a match, get resource
-        var res = this.vatom.properties.resources.find(r => r.name === policy.resource)
-        if (!res) {
+    var children = this.vatomView.blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id == this.vatom.id)
+    
+    // Fetch policy
+    // Log.debug("ImagePolicyFace", "Refreshing image, found " + children.length + " child vatoms...")
+    let policies = (this.face.properties.config && this.face.properties.config.image_policy) || this.vatom.private['image_policy'] || this.vatom.properties['icon_stages'] || []
+    // Find matching policy
+    for (let policy of policies) {
+      // Check policy type
+      if (typeof policy.count_max !== 'undefined') {
+        // Child count policy, check if count matches
+        if (children.length > policy.count_max) {
           continue
         }
-        var _url = this.vatomView.blockv.UserManager.encodeAssetProvider(res.value.value)
-        // Display URL
-        this.element.style.backgroundImage = `url('${_url}')`
-        this.element.style.backgroundSize = policy.mode || 'contain'
-        // Return promise
-        return ImagePolicy.waitForImage(_url)
+      } else if (policy.field) {
+        // Field value policy, get key path
+        let keyPath = policy.field.split('.')
+        // Follow key path and get the value
+        let keyValue = this.vatom.payload
+        while (keyPath.length > 0) {
+          keyValue = keyValue[keyPath[0]]
+          keyPath.splice(0, 1)
+          if (!keyValue) {
+            break
+          }
+        }
+        // Check if value matches
+        if (policy.value !== keyValue) {
+          continue
+        }
       }
-      // None found! Use the ActivatedImage
-      // Found a match, get resource
-      var resource = this.vatom.properties.resources.find(r => r.name === 'ActivatedImage')
-      if (!resource) {
-        throw new Error('No policy found, and no ActivatedImage resource available.')
-      }
-      var _uri = this.vatomView.blockv.UserManager.encodeAssetProvider(resource.value.value)
-      // Display URL
-      this.element.style.backgroundImage = `url(${_uri})`
-      this.element.style.backgroundSize = 'contain'
 
+      // Found a match, get resource
+      var res = this.vatom.properties.resources.find(r => r.name === policy.resource)
+      if (!res) {
+        continue
+      }
+      var _url = this.vatomView.blockv.UserManager.encodeAssetProvider(res.value.value)
+      // Display URL
+      this.element.style.backgroundImage = `url('${_url}')`
+      this.element.style.backgroundSize = policy.mode || 'contain'
       // Return promise
-      return ImagePolicy.waitForImage(_uri)
-    })
+      return ImagePolicy.waitForImage(_url)
+    }
+    // None found! Use the ActivatedImage
+    // Found a match, get resource
+    var resource = this.vatom.properties.resources.find(r => r.name === 'ActivatedImage')
+    if (!resource) {
+      throw new Error('No policy found, and no ActivatedImage resource available.')
+    }
+    var _uri = this.vatomView.blockv.UserManager.encodeAssetProvider(resource.value.value)
+    // Display URL
+    this.element.style.backgroundImage = `url(${_uri})`
+    this.element.style.backgroundSize = 'contain'
+
+    // Return promise
+    return ImagePolicy.waitForImage(_uri)
   }
 
   /** This returns a promise which resolves when the specified image URL has been downloaded by the browser. */
