@@ -34,7 +34,9 @@ export default class VatomView {
     this.config = config || {}
     // eslint-disable-next-line
     this._currentFace = null
-    this.blockv.dataPool.region('inventory').addEventListener('object.updated', this.onVatomUpdated.bind(this))
+    this.onVatomUpdated = this.onVatomUpdated.bind(this)
+    this.region = this.blockv.dataPool.region('inventory')
+    this.region.addEventListener('object.updated', this.onVatomUpdated)
     // create a default view with a div container
     // eslint-disable-next-line
     this.element = document.createElement('div')
@@ -186,7 +188,7 @@ export default class VatomView {
   free () {
     if (this._currentFace && this._currentFace.onUnload) {
       this._currentFace.onUnload()
-      this.blockv.dataPool.region('inventory').removeEventListener('object.updated')
+      this.region.removeEventListener('object.updated', this.onVatomUpdated)
     }
 
     const view = this.element
@@ -196,12 +198,18 @@ export default class VatomView {
   }
 
   onVatomUpdated (id) {
+    // Stop if not our vatom
     if (id !== this.vatomObj.id) {
       return
     }
-    if (this._currentFace && this._currentFace.onVatomUpdated) {
-      this._currentFace.onVatomUpdated()
-    }
+
+    // Fetch latest vatom from data pool
+    var vatom = this.region.getItem(id, false)
+    if (!vatom)
+      return console.warn('DataPool indicated that an updated vatom was available, but we were unable to fetch it.')
+
+    // Store new vatom and notify face
+    this.vatom = vatom
   }
 
   // register our own face

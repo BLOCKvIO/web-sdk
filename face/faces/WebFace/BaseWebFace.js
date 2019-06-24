@@ -20,7 +20,6 @@ export default class BaseWebFace extends BaseFace {
     this.iframe.style.cssText = 'display: block; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden; border: none; background: none; outline: none; z-index:0;'
     this.iframe.setAttribute('src', this.face.properties.display_url)
     this.element.appendChild(this.iframe)
-    this.vatom = this.vatomView.vatom
     this.owner = this.vatomView.vatom.properties.owner
     this.user = this.vatomView.blockv.UserManager.getPublicUserProfile(this.owner)
     this.version = null
@@ -86,9 +85,6 @@ export default class BaseWebFace extends BaseFace {
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
         return this.BridgeV2.encodeResource(payload)
-      case 'core.vatom.update':
-        this.vatom = payload.vatom
-        break
       case 'viewer.vatom.show':
         return this.BridgeV2.customMessage(payload)
       case 'viewer.qr.scan':

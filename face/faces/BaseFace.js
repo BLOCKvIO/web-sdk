@@ -15,8 +15,6 @@ export default class BaseFace {
   constructor (vatomView, vatom, face) {
     // Store info
     this.vatomView = vatomView
-    
-    this.vatom = vatom
     this.face = face
 
     // Create element
@@ -25,6 +23,11 @@ export default class BaseFace {
     this.element.style.width = '100%'
     this.element.style.height = '100%'
   }
+
+  get vatom() {
+    return this.vatomView.vatom
+  }
+
   /** Called when the view is resized */
   onResize () {}
   
