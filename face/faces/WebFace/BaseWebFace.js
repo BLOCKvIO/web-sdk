@@ -169,7 +169,6 @@ export default class BaseWebFace extends BaseFace {
   vatomStateChanged (vatom) {
     if (this.version === 1) {
       if (vatom.id === this.vatom.id && this.face) {
-        this.vatom = vatom
         var resources = {}
   
         for (var res in this.vatomView.vatom.resources) {
@@ -188,7 +187,6 @@ export default class BaseWebFace extends BaseFace {
       }
     } else {
       if (vatom.id === this.vatom.id && this.face) {
-        this.vatom = vatom
         this.sendV2Message('res_1', 'core.vatom.update', { vatom: this.BridgeV2.encodeVatom(vatom) }, true)
       }  
 
