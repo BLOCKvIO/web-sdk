@@ -95,13 +95,24 @@ export default class VatomView {
   }
 
   update () {
+
     // Check if ready to be displayed
-    if (!this.vatomObj) {
-      console.warn('No vAtom supplied')
-    } else {
-      this.free()
-      this.load()
+    if (!this.vatomObj)
+      return console.warn('No vAtom supplied')
+
+    // Notify current face it's being unloaded
+    if (this._currentFace && this._currentFace.onUnload) this._currentFace.onUnload()
+    this._currentFace = null
+
+    // Remove all views from our element
+    const view = this.element
+    while (view.firstChild) {
+      view.removeChild(view.firstChild)
     }
+
+    // Load again
+    this.load()
+
   }
 
   load () {
@@ -186,15 +197,20 @@ export default class VatomView {
   }
 
   free () {
-    if (this._currentFace && this._currentFace.onUnload) {
-      this._currentFace.onUnload()
-      this.region.removeEventListener('object.updated', this.onVatomUpdated)
-    }
 
+    // Remove event listener
+    this.region.removeEventListener('object.updated', this.onVatomUpdated)
+
+    // Notify current face it's being unloaded
+    if (this._currentFace && this._currentFace.onUnload) this._currentFace.onUnload()
+    this._currentFace = null
+
+    // Remove all views from our element
     const view = this.element
     while (view.firstChild) {
       view.removeChild(view.firstChild)
     }
+
   }
 
   onVatomUpdated (id) {
