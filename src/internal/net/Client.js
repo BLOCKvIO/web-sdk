@@ -64,17 +64,17 @@ export default class Client {
     // Ensure our access token is up to date, if this is an authenticated request
     if (auth) await this.checkToken()
 
+    // Attach headers
+    if (!headers) headers = {}
+    headers['App-Id'] = this.store.appID
+    if (auth) headers['Authorization'] = `Bearer ${this.store.token}`
+
     // Send request
     return this.authRequest(method, endpoint, payload, headers)
   }
 
   /** @private */
-  async authRequest (method, endpoint, payload, extraHeaders) {
-    // Setup headers
-    const headers = Object.assign({
-      'App-Id': this.store.appID,
-      Authorization: `Bearer ${this.store.token}`
-    }, extraHeaders)
+  async authRequest (method, endpoint, payload, headers) {
 
     // Check payload type
     let body = null
@@ -124,12 +124,16 @@ export default class Client {
       const error = new Error(`Too many login attempts, Try again at : ${response.lockedUntil}`)
       error.code = json.error || response.status || 0
       error.httpStatus = response.status
+      error.requestID = json.request_id
+      error.serverMessage = json.message
       throw error
     } else if (!json.payload) {
       // Throw the error returned by the server
       const error = new Error(ErrorCodes[response.error] || json.message || 'An unknown server error has occurred')
       error.code = json.error || response.status || 0
       error.httpStatus = response.status
+      error.requestID = json.request_id
+      error.serverMessage = json.message
       throw error
     }
 
@@ -141,6 +145,7 @@ export default class Client {
       error.code = err
       error.serverMessage = json.payload.main.error.Msg || ''
       error.httpStatus = response.status
+      error.requestID = json.request_id
       throw error
     }
 
