@@ -16,7 +16,7 @@ import Vatoms from './manager/Vatoms'
 import Activity from './manager/Activity'
 import ActivityApi from '../internal/net/rest/api/ActivityApi'
 import Client from '../internal/net/Client'
-import WebSockets from './manager/WebSockets'
+import MultiWebSockets from './manager/MultiWebSockets'
 import EventEmitter from '../internal/EventEmitter';
 
 export default class Blockv extends EventEmitter {
@@ -37,7 +37,7 @@ export default class Blockv extends EventEmitter {
     const activityApi = new ActivityApi(this.client)
 
     this.Activity = new Activity(activityApi)
-    this.WebSockets = new WebSockets(this.store, this.client)
+    this.WebSockets = new MultiWebSockets(this.store, this.client)
     this.UserManager = new UserManager(userApi, this.store)
     this.Vatoms = new Vatoms(this)
 

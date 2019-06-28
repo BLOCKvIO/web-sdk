@@ -12,10 +12,11 @@
 import EventEmitter from '../../internal/EventEmitter'
 
 export default class WebSockets extends EventEmitter {
-  constructor (store, client) {
+  constructor (store, client, address) {
     super()
     this.store = store
     this.client = client
+    this.address = address
 
     /** The WebSocket connection */
     this.socket = null
@@ -33,7 +34,7 @@ export default class WebSockets extends EventEmitter {
   }
 
   /**
-   * The connect function establishes a connection the Web socket.
+   * The connect function establishes a connection to the WebSocket.
    * @public
    * @return {Promise<WebSockets>}
    */
@@ -54,7 +55,7 @@ export default class WebSockets extends EventEmitter {
     }
 
     // Create the websocket
-    const url = `${this.store.wssocketAddress}/ws?app_id=${encodeURIComponent(this.store.appID)}&token=${encodeURIComponent(this.store.token)}`
+    const url = `${this.address}/ws?app_id=${encodeURIComponent(this.store.appID)}&token=${encodeURIComponent(this.store.token)}`
     this.socket = new WebSocket(url)
     this.socket.addEventListener('open', this.handleConnected.bind(this))
     this.socket.addEventListener('message', this.handleMessage.bind(this))
