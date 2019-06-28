@@ -85,8 +85,6 @@ export default class BaseWebFace extends BaseFace {
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
         return this.BridgeV2.encodeResource(payload)
-      case 'viewer.vatom.show':
-        return this.BridgeV2.customMessage(payload)
       case 'viewer.qr.scan':
         return this.BridgeV2.customMessage(payload)
       case 'viewer.view.close':
