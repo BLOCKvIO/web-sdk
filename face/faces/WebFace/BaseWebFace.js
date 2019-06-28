@@ -85,14 +85,6 @@ export default class BaseWebFace extends BaseFace {
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
         return this.BridgeV2.encodeResource(payload)
-      case 'viewer.qr.scan':
-        return this.BridgeV2.customMessage(payload)
-      case 'viewer.view.close':
-        return this.BridgeV2.customMessage(payload)
-      case 'viewer.url.open':
-        return this.BridgeV2.customMessage(payload)
-      case 'viewer.scanner.show':
-        return this.BridgeV2.customMessage(payload)
       default:
         // Unknown event. Pass on to VatomView listener
         if (this.vatomView && this.vatomView.onMessage) {
