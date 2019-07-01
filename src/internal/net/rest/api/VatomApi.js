@@ -196,12 +196,6 @@ export default class VatomApi {
     return this.client.request('PATCH', '/v1/vatoms', payload, true).then(data => data)
   }
 
-  observeChildren (vatomId) {
-    return this.client.request('POST', '/v1/user/vatom/inventory', { 'parent_id': vatomId }, true).then(data => {
-      return data.vatoms
-    })
-  }
-
   trashVatom (vatomID) {
     const payload = {
       'this.id': vatomID
