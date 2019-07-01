@@ -27,17 +27,28 @@ export default class Database {
 
     setupPouchDB() {
 
-        // Stop if only in memory
-        if (this.noStore)
+        // Catch errors, eg. if in private browsing mode
+        try {
+
+            // Stop if only in memory
+            if (this.noStore)
+                return null
+
+            // Create database
+            return new PouchDB({
+
+                // Database name
+                name: 'datapool_' + this.id
+
+            })
+
+        } catch (err) {
+
+            // Failed to load
+            console.warn(err)
             return null
 
-        // Create database
-        return new PouchDB({
-
-            // Database name
-            name: 'datapool_' + this.id
-
-        })
+        }
 
     }
 
@@ -74,6 +85,11 @@ export default class Database {
 
             // Done
             console.log(`[DataPool > DatabaseMap] Loaded ${this.cache.size} items from ${this.pouch.name}`)
+
+        }).catch(err => {
+
+            // Failed to load from PouchDB
+            console.warn('Unable to load items from PouchDB.', err)
 
         })
 
