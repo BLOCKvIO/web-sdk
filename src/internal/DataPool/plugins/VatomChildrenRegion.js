@@ -17,6 +17,9 @@ export default class VatomChildrenRegion extends BLOCKvRegion {
   /** Constructor */
   constructor (dataPool, parentID) {
     super(dataPool)
+    
+    // Don't cache this content
+    this.noCache = true
 
     // Store ID
     this.parentID = parentID

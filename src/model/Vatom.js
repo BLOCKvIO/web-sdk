@@ -32,6 +32,10 @@ export default class Vatom {
     return this.payload.version
   }
 
+  get sync () {
+    return this.payload.sync
+  } 
+
   get whenCreated () {
     return this.payload.when_created
   }

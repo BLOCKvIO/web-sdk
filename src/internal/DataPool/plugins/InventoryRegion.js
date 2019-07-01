@@ -36,10 +36,135 @@ export default class InventoryRegion extends BLOCKvRegion {
     this.close()
   }
 
-  /** Load current state from the server */
+  /** 
+   * Load current state from the server. The process is as follows:
+   * 
+   * 1. Call /hash API to get the current inventory hash, if it matches our local copy then stop.
+   * 2. Call /sync API to fetch all vatom sync numbers
+   * 3. For all vatoms in our db which is not returned by /sync, remove
+   * 4. For all vatoms which are not in our dbb, or whose sync number is different, fetch via individual GET (batched)
+   * 
+   * If at any point the above process throws an error, fall back to the old approach:
+   * 
+   * 1. Fetch all vatoms from the /inventory API
+   * 2. For any vatoms in our db not returned by /inventory, remove
+   * 
+   */
   async load () {
+
     // Pause websocket events
     this.pauseMessages()
+
+    let ids = null
+    try {
+
+      // Load via new method
+      ids = await this.loadNew()
+
+    } catch (err) {
+
+      // Failed! Try via the old method
+      console.warn('[DataPool > InventoryRegion] Unable to sync via the new method! Attempting the old method now. Reason:', err)
+      ids = await this.loadOld()
+
+    }
+
+    // Resume websocket events
+    this.resumeMessages()
+    return ids
+
+  }
+
+  async loadNew() {
+
+    // Check SDK config to see if the new sync method is disabled
+    if (this.dataPool.disableSyncV2)
+      throw new Error('V2 synchronization algorithm is disabled in the config.')
+
+    // Get current inventory hash and compare with server's
+    let currentHash = this.objects.getExtra('hash')
+    let serverHashReq = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/hash', null, true)
+    if (!serverHashReq.hash)
+      throw new Error('The server did not return a hash for our current inventory.')
+    if (currentHash && currentHash == serverHashReq.hash)
+      return console.log('[DataPool > InventoryRegion] Sync complete, our hash matches the server, no changes needed.')
+
+    // We are not in sync with the server. Fetch all vatom IDs and their sync numbers
+    var allSyncs = []
+    var page = 0
+    var nextToken = null
+    while (true) {
+
+      // Fetch next page of IDs
+      page += 1
+      console.log(`[DataPool > InventoryRegion] Fetching page ${page} of sync statuses...`)
+      let res = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/index?limit=1000' + (nextToken ? `&next_token=${nextToken}` : ''), null, true)
+
+      // Add to array
+      allSyncs = allSyncs.concat(res.vatoms || [])
+
+      // Get next token
+      nextToken = res.next_token
+      if (!nextToken)
+        break
+
+    }
+
+    // Remove vatoms which are no longer here
+    let keysToRemove = Array.from(this.objects.values()).filter(obj => obj.type == 'vatom' && !allSyncs.find(sync => sync.id == obj.id)).map(obj => obj.id)
+    this.removeObjects(keysToRemove)
+    if (keysToRemove.length > 0)
+      console.log(`DataPool > InventoryRegion] Removed ${keysToRemove.length} vatoms which are no longer in the inventory`)
+
+    // Check which vatoms are out of sync
+    var idsToFetch = []
+    for (let syncInfo of allSyncs) {
+
+      // Get local vatom
+      let vatom = this.getItem(syncInfo.id, false)
+      if (!vatom || vatom.sync != syncInfo.sync)
+        idsToFetch.push(syncInfo.id)
+
+    }
+
+    // Fetch vatoms in bulk
+    let VatomsPerPage = 100
+    let remainingIds = idsToFetch
+    while (remainingIds.length > 0) {
+
+      // Fetch next 100 vatoms
+      let ids = remainingIds.slice(0, VatomsPerPage)
+      remainingIds = remainingIds.slice(VatomsPerPage)
+      console.log(`[DataPool > InventoryRegion] Fetching ${ids.length} updates, ${remainingIds.length} vatoms left...`)
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids }, true)
+
+      // Create list of new objects
+      let newObjects = []
+
+      // Add vatoms to the list
+      for (let v of response.vatoms)
+        newObjects.push(new DataObject('vatom', v.id, v))
+
+      // Add faces to the list
+      for (let f of response.faces)
+        newObjects.push(new DataObject('face', f.id, f))
+
+      // Add actions to the list
+      for (let a of response.actions)
+        newObjects.push(new DataObject('action', a.name, a))
+
+      // Update the pool
+      this.addObjects(newObjects)
+
+    }
+
+    // Done! Store the inventory hash for next sync
+    this.objects.setExtra('hash', serverHashReq.hash)
+    console.log(`[DataPool > InventoryRegion] Sync complete! We fetched ${idsToFetch.length} vatoms, and removed ${keysToRemove.length} vatoms.`)
+
+  }
+
+  async loadOld() {
 
     // Go through all pages on the server, we want _everything_
     let pageCount = 1
@@ -84,9 +209,6 @@ export default class InventoryRegion extends BLOCKvRegion {
         break
       }
     }
-
-    // Resume websocket events
-    this.resumeMessages()
 
     // Return array of all items
     return loadedIDs
@@ -144,6 +266,23 @@ export default class InventoryRegion extends BLOCKvRegion {
 
     // Filter array of vatoms
     return super.get(false).filter(v => v.properties.owner == this.currentUserID)
+
+  }
+
+  // When a preemptive change occurs, clear our stored hash so that the next inventory refresh will query with the server.
+  // Normally this should not be needed since the hash on the server should change as well, but sometimes if an action fails
+  // and we fail to rollback the DB we'll be stuck with an outdated vatom.
+  willAdd (object) { this.onObjectPreemptivelyChanged(object) }
+  willUpdateFields (object, newData) { this.onObjectPreemptivelyChanged(object) }
+  willUpdateField (object, keyPath, oldValue, newValue) { this.onObjectPreemptivelyChanged(object) }
+  willRemove (objectOrID) { this.objects.setExtra('hash', '') }
+  onObjectPreemptivelyChanged(object) {
+
+    // Update object's sync # so that on the next refresh we fetch it's state from the server.
+    object.data.sync = -1
+
+    // Clear our hash
+    this.objects.setExtra('hash', '')
 
   }
 
