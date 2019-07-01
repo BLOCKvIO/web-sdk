@@ -81,6 +81,10 @@ export default class InventoryRegion extends BLOCKvRegion {
     if (this.dataPool.disableSyncV2)
       throw new Error('V2 synchronization algorithm is disabled in the config.')
 
+    // Stop if no vatoms
+    if (!Array.from(this.objects.values()).find(obj => obj.type == 'vatom'))
+      throw new Error(`V2 synchronization is disabled if the inventory is empty, since it's faster to use the old method for initial sync.`)
+
     // Get current inventory hash and compare with server's
     let currentHash = this.objects.getExtra('hash')
     let serverHashReq = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/hash', null, true)
