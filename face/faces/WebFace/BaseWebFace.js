@@ -25,6 +25,7 @@ export default class BaseWebFace extends BaseFace {
     this.version = null
     this.BridgeV1 = new BridgeV1(this.vatomView.blockv, this.vatom, this.face)
     this.BridgeV2 = new BridgeV2(this.vatomView.blockv, this.vatom, this.face)
+    this.observeListenerSet = false
 
     // Bind functions
     this.onIncomingBridgeMessage = this.onIncomingBridgeMessage.bind(this)
@@ -45,6 +46,9 @@ export default class BaseWebFace extends BaseFace {
 
     // Remove bridge message listener
     window.removeEventListener('message', this.onIncomingBridgeMessage)
+    if (this.observeListenerSet) {
+      this.vatomView.blockv.dataPool.region('inventory').removeEventListener('object.updated', this.observeChildren)
+    }
   }
 
   processIncomingBridgeMessage (name, payload) {
@@ -80,7 +84,12 @@ export default class BaseWebFace extends BaseFace {
       case 'core.vatom.parent.set':
         return this.BridgeV2.vatomParentSet(payload)
       case 'core.vatom.children.observe':
-        return this.BridgeV2.observeChildren(payload)
+        if (!this.observeListenerSet) {
+          this.observeChildren = this.observeChildren.bind(this)
+          this.vatomView.blockv.dataPool.region('inventory').addEventListener('object.updated', this.observeChildren)
+          this.observeListenerSet = true
+        }
+        return this.observeChildren(payload.id)
       case 'core.action.perform':
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
@@ -99,10 +108,10 @@ export default class BaseWebFace extends BaseFace {
     // Get payload
     let payload = event.data
     // Check source is from this face's iframe
-    if (!payload || !this.iframe || event.source != this.iframe.contentWindow) {
+    if (!payload || !this.iframe || event.source !== this.iframe.contentWindow) {
       return
     }
-    
+
     // Check if there's a response ID, if so the web face is expecting a reply with that ID
     let responseID = null
     if (payload.responseID) {
@@ -160,11 +169,11 @@ export default class BaseWebFace extends BaseFace {
     if (this.version === 1) {
       if (vatom.id === this.vatom.id && this.face) {
         var resources = {}
-  
+
         for (var res in this.vatomView.vatom.resources) {
           resources[res] = this.vatomView.vatom.resources[res].value.value
         }
-  
+
         var data = {
           vatomInfo: {
             id: this.vatomView.vatom.id,
@@ -178,10 +187,15 @@ export default class BaseWebFace extends BaseFace {
     } else {
       if (vatom.id === this.vatom.id && this.face) {
         this.sendV2Message('res_1', 'core.vatom.update', { vatom: this.BridgeV2.encodeVatom(vatom) }, true)
-      }  
-
+      }
     }
-    
+  }
+
+  async observeChildren (payload) {
+    if (this.vatom.id === payload) {
+      let children = await this.vatomView.blockv.client.request('POST', '/v1/user/vatom/inventory', { 'parent_id': payload }, true)
+      this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children.vatoms }, true)
+    }
   }
 
   onVatomUpdated () {
