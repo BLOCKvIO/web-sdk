@@ -246,9 +246,6 @@ export default class Vatoms {
     return this.vatomApi.setParent(parentPayload)
   }
 
-  observeChildren (vatomId) {
-    return this.vatomApi.observeChildren(vatomId)
-  }
   /**
    * Removes the specified vAtom from the current user's inventory
    * @param  {String} vatomID  Id of the vAtom you want to remove
