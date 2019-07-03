@@ -31,6 +31,7 @@ export default class Blockv extends EventEmitter {
 
     this.dataPool = new DataPool(this)
     this.dataPool.Blockv = this
+    this.dataPool.disableSyncV2 = payload.disableSyncV2
     this.client = new Client(this)
 
     const userApi = new UserApi(this)

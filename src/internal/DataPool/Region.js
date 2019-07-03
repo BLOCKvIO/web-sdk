@@ -173,31 +173,43 @@ export default class Region extends EventEmitter {
      * @param {DataObject[]} objects List of new data objects added to the pool.
      */
   addObjects (objects) {
+
     // Go through each object
     for (let obj of objects) {
+
       // Check if object exists already
       let existingObject = this.objects.get(obj.id)
       if (existingObject) {
+
         // Notify
         this.willUpdateFields(existingObject, obj.data)
 
         // It exists already, update the object
         existingObject.data = obj.data
         existingObject.cached = null
+
+        // Update database copy
+        this.objects.set(obj.id, obj)
+
       } else {
+
         // Notify
         this.willAdd(obj)
 
         // It does not exist, add it
         this.objects.set(obj.id, obj)
+
       }
 
       // Emit event, on next run loop so all objects are added first
       Delayer.run(e => this.emit('object.updated', obj.id))
+
     }
 
     // Notify updated
-    if (objects.length > 0) { this.emit('updated') }
+    if (objects.length > 0) 
+      this.emit('updated')
+
   }
 
   /**
@@ -424,6 +436,9 @@ export default class Region extends EventEmitter {
       set(object.data, keyPath, oldValue)
       this.emit('object.updated', id)
       this.emit('updated')
+
+      // Notify database of change
+      this.objects.set(id, object)
     }
   }
 

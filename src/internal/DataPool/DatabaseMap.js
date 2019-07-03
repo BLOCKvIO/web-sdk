@@ -73,7 +73,7 @@ export default class Database {
             for (let row of results.rows) {
 
                 // Ignore deleted and errors
-                if (!row.id || !row.value.rev || row.value.deleted)
+                if (!row.id || !row.value.rev)
                     continue
 
                 // Create and cache the DataObject
@@ -82,6 +82,15 @@ export default class Database {
                 this.cache.set(row.id, obj)
 
             }
+
+            // Compact database in background (ie don't wait for promise)
+            // TODO: Why u take so long?
+            // Promise.resolve().then(async e => {
+            //     let time = Date.now()
+            //     await this.pouch.viewCleanup()
+            //     await this.pouch.compact()
+            //     console.log(`[DataPool > DatabaseMap] Compacting database took ${Math.round(Date.now() - time)} ms`)
+            // })
 
             // Done
             console.log(`[DataPool > DatabaseMap] Loaded ${this.cache.size} items from ${this.pouch.name}`)
@@ -133,9 +142,6 @@ export default class Database {
         if (!this.pouch)
             return this.cache.delete(key)
 
-        // Get existing item
-        let object = this.cache.get(key)
-
         // Delete item
         let found = this.cache.delete(key)
 
@@ -157,6 +163,7 @@ export default class Database {
 
     }
 
+    /** Set a value. `value` must be a DataObject. */
     set(key, value) {
 
         // Stop if no database
@@ -219,6 +226,29 @@ export default class Database {
             throw err
 
         }
+
+    }
+
+    /** Get a string extra value */
+    getExtra(key) {
+
+        // Get item
+        let itm = this.get('extra:' + key)
+        if (itm)
+            return itm.data
+        else
+            return null
+
+    }
+
+    /** Set a string extra */
+    setExtra(key, value) {
+
+        // Set item
+        this.set('extra:' + key, {
+            type: '_extra',
+            data: value
+        })
 
     }
 

@@ -18,6 +18,9 @@ export default class VatomIDRegion extends BLOCKvRegion {
   /** Constructor */
   constructor (dataPool, ids) {
     super(dataPool)
+    
+    // Don't cache this content
+    this.noCache = true
 
     // Store IDs. Sort them to keep our stateKey in check.
     this.ids = ids.sort()
