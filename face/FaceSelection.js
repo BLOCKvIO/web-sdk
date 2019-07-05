@@ -11,7 +11,7 @@
 /* eslint-disable no-use-before-define */
 
 export default {
-  Icon: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'icon') || vatom.properties.find(v => v.resources.name === 'Activated Image'),
+  Icon: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'icon'),
   Engaged: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'engaged') || vatom.faces.find(v => v.properties.constraints.view_mode === 'icon'),
   Fullscreen: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'fullscreen'),
   Card: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'card')
