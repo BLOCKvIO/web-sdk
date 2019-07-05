@@ -11,57 +11,8 @@
 /* eslint-disable no-use-before-define */
 
 export default {
-  Icon: vatom => start(vatom, 'icon'),
-  Engaged: vatom => start(vatom, 'engaged') || start(vatom, 'icon'),
-  Fullscreen: vatom => start(vatom, 'fullscreen'),
-  Card: vatom => start(vatom, 'card')
-}
-
-function start (vatom, viewmode) {
-  // get the faces & vatoms array
-  // create a best face array
-  const bf = []
-  // define what is native
-  const native = 'web'
-  const farray = vatom.faces
-  // loop through the faces
-  // eslint-disable-next-line
-    for(let face of farray) {
-    // set base rating
-    let rate = 0
-    // set default viewmode
-    // const viewmode = this.viewMode.toLowerCase() || 'icon';
-    // create a rating switch
-    switch (face.properties.constraints.platform) {
-      case native:
-        rate += 2
-        break
-      case 'generic':
-        rate += 1
-        break
-      default:
-        rate -= 1
-        break
-    }
-
-    // additional rating bonus
-    if (face.properties.constraints.view_mode === 'engaged' && viewmode === 'engaged') {
-      rate += 10
-    } else if (face.properties.constraints.view_mode === viewmode) {
-      rate += 2
-    } else if (face.properties.constraints.view_mode === 'icon') {
-      rate += 0
-    } else {
-      rate -= 1
-    }
-
-    // filter out non-rated items or items that are not benificial for our platform
-    if (rate >= 0) {
-      bf.push({ face, rate })
-    }
-  }
-  // return the best face available
-  // eslint-disable-next-line
-  let best = bf.reduce((max, p) => p.rate > max.rate ? p : max, bf[0])
-  return best && best.face
+  Icon: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'icon') || vatom.properties.find(v => v.resources.name === 'Activated Image'),
+  Engaged: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'engaged') || vatom.faces.find(v => v.properties.constraints.view_mode === 'icon'),
+  Fullscreen: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'fullscreen'),
+  Card: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'card')
 }
