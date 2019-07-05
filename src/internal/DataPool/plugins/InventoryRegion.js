@@ -276,10 +276,26 @@ export default class InventoryRegion extends BLOCKvRegion {
   // When a preemptive change occurs, clear our stored hash so that the next inventory refresh will query with the server.
   // Normally this should not be needed since the hash on the server should change as well, but sometimes if an action fails
   // and we fail to rollback the DB we'll be stuck with an outdated vatom.
-  willAdd (object) { this.onObjectPreemptivelyChanged(object) }
-  willUpdateFields (object, newData) { this.onObjectPreemptivelyChanged(object) }
-  willUpdateField (object, keyPath, oldValue, newValue) { this.onObjectPreemptivelyChanged(object) }
-  willRemove (objectOrID) { this.objects.setExtra('hash', '') }
+  willAdd (object) {
+    super.willAdd(object)
+    this.onObjectPreemptivelyChanged(object) 
+  }
+  
+  willUpdateFields (object, newData) {
+    super.willUpdateFields(object, newData)
+    this.onObjectPreemptivelyChanged(object) 
+  }
+
+  willUpdateField (object, keyPath, oldValue, newValue) {
+    super.willUpdateField(object, keyPath, oldValue, newValue)
+    this.onObjectPreemptivelyChanged(object)
+  }
+  
+  willRemove (objectOrID) {
+    super.willRemove(objectOrID)
+    this.objects.setExtra('hash', '')
+  }
+  
   onObjectPreemptivelyChanged(object) {
 
     // Update object's sync # so that on the next refresh we fetch it's state from the server.
