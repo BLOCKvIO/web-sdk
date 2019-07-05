@@ -102,32 +102,26 @@ export default class Client {
 
     // Check for server error
     if (!json.payload && json.error === 2051) {
+
       // Check for the special login locked error
       // We need to pull the timestamp that is in the reponse.message to show when they
       // can login agin
 
       // HACK: Pull time from original server error string
       const dateString = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/g.exec(response.message)
-      response.lockedUntil = new Date(dateString)
+      let lockedUntil = new Date(dateString)
 
-      // Replace duration in the error message
-      let duration = response.lockedUntil.getTime() - Date.now()
-      if (duration < 2000) duration = 2000
-      const seconds = Math.floor(duration / 1000)
-      const minutes = Math.floor(duration / 1000 / 60)
-      if (seconds <= 90) {
-        response.message = response.message.replace('%DURATION%', seconds === 1 ? '1 second' : `${seconds}  seconds`)
-      } else {
-        response.message = response.message.replace('%DURATION%', minutes === 1 ? '1 minute' : `${minutes} minutes`)
-      }
       // Throw error
-      const error = new Error(`Too many login attempts, Try again at : ${response.lockedUntil}`)
+      const error = new Error(`Too many login attempts, try again at ${lockedUntil}`)
       error.code = json.error || response.status || 0
       error.httpStatus = response.status
       error.requestID = json.request_id
       error.serverMessage = json.message
+      error.lockedUntil = lockedUntil
       throw error
+
     } else if (!json.payload) {
+
       // Throw the error returned by the server
       const error = new Error(ErrorCodes[response.error] || json.message || 'An unknown server error has occurred')
       error.code = json.error || response.status || 0
@@ -135,6 +129,7 @@ export default class Client {
       error.requestID = json.request_id
       error.serverMessage = json.message
       throw error
+      
     }
 
     // Check for main reactor error payload
