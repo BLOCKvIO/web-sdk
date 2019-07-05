@@ -130,6 +130,8 @@ export default class VatomView {
     Promise.resolve(() => null).then(() => {
     // start the face selection procedure
       const st = this.fsp(this.vatomObj)
+      if (!st)
+        throw new Error('No face found for this view mode.')
       let FaceClass = null
       // check if face is registered
       const du = st.properties.display_url.toLowerCase()
