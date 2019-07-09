@@ -11,8 +11,27 @@
 /* eslint-disable no-use-before-define */
 
 export default {
-  Icon: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'icon'),
-  Engaged: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'engaged') || vatom.faces.find(v => v.properties.constraints.view_mode === 'icon'),
-  Fullscreen: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'fullscreen'),
-  Card: vatom => vatom.faces.find(v => v.properties.constraints.view_mode === 'card')
+
+  // This display mode is used in the inventory view.
+  Icon: vatom =>
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'icon' && v.properties.constraints.platform === 'web') ||
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'icon' && v.properties.constraints.platform === 'generic'),
+
+  // This display mode is used when a user opens the vatom. It falls back to icon if no engaged face is found.
+  Engaged: vatom =>
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'engaged' && v.properties.constraints.platform === 'web') ||
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'engaged' && v.properties.constraints.platform === 'generic') ||
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'icon' && v.properties.constraints.platform === 'web') ||
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'icon' && v.properties.constraints.platform === 'generic'),
+
+  // This display mode is used when a vatom enters fullscreen mode
+  Fullscreen: vatom =>
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'fullscreen' && v.properties.constraints.platform === 'web') ||
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'fullscreen' && v.properties.constraints.platform === 'generic'),
+
+  // This display mode is used in the info card
+  Card: vatom =>
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'card' && v.properties.constraints.platform === 'web') ||
+    vatom.faces.find(v => v.properties.constraints.view_mode === 'card' && v.properties.constraints.platform === 'generic')
+
 }
