@@ -196,7 +196,6 @@ export default class BaseWebFace extends BaseFace {
     
     if (this.vatom.id === payload) {
       let children = this.vatomView.blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id === payload).map(this.mapVatom)
-      console.log('Here are the children: ', children)
       this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children }, true)
     }
     
@@ -204,7 +203,6 @@ export default class BaseWebFace extends BaseFace {
 
   onVatomUpdated () {
     this.vatomStateChanged(this.vatom)
-    console.log("vatom has been updated : ", this.vatom);
   }
   /**
    * pass in vatom model recieve out packaged vatom for bridge
