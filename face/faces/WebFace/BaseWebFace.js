@@ -170,9 +170,8 @@ export default class BaseWebFace extends BaseFace {
     if (this.version === 1) {
       if (vatom.id === this.vatom.id && this.face) {
         var resources = {}
-
-        for (var res in this.vatomView.vatom.properties.resources) {
-          resources[res] = this.vatomView.vatom.properties.resources.find(r => r.name === res).value.value
+        for (var resource of this.vatomView.vatom.properties.resources) {
+          resources[resource.name] = resource.value.value
         }
 
         var data = {
