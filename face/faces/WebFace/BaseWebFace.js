@@ -204,7 +204,6 @@ export default class BaseWebFace extends BaseFace {
 
   onVatomUpdated () {
     this.vatomStateChanged(this.vatom)
-    console.log("vatom has been updated : ", this.vatom);
   }
   /**
    * pass in vatom model recieve out packaged vatom for bridge
