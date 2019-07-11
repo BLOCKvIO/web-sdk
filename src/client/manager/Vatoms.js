@@ -116,14 +116,16 @@ export default class Vatoms {
 
   /** Called to remove all child vatoms from this vatom */
   split (vatom) {
+    // Get vatom's parent ID
+    let newParentID = vatom.properties.parent_id || '.'
     // Get all children
     return this.getVatomChildren(vatom.id).then(children => {
       // Remove parent IDs
       return Promise.all(children.map(child => {
         // Pre-emptively update parent ID
-        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', '.')
+        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', newParentID)
         // Do patch
-        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: '.' }, true).catch(err => {
+        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: newParentID }, true).catch(err => {
           // Failed, reset vatom reference
           undo()
           throw err
@@ -231,6 +233,22 @@ export default class Vatoms {
     return this.Blockv.dataPool.region('inventory').get().then(children => {
       return children.filter(v => v.properties.parent_id === parentID)
     })
+  }
+
+  setParentID(childID, newParentID) {
+
+    // Pre-emptively update parent ID
+    let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(childID, 'vAtom::vAtomType.parent_id', newParentID)
+
+    // Do patch
+    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [childID], parent_id: newParentID }, true).catch(err => {
+
+      // Failed, reset vatom reference
+      undo()
+      throw err
+
+    })
+
   }
 
   /**
