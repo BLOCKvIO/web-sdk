@@ -26,6 +26,7 @@ export default class BaseWebFace extends BaseFace {
     this.BridgeV1 = new BridgeV1(this.vatomView.blockv, this.vatom, this.face)
     this.BridgeV2 = new BridgeV2(this.vatomView.blockv, this.vatom, this.face)
     this.observeListenerSet = false
+    this.listChildren = []
 
     // Bind functions
     this.onIncomingBridgeMessage = this.onIncomingBridgeMessage.bind(this)
@@ -169,9 +170,8 @@ export default class BaseWebFace extends BaseFace {
     if (this.version === 1) {
       if (vatom.id === this.vatom.id && this.face) {
         var resources = {}
-
-        for (var res in this.vatomView.vatom.resources) {
-          resources[res] = this.vatomView.vatom.resources[res].value.value
+        for (var resource of this.vatomView.vatom.properties.resources) {
+          resources[resource.name] = resource.value.value
         }
 
         var data = {
@@ -192,14 +192,23 @@ export default class BaseWebFace extends BaseFace {
   }
 
   async observeChildren (payload) {
+    console.log('payload from observe', payload)
+    
     if (this.vatom.id === payload) {
-      let children = await this.vatomView.blockv.client.request('POST', '/v1/user/vatom/inventory', { 'parent_id': payload }, true)
-      this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children.vatoms }, true)
+      let children = this.vatomView.blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id === payload).map(this.mapVatom)
+      this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children }, true)
     }
+    
   }
 
   onVatomUpdated () {
     this.vatomStateChanged(this.vatom)
-    // console.log(this.vatomView.vatom);
+  }
+  /**
+   * pass in vatom model recieve out packaged vatom for bridge
+   * @param {*} vatom 
+   */
+  mapVatom (vatom) {
+    return Object.assign({actions: vatom.actions, faces: vatom.faces}, vatom.payload)
   }
 }
