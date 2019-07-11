@@ -21,14 +21,14 @@ export default class BridgeV1 {
     let data = this.encodeVatom(this.vatom)
     data.vatomInfo.faceProperties = this.face.properties || {}
 
-    if (this.blockv.store.user != null) {
+    if (this.blockv.store.userID != null) {
       this.blockv.UserManager.getCurrentUser().then(uv => {
         data['user'] = this.encodeUser(uv)
       })
     }
     // This response has a special message name
     data._responseName = 'vatom.init-complete'
-
+    
     // Done, return payload
     return data
   }
@@ -93,6 +93,11 @@ export default class BridgeV1 {
     for (let i = 0; i < vatom.properties.resources.length; i++) {
       resources[vatom.properties.resources[i].name] = this.blockv.UserManager.encodeAssetProvider(vatom.properties.resources[i].value.value)
     }
+    if (vatom.private && vatom.private.resources) {
+      for (let p = 0; p < vatom.private.resources.length; p++) {
+        resources[vatom.private.resources[p].name] = this.blockv.UserManager.encodeAssetProvider(vatom.private.resources[p].value.value)
+      }
+    }
     // Create payload
     return {
       'vatomInfo': {
@@ -106,9 +111,9 @@ export default class BridgeV1 {
   encodeUser (user) {
     return {
       id: user.id,
-      firstName: user.properties.first_name,
-      lastName: user.properties.last_name,
-      avatarURL: this.blockv.UserManager.encodeAssetProvider(user.properties.avatar_uri)
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarURL: this.blockv.UserManager.encodeAssetProvider(user.avatarURI)
     }
   }
 }
