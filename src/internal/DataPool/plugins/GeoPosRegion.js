@@ -149,8 +149,29 @@ export default class GeoPosRegion extends BLOCKvRegion {
    * @abstract Subclasses can override to process other WebSocket messages. Always call super.processMessage(msg) though.
    * @param {Object} msg The raw JSON from the websocket event message
    */
-  processMessage (msg) {
+  async processMessage(msg) {
     super.processMessage(msg)
+
+    // Check for map add event
+    if (msg.msg_type === 'map' && msg.payload.op === 'add') {
+
+      // A vatom was added to the map. Fetch vatom, add components to data pool
+      let objects = []
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [msg.payload.vatom_id] }, true)
+      let vatom = new DataObject('vatom', response.vatoms[0].id, response.vatoms[0])
+      objects.push(vatom)
+      response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
+      response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+      this.addObjects(objects)
+      return
+
+    } else if (msg.msg_type === 'map' && msg.payload.op === 'remove') {
+
+      // A vatom was removed from the map. Undrop it
+      this.preemptiveChange(msg.payload.vatom_id, 'vAtom::vAtomType.dropped', false)
+      return
+
+    }
 
     // Get vatom ID
     let vatomID = msg.payload && msg.payload.id
@@ -187,7 +208,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
       this.addObjects(objects)
     }).catch(err => {
       // Log it
-      console.warn(`[DataPool > GeoPosRegion] A vatom was dropped, bbut we could not fetch it's payload! ` + err.message)
+      console.warn(`[DataPool > GeoPosRegion] A vatom was dropped, but we could not fetch it's payload! ` + err.message)
     }).then(e => {
       // Resume message processing
       this.resumeMessages()

@@ -421,6 +421,7 @@ export default class Region extends EventEmitter {
 
     // Update to new value
     set(object.data, keyPath, value)
+    object.cached = null
     this.emit('object.updated', id)
     this.emit('updated')
 
@@ -434,6 +435,7 @@ export default class Region extends EventEmitter {
 
       // Revert
       set(object.data, keyPath, oldValue)
+      object.cached = null
       this.emit('object.updated', id)
       this.emit('updated')
 
