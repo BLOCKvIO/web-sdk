@@ -27,26 +27,21 @@ export default class MultiWebSockets extends EventEmitter {
     /**
      * The connect function establishes a connection to the WebSocket.
      * @public
-     * @return {Promise<WebSockets>}
+     * @return {Promise<MultiWebSockets>}
      */
-    async connect() {
+    connect() {
 
         // Create sockets if needed
         if (this.sockets.length == 0) {
 
+            // Get array of socket addresses
+            let addresses = this.store.websocketAddress
+            if (typeof addresses == 'string')
+                addresses = [addresses]
+
             // Create sockets
-            if (typeof this.store.websocketAddress == 'string') {
-                
-                // Config supplied a single websocket address
-                this.sockets.push(new WebSockets(this.store, this.client, this.store.websocketAddress))
-            
-            } else if (Array.isArray(this.store.websocketAddress)) {
-
-                // Config supplied an array of addresses
-                for (let address of this.store.websocketAddress)
+            for (let address of addresses)
                 this.sockets.push(new WebSockets(this.store, this.client, address))
-
-            }
 
             // Override the newly created socket's trigger() and emit() to instead trigger and emit on us
             for (let socket of this.sockets) {

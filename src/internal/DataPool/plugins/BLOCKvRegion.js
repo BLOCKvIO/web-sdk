@@ -92,21 +92,27 @@ export default class BLOCKvRegion extends Region {
     }
     this.socketProcessing = true
 
+    // Get next msg to process
+    let msg = this.queuedMessages.shift()
+    if (!msg) {
+
+      // No more messages!
+      this.socketProcessing = false
+      return
+
+    }
+
     // Process message
     try {
-      // Get next msg to process
-      let msg = this.queuedMessages.shift()
-      if (!msg) {
-        // No more messages!
-        this.socketProcessing = false
-        return
-      }
 
       // Process message
       await this.processMessage(msg)
+
     } catch (err) {
+
       // Error!
-      console.warn('[DataPool > BVWebSocketRegion] Error processing WebSocket message! ', err)
+      console.warn('[DataPool > BVWebSocketRegion] Error processing WebSocket message! ' + err.message, msg)
+
     }
 
     // Done, process next message
@@ -121,15 +127,21 @@ export default class BLOCKvRegion extends Region {
     * @abstract Subclasses can override to process other WebSocket messages. Always call super.processMessage(msg) though.
     * @param {Object} msg The raw JSON from the websocket event message
     */
-  processMessage (msg) {
+  async processMessage (msg) {
+
+    // We only handle state_update messages here
+    if (msg.msg_type != 'state_update')
+      return
+
     // Get vatom ID
     let vatomID = msg.payload && msg.payload.id
     if (!vatomID) {
-      return console.warn(`[DataPool > BVWebSocketRegion] Got websocket message with no vatom ID in it: `, msg)
+      throw new Error(`Got websocket message with no vatom ID in it.`)
     }
-    // Ensure it's a state update message
-    if (msg.msg_type !== 'state_update' || !msg.payload.new_object) {
-      return
+
+    // Ensure it's formatted correctly
+    if (!msg.payload.new_object) {
+      throw new Error(`WebSocket message had no new object payload.`)
     }
 
     // Update existing objects
