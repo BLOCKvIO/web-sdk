@@ -49,6 +49,11 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Sends the region command up the websocket to enable region monitoring */
   sendRegionCommand () {
+
+    // Stop if WebSocket is not connected
+    if (!this.socket.isOpen)
+      return
+
     // Convert our coordinates into the ones needed by the command
     let topLeft = {
       lat: Math.max(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
@@ -169,49 +174,53 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
       // A vatom was removed from the map. Undrop it
       this.preemptiveChange(msg.payload.vatom_id, 'vAtom::vAtomType.dropped', false)
+      console.log('MAP: Item removed: ' + msg.payload.vatom_id)
       return
 
+    } else if (msg.msg_type == 'state_update') {
+
+      // Get vatom ID
+      let vatomID = msg.payload && msg.payload.id
+      if (!vatomID) {
+        throw new Error(`Got websocket message with no vatom ID in it.`)
+      }
+
+      // Check if this is a newly dropped vatom
+      let dropped = msg.payload.new_object && msg.payload.new_object['vAtom::vAtomType'] && msg.payload.new_object['vAtom::vAtomType'].dropped
+      if (!dropped) {
+        return
+      }
+
+      // Check if we already have this vatom
+      if (this.objects.get(vatomID)) {
+        return
+      }
+
+      // A new vatom was dropped! Pause WebSocket message processing
+      this.pauseMessages()
+
+      // Fetch vatom payload
+      this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true).then(response => {
+        // Add vatom to new objects list
+        let objects = []
+        objects.push(new DataObject('vatom', response.vatoms[0].id, response.vatoms[0]))
+
+        // Add faces to new objects list
+        response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
+
+        // Add actions to new objects list
+        response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+
+        // Add new objects
+        this.addObjects(objects)
+      }).catch(err => {
+        // Log it
+        console.warn(`[DataPool > GeoPosRegion] A vatom was dropped, but we could not fetch it's payload! ` + err.message)
+      }).then(e => {
+        // Resume message processing
+        this.resumeMessages()
+      })
+
     }
-
-    // Get vatom ID
-    let vatomID = msg.payload && msg.payload.id
-    if (!vatomID) {
-      return console.warn(`[DataPool > BVWebSocketRegion] Got websocket message with no vatom ID in it: `, msg)
-    }
-    // Check if this is a newly dropped vatom
-    let dropped = msg.payload.new_object && msg.payload.new_object['vAtom::vAtomType'] && msg.payload.new_object['vAtom::vAtomType'].dropped
-    if (msg.msg_type !== 'state_update' || !dropped) {
-      return
-    }
-
-    // Check if we already have this vatom
-    if (this.objects.get(vatomID)) {
-      return
-    }
-
-    // A new vatom was dropped! Pause WebSocket message processing
-    this.pauseMessages()
-
-    // Fetch vatom payload
-    this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true).then(response => {
-      // Add vatom to new objects list
-      let objects = []
-      objects.push(new DataObject('vatom', response.vatoms[0].id, response.vatoms[0]))
-
-      // Add faces to new objects list
-      response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
-
-      // Add actions to new objects list
-      response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
-
-      // Add new objects
-      this.addObjects(objects)
-    }).catch(err => {
-      // Log it
-      console.warn(`[DataPool > GeoPosRegion] A vatom was dropped, but we could not fetch it's payload! ` + err.message)
-    }).then(e => {
-      // Resume message processing
-      this.resumeMessages()
-    })
   }
 }

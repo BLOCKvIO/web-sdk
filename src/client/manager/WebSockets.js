@@ -41,8 +41,9 @@ export default class WebSockets extends EventEmitter {
   async connect () {
     // Stay connected after this point
     this.shouldRetry = true
+
     // if the websocket is connected or connecting already, then stop
-    if (this.socket && this.socket.readyState !== 3) {
+    if (this.socket) {
       return this
     }
 
@@ -50,7 +51,13 @@ export default class WebSockets extends EventEmitter {
     try {
       await this.client.checkToken()
     } catch (err) {
+      console.warn('WebSocket unable to get client token! Will retry soon...')
       this.retryConnection()
+      return this
+    }
+
+    // if the websocket is connected or connecting already, then stop
+    if (this.socket) {
       return this
     }
 
@@ -73,6 +80,8 @@ export default class WebSockets extends EventEmitter {
   sendMessage (cmd) {
     if (this.socket && this.socket.readyState === 1) {
       this.socket.send(JSON.stringify(cmd))
+    } else {
+      console.warn('WebSocket: Attempted to send message up, but the socket is not ready.')
     }
   }
 
@@ -165,6 +174,7 @@ export default class WebSockets extends EventEmitter {
    * @param {Error} err The error that happened
    */
   handleError (err) {
+    this.socket = null
     console.warn('[WebSocket] Connection failed: ' + err.message)
   }
 
@@ -174,6 +184,7 @@ export default class WebSockets extends EventEmitter {
    * @param  {Event} e no need for inputting, It is a Websocket Event
    */
   handleClose () {
+    this.socket = null
     this.retryConnection()
   }
 
