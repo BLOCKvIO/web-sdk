@@ -174,7 +174,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
       // A vatom was removed from the map. Undrop it
       this.preemptiveChange(msg.payload.vatom_id, 'vAtom::vAtomType.dropped', false)
-      console.log('MAP: Item removed: ' + msg.payload.vatom_id)
       return
 
     } else if (msg.msg_type == 'state_update') {
