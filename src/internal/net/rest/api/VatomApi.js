@@ -156,8 +156,18 @@ export default class VatomApi {
   }
 
   getVatomChildren (parentID) {
-    return this.client.request('POST', '/v1/user/vatom/inventory', { 'parent_id': parentID }, true).then(data => {
-      const { actions, faces, vatoms } = data
+    return this.client.request('POST', '/v1/vatom/discover', { 
+      scope: {
+        key: "vAtom::vAtomType.parent_id" ,
+        value: parentID
+      },
+      return: {
+        type: "*",
+        fields: []
+      }
+    }, true).then(data => {
+      const { actions, faces, results } = data
+      const vatoms = results
 
       const actionsArray = []
       const facesArray = []
