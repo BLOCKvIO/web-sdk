@@ -228,11 +228,23 @@ export default class Vatoms {
   /**
    *
    * @param {String} parentID   ID of the vatom that you would like to list the children
+   * @returns {Promise<Vatom[]>} Array of vatoms
    */
   getVatomChildren (parentID) {
-    return this.Blockv.dataPool.region('inventory').get().then(children => {
-      return children.filter(v => v.properties.parent_id === parentID)
-    })
+
+    // Check if vatom is in the inventory
+    if (this.Blockv.dataPool.region('inventory').has(parentID)) {
+
+      // It is, read children from inventory region
+      return this.Blockv.dataPool.region('inventory').get().then(children => {
+        return children.filter(v => v.properties.parent_id === parentID)
+      })
+
+    }
+
+    // Not in inventory region, read from API
+    return this.vatomApi.getVatomChildren(parentID)
+    
   }
 
   setParentID(childID, newParentID) {
