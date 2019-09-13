@@ -117,6 +117,7 @@ export default class Region extends EventEmitter {
     // All data is up to date!
     this.synchronized = true
     this._syncPromise = null
+    this.emit('updated')
     console.log(`[DataPool > Region] Region '${this.stateKey}' is now in sync!`)
     
   }

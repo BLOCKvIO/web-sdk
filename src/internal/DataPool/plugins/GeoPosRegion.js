@@ -105,13 +105,17 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Pause websocket events
     this.pauseMessages()
 
-    // Fetch data
-    let response = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/geodiscover', {
+    let payload = {
       top_right: this.coordinates.top_right,
       bottom_left: this.coordinates.bottom_left,
       filter: 'all',
       limit: 10000
-    }, true)
+    }
+
+    if (this.coordinates.publisher_fqdn)
+      payload['publisher_fqdn'] = this.coordinates.publisher_fqdn
+    // Fetch data
+    let response = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/geodiscover', payload, true)
 
     // Add vatom to new objects list
     let objects = []
@@ -138,11 +142,15 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Don't return vatoms which are not dropped */
   map (object) {
+    if(this.coordinates.publisher_fqdn && object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].publisher_fqdn !== this.coordinates.publisher_fqdn)
+      return null
+      
     // Check if dropped
     if (object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].dropped) {
       return super.map(object)
     }
 
+    
     // Vatom is not dropped!
     return null
   }
