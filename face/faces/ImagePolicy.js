@@ -71,7 +71,7 @@ export default class ImagePolicy extends BaseFace {
       } else if (policy.field) {
 
         // Field value policy, get key path
-        let keyPath = policy.field.split('.')
+        let keyPath = policy.field.split(/\.(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(k => k.replace(/"/g, ''))
 
         // Follow key path and get the value
         let keyValue = vatom.payload
