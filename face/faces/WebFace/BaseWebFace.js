@@ -128,11 +128,22 @@ export default class BaseWebFace extends BaseFace {
         this.sendv1Message(responseID || resp._responseName, resp)
       }
     }).catch(err => {
-      // Failed, send error response
-      this.sendv1Message(responseID, {
-        errorCode: err.code,
-        errorText: err.message
-      })
+
+      if (payload.version === '2.0.0') {
+        this.sendV2Message(payload.request_id, payload.name,{
+          error_code: err.code || 'unknown_error',
+          error_message: err.message
+        }, false)
+      } else { 
+        // Failed, send error response
+        this.sendv1Message(responseID, {
+          errorCode: err.code,
+          errorText: err.message
+        })
+     }
+
+      
+
     })
   }
 
@@ -156,6 +167,14 @@ export default class BaseWebFace extends BaseFace {
       return
     }
 
+    let sam = {
+      [ isRequest ? 'request_id' : 'response_id' ]: id,
+      source: 'BLOCKv SDK',
+      name: name,
+      payload: data,
+      version: '2.0.0'
+    }
+    console.log("Message from V2 : ", sam)
     // Send payload
     this.iframe.contentWindow.postMessage({
       [ isRequest ? 'request_id' : 'response_id' ]: id,
