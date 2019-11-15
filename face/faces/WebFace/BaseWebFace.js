@@ -167,14 +167,6 @@ export default class BaseWebFace extends BaseFace {
       return
     }
 
-    let sam = {
-      [ isRequest ? 'request_id' : 'response_id' ]: id,
-      source: 'BLOCKv SDK',
-      name: name,
-      payload: data,
-      version: '2.0.0'
-    }
-    console.log("Message from V2 : ", sam)
     // Send payload
     this.iframe.contentWindow.postMessage({
       [ isRequest ? 'request_id' : 'response_id' ]: id,
