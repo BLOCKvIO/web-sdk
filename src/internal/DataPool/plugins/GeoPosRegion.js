@@ -81,6 +81,23 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.dataPool.Blockv.WebSockets.sendMessage(cmd)
   }
 
+ /**
+     * Returns true if the object with the specified ID exists in the cache.
+     *
+     * @param {*} id The object's ID
+     * @returns {boolean} True if the object exists.
+     */
+    has (id) {
+      if(!super.has(id))
+        return false
+      
+    let object = this.objects.get(id)
+
+    // Check if dropped
+    if (object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].dropped) {
+      return true
+    }
+    }
   /** Our state key is the region */
   get stateKey () {
     return 'geopos:' + this.coordinates.top_right.lat + ',' + this.coordinates.top_right.lon + ' ' + this.coordinates.bottom_left.lat + ',' + this.coordinates.bottom_left.lon
@@ -149,8 +166,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
     if (object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].dropped) {
       return super.map(object)
     }
-
-    
     // Vatom is not dropped!
     return null
   }
