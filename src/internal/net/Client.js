@@ -98,7 +98,7 @@ export default class Client {
     const response = await fetch(this.store.server + endpoint, { method, body, headers })
 
     // Decode JSON
-    const json = await response.json()
+    let json = await response.json()
 
     // Check for server error
     if (!json.payload && json.error === 2051) {
@@ -120,6 +120,14 @@ export default class Client {
       error.lockedUntil = lockedUntil
       throw error
 
+    } else if (json && !json.payload && response.status == 200) {
+
+      // Sometimes, just sometimes, the backend will send a response outside of the usual `payload` param.
+      // In this case, just wrap it.
+      json = {
+        payload: json
+      }
+      
     } else if (!json.payload) {
 
       // Throw the error returned by the server
