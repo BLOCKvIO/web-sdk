@@ -72,18 +72,25 @@ export default class BridgeV2 {
   }
 
   getCurrentUser (payload) {
-    return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(user => {
-      console.log(user)
-       return {
+    let user = {}
+    return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(u => {
+      user = u
+      return this.blockv.UserManager.getCurrentUserTokens()
+    }).then(tokens => {
+      return {
         user : {
-         id: user.id,
-         properties: {
-           avatar_uri: user.properties.avatar_uri,
-           first_name: user.properties.first_name,
-           last_name: user.properties.last_name,
-           is_guest: user.properties.guest_id ? true : false
-         }
-        }
+          id: user.id,
+          properties: {
+            avatar_uri: user.properties.avatar_uri,
+            first_name: user.properties.first_name,
+            last_name: user.properties.last_name,
+            is_guest: user.properties.guest_id ? true : false
+          },
+          tokens: {
+            has_verified_email: tokens.some(t => t.properties.confirmed && t.properties.token_type == 'email'),
+            has_verified_phone: tokens.some(t => t.properties.confirmed && t.properties.token_type == 'phone_number')
+          }
+        },
       }
     })
   }
