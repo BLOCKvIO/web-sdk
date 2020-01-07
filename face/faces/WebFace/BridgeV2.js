@@ -73,10 +73,12 @@ export default class BridgeV2 {
 
   getCurrentUser (payload) {
     let user = {}
-    return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(u => {
-      user = u
-      return this.blockv.UserManager.getCurrentUserTokens()
-    }).then(tokens => {
+    return Promise.all([
+      this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner),
+      this.blockv.UserManager.getCurrentUserTokens()
+    ]).then(data => {
+      let user = data[0]
+      let tokens = data[1]
       return {
         user : {
           id: user.id,
