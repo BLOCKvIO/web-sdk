@@ -101,7 +101,7 @@ export default class Client {
     let json = await response.json()
 
     // Check for server error
-    if (!json.payload && json.error === 2051) {
+    if (json.payload === undefined && json.error === 2051) {
 
       // Check for the special login locked error
       // We need to pull the timestamp that is in the reponse.message to show when they
@@ -120,7 +120,7 @@ export default class Client {
       error.lockedUntil = lockedUntil
       throw error
 
-    } else if (json && !json.payload && response.status == 200) {
+    } else if (json && json.payload === undefined && response.status == 200) {
 
       // Sometimes, just sometimes, the backend will send a response outside of the usual `payload` param.
       // In this case, just wrap it.
@@ -128,7 +128,7 @@ export default class Client {
         payload: json
       }
       
-    } else if (!json.payload) {
+    } else if (json.payload === undefined) {
 
       // Throw the error returned by the server
       const error = new Error(ErrorCodes[response.error] || json.message || 'An unknown server error has occurred')
