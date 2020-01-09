@@ -89,6 +89,8 @@ export default class BridgeV2 {
             is_guest: user.properties.guest_id ? true : false
           },
           tokens: {
+            has_email: tokens.some(t => t.properties.token_type == 'email'),
+            has_phone: tokens.some(t => t.properties.token_type == 'phone_number'),
             has_verified_email: tokens.some(t => t.properties.confirmed && t.properties.token_type == 'email'),
             has_verified_phone: tokens.some(t => t.properties.confirmed && t.properties.token_type == 'phone_number')
           }
