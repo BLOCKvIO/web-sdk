@@ -77,6 +77,8 @@ export default class Client extends EventEmitter {
 
   /** @private */
   async authRequest (method, endpoint, payload, headers) {
+    
+    // Send request start event
     let t0 = performance.now();
     let statekey = Math.random().toString(36).substr(2)
     this.emit('requestTimerStart', {
@@ -85,9 +87,8 @@ export default class Client extends EventEmitter {
       event: 'start',
       statekey,
       time: t0
-      
+    })
 
-     })
     // Check payload type
     let body = null
     if (!payload) {
@@ -105,12 +106,14 @@ export default class Client extends EventEmitter {
       body = payload
       if (!extraHeaders['Content-Type']) headers['Content-Type'] = 'application/json'
     }
-    let json = null
     
-    // try get a response 
-    try{
+    // try get a response
+    let response = null
+    let json = null
+    try {
+
       // Send request
-      const response = await fetch(this.store.server + endpoint, { method, body, headers })
+      response = await fetch(this.store.server + endpoint, { method, body, headers })
 
       // Decode JSON
       json = await response.json()
@@ -123,7 +126,8 @@ export default class Client extends EventEmitter {
         milliseconds: t1 - t0,
         statekey,
         event: 'end'
-       })
+      })
+
     } catch (err) {
 
       // Request failed, send timing event
@@ -134,7 +138,7 @@ export default class Client extends EventEmitter {
         milliseconds: t1 - t0,
         statekey,
         event: 'end'
-       })
+      })
 
        throw err
 
