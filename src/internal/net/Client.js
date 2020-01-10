@@ -78,7 +78,7 @@ export default class Client extends EventEmitter {
   /** @private */
   async authRequest (method, endpoint, payload, headers) {
     let t0 = performance.now();
-    let statekey = Math.random(100, 10000)
+    let statekey = Math.random().toString(36).substr(2)
     this.emit('requestTimerStart', {
       url: this.store.server + endpoint,
       method,
