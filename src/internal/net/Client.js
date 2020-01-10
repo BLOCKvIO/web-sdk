@@ -114,6 +114,8 @@ export default class Client extends EventEmitter {
 
       // Decode JSON
       json = await response.json()
+
+      // Send timing event
       var t1 = performance.now();
       this.emit('requestTimerEnd', {
         url: this.store.server + endpoint,
