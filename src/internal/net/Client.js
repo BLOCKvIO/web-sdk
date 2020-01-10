@@ -125,6 +125,8 @@ export default class Client extends EventEmitter {
         event: 'end'
        })
     } catch (err) {
+
+      // Request failed, send timing event
       var t1 = performance.now();
       this.emit('requestTimerEnd', {
         url: this.store.server + endpoint,
