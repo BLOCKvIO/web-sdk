@@ -10,6 +10,7 @@
 //
 import fetch from '@brillout/fetch'
 import jwtDecode from 'jwt-decode'
+import EventEmitter from '../EventEmitter'
 
 /* global FormData */
 
@@ -44,9 +45,10 @@ const ErrorCodes = {
   2572: 'Invalid Phone Number'
 }
 
-export default class Client {
+export default class Client extends EventEmitter {
   /** @private */
   constructor (bv) {
+    super()
     this.Blockv = bv
     this.store = bv.store
   }
@@ -75,7 +77,17 @@ export default class Client {
 
   /** @private */
   async authRequest (method, endpoint, payload, headers) {
+    let t0 = performance.now();
+    let statekey = Math.random().toString(36).substr(2)
+    this.emit('requestTimerStart', {
+      url: this.store.server + endpoint,
+      method,
+      event: 'start',
+      statekey,
+      time: t0
+      
 
+     })
     // Check payload type
     let body = null
     if (!payload) {
@@ -93,13 +105,42 @@ export default class Client {
       body = payload
       if (!extraHeaders['Content-Type']) headers['Content-Type'] = 'application/json'
     }
+    let json = null
+    
+    // try get a response 
+    try{
+      // Send request
+      const response = await fetch(this.store.server + endpoint, { method, body, headers })
 
-    // Send request
-    const response = await fetch(this.store.server + endpoint, { method, body, headers })
+      // Decode JSON
+      json = await response.json()
 
-    // Decode JSON
-    let json = await response.json()
+      // Send timing event
+      var t1 = performance.now();
+      this.emit('requestTimerEnd', {
+        url: this.store.server + endpoint,
+        method,
+        milliseconds: t1 - t0,
+        statekey,
+        event: 'end'
+       })
+    } catch (err) {
 
+      // Request failed, send timing event
+      var t1 = performance.now();
+      this.emit('requestTimerEnd', {
+        url: this.store.server + endpoint,
+        method,
+        milliseconds: t1 - t0,
+        statekey,
+        event: 'end'
+       })
+
+       throw err
+
+    }
+    
+    
     // Check for server error
     if (json.payload === undefined && json.error === 2051) {
 
@@ -151,7 +192,7 @@ export default class Client {
       error.requestID = json.request_id
       throw error
     }
-
+    
     // No error, continue
     return json.payload
   }
