@@ -15,6 +15,10 @@ import BridgeV2 from './BridgeV2'
 export default class BaseWebFace extends BaseFace {
   /** @private Called on startup */
   onLoad () {
+
+    // Pending requests
+    this.pendingRequests = {}
+
     // Create iframe
     this.iframe = document.createElement('iframe')
     this.iframe.style.cssText = 'display: block; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden; border: none; background: none; outline: none; z-index:0;'
@@ -113,10 +117,34 @@ export default class BaseWebFace extends BaseFace {
       return
     }
 
-    // Check if there's a response ID, if so the web face is expecting a reply with that ID
+    // V1: Check if there's a response ID, if so the web face is expecting a reply with that ID
     let responseID = null
     if (payload.responseID) {
       responseID = payload.responseID
+    }
+
+    // V2: Check if this is a response to one of our requests
+    if (payload.response_id && this.pendingRequests[payload.response_id]) {
+
+      // Complete the promise. Check for error or success
+      if (payload.error_message) {
+
+        // Failed
+        let err = new Error(payload.error_message)
+        err.code = payload.error_code || 'unknown_error'
+        this.pendingRequests[payload.response_id].reject(err)
+        delete this.pendingRequests[payload.response_id]
+        return
+
+      } else {
+
+        // Success
+        this.pendingRequests[payload.response_id].resolve(payload.payload)
+        delete this.pendingRequests[payload.response_id]
+        return
+
+      }
+
     }
 
     // Process it, get response
@@ -175,6 +203,20 @@ export default class BaseWebFace extends BaseFace {
       payload: data,
       version: '2.0.0'
     }, '*')
+  }
+
+  /** Called when the viewer wants to send a request to the face. Only supported with the V2 bridge. */
+  sendRequest(name, data) {
+
+    // Send it
+    let id = Math.random().toString(36).substr(2)
+    this.sendV2Message(id, name, data, true)
+
+    // Store response promise
+    return new Promise((resolve, reject) => {
+      this.pendingRequests[id] = { resolve, reject }
+    })
+
   }
 
   vatomStateChanged (vatom) {

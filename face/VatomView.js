@@ -234,4 +234,15 @@ export default class VatomView {
   static registerFace (faceClass) {
     registeredFace[faceClass.url.toLowerCase()] = faceClass
   }
+
+  /** Send a custom request to the face */
+  async sendRequest(name, data) {
+
+    // Pass on to the face code, if supported
+    if (!this._currentFace) throw new Error('No face loaded.')
+    if (!this._currentFace.sendRequest) throw new Error('Request not supported for this face.')
+    return this._currentFace.sendRequest(name, data)
+
+  }
+
 }
