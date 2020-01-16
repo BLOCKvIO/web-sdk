@@ -9,12 +9,14 @@ import Events from '../EventEmitter'
  * To get an instance, call `DataPool.region('geopos', { top_right: { lat: ..., lon: ... }, bottom_left: { lat: ..., lon: ... } })`
  */
 export default class GeoPosRegion extends BLOCKvRegion {
+
   /** Plugin ID */
   static get id () { return 'geopos' }
 
   /** Constructor */
   constructor (dataPool, coordinates) {
     super(dataPool)
+
     // Don't cache this content
     this.noCache = true
 
@@ -32,6 +34,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Listen for events
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
     this.socket.addEventListener('connected', this.onWebSocketOpen)
+
   }
 
   /** Called when this region is going to be shut down */
@@ -40,6 +43,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
+
   }
 
   /** Called when the WebSocket connection re-opens */
@@ -79,25 +83,29 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Send it up
     console.log('Sending WS command: ' + JSON.stringify(cmd))
     this.dataPool.Blockv.WebSockets.sendMessage(cmd)
+
   }
 
- /**
-     * Returns true if the object with the specified ID exists in the cache.
-     *
-     * @param {*} id The object's ID
-     * @returns {boolean} True if the object exists.
-     */
-    has (id) {
-      if(!super.has(id))
-        return false
-      
-    let object = this.objects.get(id)
+  /**
+   * Returns true if the object with the specified ID exists in the cache.
+   *
+   * @param {*} id The object's ID
+   * @returns {boolean} True if the object exists.
+   */
+  has (id) {
 
+    // Check super implementation
+    if(!super.has(id))
+      return false
+      
     // Check if dropped
-    if (object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].dropped) {
+    let object = this.objects.get(id)
+    let props = object.data['vAtom::vAtomType'] || {}
+    if (props.dropped && props.geo_pos && props.geo_pos.coordinates && props.geo_pos.coordinates[0])
       return true
-    }
-    }
+
+  }
+
   /** Our state key is the region */
   get stateKey () {
     return 'geopos:' + this.coordinates.top_right.lat + ',' + this.coordinates.top_right.lon + ' ' + this.coordinates.bottom_left.lat + ',' + this.coordinates.bottom_left.lon
@@ -157,17 +165,21 @@ export default class GeoPosRegion extends BLOCKvRegion {
   /** This region type should not be cached */
   save () {}
 
-  /** Don't return vatoms which are not dropped */
+  /** Override to only return dropped vatoms */
   map (object) {
+
+    // Check FQDN filter
     if(this.coordinates.publisher_fqdn && object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].publisher_fqdn !== this.coordinates.publisher_fqdn)
       return null
       
     // Check if dropped
-    if (object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].dropped) {
+    let props = object.data['vAtom::vAtomType'] || {}
+    if (props.dropped && props.geo_pos && props.geo_pos.coordinates && props.geo_pos.coordinates[0])
       return super.map(object)
-    }
+    
     // Vatom is not dropped!
     return null
+
   }
 
   /**
