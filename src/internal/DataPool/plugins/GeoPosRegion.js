@@ -35,6 +35,9 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
     this.socket.addEventListener('connected', this.onWebSocketOpen)
 
+    // Start refresh timer
+    this.timer = setInterval(this.onTimer.bind(this), 30000)
+
   }
 
   /** Called when this region is going to be shut down */
@@ -44,11 +47,25 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
 
+    // Remove timer
+    clearInterval(this.timer)
+
+  }
+
+  /** Called on timer */
+  onTimer() {
+    this.forceSynchronize()
   }
 
   /** Called when the WebSocket connection re-opens */
   onWebSocketOpen () {
+
+    // Full refresh this region, in case any messages were missed
+    this.forceSynchronize()
+
+    // Send region command again
     this.sendRegionCommand()
+
   }
 
   /** Sends the region command up the websocket to enable region monitoring */
