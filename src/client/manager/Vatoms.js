@@ -10,6 +10,7 @@
 //
 
 import VatomApi from '../../internal/net/rest/api/VatomApi'
+import GeoPosRegion from '../../internal/DataPool/plugins/GeoPosRegion'
 export default class Vatoms {
   constructor (blockv) {
     this.Blockv = blockv
@@ -72,6 +73,8 @@ export default class Vatoms {
   }
 
   performAction (vatomId, action, payload) {
+
+    // Create pre-emptive action in DataPool for known actions
     let undos = []
     switch (action) {
       case 'Transfer':
@@ -95,10 +98,22 @@ export default class Vatoms {
         break
     }
 
+    // Perform the action
     return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId }, payload)).catch(err => {
+
+      // An error occurred, undo preemptive actions
       undos.map(u => u())
+
+      // Workaround: If error was an attempt to pick up a vatom but the vatom is already picked up, it's possible
+      // that the GeoPos region missed an update. Notify all GeoPos regions that this vatom is no longer available.
+      if (err.code == 1645)
+        this.Blockv.dataPool.regions.filter(r => r instanceof GeoPosRegion).forEach(r => r.preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false))
+
+      // Pass on the error
       throw err
+
     })
+
   }
 
   /** Called to combine the specified vatom into this one. Note that some faces override the Combine action,
