@@ -134,7 +134,7 @@ export default class Database {
 
         // Start a timer to save soon, unless one exists already
         if (!this.saveTimer)
-            this.saveTimer = setTimeout(this.save.bind(this), 5000)
+            this.saveTimer = setTimeout(this.save.bind(this), 2000)
 
         // Changes still occurring, schedule another save
         this.changesStillOccurring = true
