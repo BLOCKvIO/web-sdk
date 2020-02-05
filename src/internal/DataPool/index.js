@@ -69,4 +69,31 @@ export default class DataPool {
       r.onSessionInfoChanged(info)
     }
   }
+
+  /** Retrieve information about storage etc */
+  stats() {
+
+    // Calculate size of local storage
+    let sizeBytes = 0
+    for (let key in localStorage)
+      if (key.startsWith('sync.'))
+        sizeBytes += localStorage[key].length
+
+    // Done
+    return {
+      estimatedSize: sizeBytes
+    }
+
+  }
+
+  /** Clear cached items */
+  clearCache() {
+
+    // Remove local storage cached items
+    for (let key in localStorage)
+      if (key.startsWith('sync.'))
+        localStorage.removeItem(key)
+
+  }
+
 }

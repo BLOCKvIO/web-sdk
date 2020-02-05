@@ -5,7 +5,7 @@ import Filter from './Filter'
 import LZString from 'lz-string'
 import { merge, get, set } from 'lodash'
 import Delayer from './Delayer'
-import DatabaseMap from './DatabaseMap'
+import LocalStorageMap from './LocalStorageMap'
 
 /**
  * Base class for a region.
@@ -46,7 +46,7 @@ export default class Region extends EventEmitter {
       return this._objects
 
     // Create DB
-    this._objects = new DatabaseMap(this.stateKey, this.noCache)
+    this._objects = new LocalStorageMap(this.stateKey, this.noCache)
     return this._objects
 
   }
@@ -104,14 +104,21 @@ export default class Region extends EventEmitter {
 
     // If the subclass load() returned an array of IDs, we can remove everything which is not in that list.
     if (loadedIDs && typeof loadedIDs.length === 'number') {
+
       let keysToRemove = []
       for (let id of this.objects.keys()) {
+
+        // Skip 'extra' keys used internally for sync state vars
+        if (id.startsWith('extra:')) continue
+
         // Check if it's in our list
         if (!loadedIDs.includes(id)) { keysToRemove.push(id) }
+
       }
 
       // Remove vatoms
       this.removeObjects(keysToRemove)
+      
     }
 
     // All data is up to date!
