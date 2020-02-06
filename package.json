@@ -78,6 +78,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
     "lz-string": "^1.4.4",
+    "lzutf8": "^0.5.5",
     "pouchdb": "^7.1.1",
     "url-parse": "^1.4.7"
   },

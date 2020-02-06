@@ -3,7 +3,7 @@ import PouchDB from 'pouchdb'
 import DataObject from './DataObject'
 
 /** 
- * A version of the built-in Map class, but which synchronizes to a local database of offline access. Key must be a string,
+ * A version of the built-in Map class, but which synchronizes to a local database for offline access. Key must be a string,
  * and value must be a DataObject.
  */
 export default class Database {
@@ -244,11 +244,9 @@ export default class Database {
     /** Set a string extra */
     setExtra(key, value) {
 
-        // Set item
-        this.set('extra:' + key, {
-            type: '_extra',
-            data: value
-        })
+        // Set item if it's changed
+        if (this.getExtra(key) != value)
+            this.set('extra:' + key, { type: '_extra', data: value })
 
     }
 
