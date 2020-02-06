@@ -44,7 +44,7 @@ export default class InventoryRegion extends BLOCKvRegion {
    * 3. For all vatoms in our db which is not returned by /sync, remove
    * 4. For all vatoms which are not in our dbb, or whose sync number is different, fetch via individual GET (batched)
    * 
-   * If at any point the above process throws an error, fall back to the old approach:
+   * If at any point the above process throws an error, fall back to the v1 approach:
    * 
    * 1. Fetch all vatoms from the /inventory API
    * 2. For any vatoms in our db not returned by /inventory, remove
@@ -59,13 +59,16 @@ export default class InventoryRegion extends BLOCKvRegion {
     try {
 
       // Load via new method
-      ids = await this.loadNew()
+      await this.loadV2()
+
+      // Synchronize faces and actions
+      await this.loadV2FacesActions()
 
     } catch (err) {
 
-      // Failed! Try via the old method
+      // Failed! Try via the v1 method
       console.warn('[DataPool > InventoryRegion] Unable to sync via the new method! Attempting the old method now. Reason:', err)
-      ids = await this.loadOld()
+      ids = await this.loadV1()
 
     }
 
@@ -75,7 +78,121 @@ export default class InventoryRegion extends BLOCKvRegion {
 
   }
 
-  async loadNew() {
+  /** Fetches changed faces and actions since the last vatom was modified. */
+  async loadV2FacesActions() {
+
+    // Get details
+    let templateIDs = []
+    let lastStableSync = this.objects.getExtra('last-stable-sync')
+    for (let vatom of this.get(false))
+      if (!templateIDs.includes(vatom.properties.template))
+        templateIDs.push(vatom.properties.template)
+
+    console.debug(`[DataPool > InventoryRegion] Synchronizing faces using v2 method... Starting from date ${new Date(lastStableSync).toLocaleString()} and using ${templateIDs.length} templates.`)
+
+    // Server only supports a few at a time, so batch these.
+    // Convert the server's data to an array of:
+    //
+    // { 
+    //     operation: "create" | "update" | "delete",
+    //     type: "face" | "action",
+    //     id: "...",
+    //     template: "...",
+    //     data: {...}
+    // }
+    // 
+    let maxPerRequest = 100
+    let allChanges = []
+    for (let i = 0 ; i < templateIDs.length ; i += maxPerRequest) {
+
+      // Load next page
+      let data = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/actions/changes', {
+        templates: templateIDs.slice(i, Math.min(i + maxPerRequest, templateIDs.length)),
+        since: lastStableSync
+      }, true)
+
+      // Add changes for each key
+      for (let templateID in data.actions_changes)
+        for (let change of data.actions_changes[templateID])
+          allChanges.push({ operation: change.operation, template: templateID, id: change.action.name, type: "action", data: change.action })
+
+      console.debug(`[DataPool > InventoryRegion] Fetched action changes for templates ${i} to ${Math.min(i + maxPerRequest, templateIDs.length)}`)
+
+    }
+    
+    for (let i = 0 ; i < templateIDs.length ; i += maxPerRequest) {
+
+      // Load next page
+      let data = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/faces/changes', {
+        templates: templateIDs.slice(i, Math.min(i + maxPerRequest, templateIDs.length)),
+        since: lastStableSync
+      }, true)
+
+      // Add changes for each key
+      for (let templateID in data.faces_changes)
+        for (let change of data.faces_changes[templateID])
+          allChanges.push({ operation: change.operation, template: templateID, id: change.face.id, type: "face", data: change.face })
+
+      console.debug(`[DataPool > InventoryRegion] Fetched face changes for templates ${i} to ${Math.min(i + maxPerRequest, templateIDs.length)}`)
+
+    }
+
+    // Apply changes
+    console.debug(`[DataPool > InventoryRegion] Applying ${allChanges.length} face/action changes`)
+    let clearCacheForTemplates = []
+    for (let change of allChanges) {
+
+      // Check if delete or update
+      if (change.operation == 'delete') {
+
+        // Remove it
+        console.log('Removing ' + change.id)
+        this.removeObjects([change.id])
+
+      } else {
+
+        // Create or update it
+        console.log('Creating or updating ' + change.id)
+        this.addObjects([new DataObject(change.type, change.id, change.data)])
+
+      }
+
+      // Add template
+      if (!clearCacheForTemplates.includes(change.template))
+        clearCacheForTemplates.push(change.template)
+
+    }
+
+    // Clear cache for all affected vatoms
+    for (let object of this.objects.values()) {
+
+      // Skip if not modified
+      let objectTemplate = object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].template
+      if (!clearCacheForTemplates.includes(objectTemplate))
+        continue
+
+      // Stop if no cached vatom
+      if (!object.cached)
+        continue
+        
+      // Remove cached vatom and notify
+      object.cached = null
+      this.emit('object.updated', object.id)
+
+    }
+
+    // Notify region updated, if there were changes
+    if (clearCacheForTemplates.length > 0) {
+      this.emit('updated')
+    }
+    
+    // Store latest sync date
+    this.objects.setExtra('last-stable-sync', Date.now())
+
+  }
+
+  /** Synchronize inventory using the v2 sync method, ie checking the hash, using sync numbers, etc. */
+  async loadV2() {
 
     // Check SDK config to see if the new sync method is disabled
     if (this.dataPool.disableSyncV2)
@@ -85,6 +202,11 @@ export default class InventoryRegion extends BLOCKvRegion {
     if (!Array.from(this.objects.values()).find(obj => obj.type == 'vatom'))
       throw new Error(`V2 synchronization is disabled if the inventory is empty, since it's faster to use the old method for initial sync.`)
 
+    // Stop if faces and actions sync date has not bee set
+    let lastStableSync = this.objects.getExtra('last-stable-sync')
+    if (!lastStableSync)
+      throw new Error(`V2 synchronization is disabled, since we don't know when the last stable sync was.`)
+
     // Get current inventory hash and compare with server's
     let currentHash = this.objects.getExtra('hash')
     let serverHashReq = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/hash', null, true)
@@ -92,7 +214,7 @@ export default class InventoryRegion extends BLOCKvRegion {
       throw new Error('The server did not return a hash for our current inventory.')
     if (currentHash && currentHash == serverHashReq.hash)
       return console.log('[DataPool > InventoryRegion] Sync complete, our hash matches the server, no changes needed.')
-
+    
     // We are not in sync with the server. Fetch all vatom IDs and their sync numbers
     var allSyncs = []
     var page = 0
@@ -168,12 +290,14 @@ export default class InventoryRegion extends BLOCKvRegion {
 
   }
 
-  async loadOld() {
+  /** Synchronize inventory using the v1 method, ie fetching everything using /user/vatom/inventory. */
+  async loadV1() {
 
     // Go through all pages on the server, we want _everything_
     let pageCount = 1
     let loadedIDs = []
     while (true) {
+      
       // Fetch all vatoms the user owns, via a Discover call
       console.debug(`[DataPool > InventoryRegion] Fetching owned vatoms, page ${pageCount}...`)
       let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/inventory', { 
@@ -214,8 +338,12 @@ export default class InventoryRegion extends BLOCKvRegion {
       }
     }
 
+    // We have completed a full sync! Store this date.
+    this.objects.setExtra('last-stable-sync', Date.now())
+
     // Return array of all items
     return loadedIDs
+
   }
 
   /** @override Called on WebSocket message. */
