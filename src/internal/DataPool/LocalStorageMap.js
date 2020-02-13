@@ -21,45 +21,66 @@ export default class Database {
 
      /** Load documents from storage. This must be called before the map can be used correctly. */
      async load() {
-
+        
         // Only do once
         if (this.loaded) return
         this.loaded = true
 
-        // Stop if no store
-        if (this.noStore)
-            return
+        try {
 
-        // Fetch compressed data
-        let compressed = localStorage['sync.' + this.id]
-        if (!compressed)
-            return
+            // Stop if no store
+            if (this.noStore)
+                return
 
-        // Apply worker script
-        LZUTF8.WebWorker.scriptURI = LZUTF8WorkerScript
+            // Fetch compressed data
+            let compressed = localStorage['sync.' + this.id]
+            if (!compressed)
+                return
 
-        // Decompress it
-        // TODO: Ensure it's using a worker
-        let startTime = Date.now()
-        let uncompressed = await new Promise((resolve, reject) => {
-            LZUTF8.decompressAsync(compressed, { inputEncoding: "StorageBinaryString" }, (result, error) => {
-                if (error) reject(error)
-                else resolve(result)
+            // Apply worker script if possible
+            if (window.Blob && window.URL && window.Worker) {
+
+                // Worker available
+                let blob = new Blob([LZUTF8WorkerScript])
+                let url = URL.createObjectURL(blob)
+                LZUTF8.WebWorker.scriptURI = url
+
+            } else {
+
+                // Worker not available
+                console.warn(`[DataPool > LocalStorageMap] Web worker unavailable, app performance may suffer while saving or loading.`)
+
+            }
+
+            // Decompress it
+            // TODO: Ensure it's using a worker
+            let startTime = Date.now()
+            let uncompressed = await new Promise((resolve, reject) => {
+                LZUTF8.decompressAsync(compressed, { inputEncoding: "StorageBinaryString" }, (result, error) => {
+                    if (error) reject(error)
+                    else resolve(result)
+                })
             })
-        })
 
-        // Store each item in the memory cache
-        let rows = JSON.parse(uncompressed)
-        for (let row of rows) {
+            // Store each item in the memory cache
+            let rows = JSON.parse(uncompressed)
+            for (let row of rows) {
 
-            // Create and cache the DataObject
-            let obj = new DataObject(row.type, row.id, row.data)
-            this.cache.set(row.id, obj)
+                // Create and cache the DataObject
+                let obj = new DataObject(row.type, row.id, row.data)
+                this.cache.set(row.id, obj)
+
+            }
+
+            // Done!
+            console.debug(`[DataPool > LocalStorageMap] Loaded ${rows.length} items from ${Math.floor(uncompressed.length / 1024)} KB of data (from ${Math.floor(compressed.length / 1024)} KB compressed) in ${Date.now() - startTime} ms`)
+
+        } catch (err) {
+
+            // Failed to load cached items
+            console.warn(`[DataPool > LocalStorageMap] Unable to load cached items: ${err.message}`)
 
         }
-
-        // Done!
-        console.debug(`[DataPool > LocalStorageMap] Loaded ${rows.length} items from ${Math.floor(uncompressed.length / 1024)} KB of data (from ${Math.floor(compressed.length / 1024)} KB compressed) in ${Date.now() - startTime} ms`)
 
     }
 
@@ -132,12 +153,21 @@ export default class Database {
     /** @private Save changes soon */
     saveSoon() {
 
-        // Start a timer to save soon, unless one exists already
-        if (!this.saveTimer)
-            this.saveTimer = setTimeout(this.save.bind(this), 2000)
+        // If web workers are supported, save as quick as possible. If not, add a delay to prevent freezing the browser main thread.
+        let saveInterval = window.Worker ? 100 : 2000
 
-        // Changes still occurring, schedule another save
-        this.changesStillOccurring = true
+        // Start a timer to save soon, unless one exists already
+        if (!this.saveTimer) {
+
+            // Create save timer
+            this.saveTimer = setTimeout(this.save.bind(this), saveInterval)
+
+        } else {
+
+            // Changes still occurring, schedule another save
+            this.changesStillOccurring = true
+
+        }
 
     }
 
@@ -170,7 +200,6 @@ export default class Database {
             })
             let uncompressed = JSON.stringify(items)
 
-
             // Compress it
             let compressed = await new Promise((resolve, reject) => {
                 LZUTF8.compressAsync(uncompressed, { outputEncoding: "StorageBinaryString" }, (result, error) => {
@@ -194,6 +223,12 @@ export default class Database {
 
         // Remove save timer
         this.saveTimer = null
+
+        // If changes occurred during the save, save again
+        if (this.changesStillOccurring) {
+            this.changesStillOccurring = false
+            this.saveSoon()
+        }
 
     }
 
