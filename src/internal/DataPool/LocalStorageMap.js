@@ -33,34 +33,34 @@ export default class Database {
                 return
 
             // Fetch compressed data
-            let compressed = localStorage['sync.' + this.id]
-            if (!compressed)
+            let uncompressed = localStorage['sync.' + this.id]
+            if (!uncompressed)
                 return
 
             // Apply worker script if possible
-            if (window.Blob && window.URL && window.Worker) {
+            // if (window.Blob && window.URL && window.Worker) {
 
-                // Worker available
-                let blob = new Blob([atob(LZUTF8WorkerScript)])
-                let url = URL.createObjectURL(blob)
-                LZUTF8.WebWorker.scriptURI = url
+            //     // Worker available
+            //     let blob = new Blob([atob(LZUTF8WorkerScript)])
+            //     let url = URL.createObjectURL(blob)
+            //     LZUTF8.WebWorker.scriptURI = url
 
-            } else {
+            // } else {
 
-                // Worker not available
-                console.warn(`[DataPool > LocalStorageMap] Web worker unavailable, app performance may suffer while saving or loading.`)
+            //     // Worker not available
+            //     console.warn(`[DataPool > LocalStorageMap] Web worker unavailable, app performance may suffer while saving or loading.`)
 
-            }
+            // }
 
             // Decompress it
             // TODO: Ensure it's using a worker
             let startTime = Date.now()
-            let uncompressed = await new Promise((resolve, reject) => {
-                LZUTF8.decompressAsync(compressed, { inputEncoding: "StorageBinaryString" }, (result, error) => {
-                    if (error) reject(error)
-                    else resolve(result)
-                })
-            })
+            // let uncompressed = await new Promise((resolve, reject) => {
+            //     LZUTF8.decompressAsync(compressed, { inputEncoding: "StorageBinaryString" }, (result, error) => {
+            //         if (error) reject(error)
+            //         else resolve(result)
+            //     })
+            // })
 
             // Store each item in the memory cache
             let rows = JSON.parse(uncompressed)
@@ -73,7 +73,7 @@ export default class Database {
             }
 
             // Done!
-            console.debug(`[DataPool > LocalStorageMap] Loaded ${rows.length} items from ${Math.floor(uncompressed.length / 1024)} KB of data (from ${Math.floor(compressed.length / 1024)} KB compressed) in ${Date.now() - startTime} ms`)
+            console.debug(`[DataPool > LocalStorageMap] Loaded ${rows.length} items from ${Math.floor(uncompressed.length / 1024)} KB of data in ${Date.now() - startTime} ms`)
 
         } catch (err) {
 
@@ -201,18 +201,19 @@ export default class Database {
             let uncompressed = JSON.stringify(items)
 
             // Compress it
-            let compressed = await new Promise((resolve, reject) => {
-                LZUTF8.compressAsync(uncompressed, { outputEncoding: "StorageBinaryString" }, (result, error) => {
-                    if (error) reject(error)
-                    else resolve(result)
-                })
-            })
+            // let compressed = await new Promise((resolve, reject) => {
+            //     LZUTF8.compressAsync(uncompressed, { outputEncoding: "StorageBinaryString" }, (result, error) => {
+            //         if (error) reject(error)
+            //         else resolve(result)
+            //     })
+            // })
 
             // Save to storage
-            localStorage['sync.' + this.id] = compressed
+            localStorage.removeItem('sync.' + this.id)
+            localStorage.setItem('sync.' + this.id, uncompressed)
 
             // Done!
-            console.debug(`[DataPool > LocalStorageMap] Saved ${items.length} items, using ${Math.floor(compressed.length / 1024)} KB of data (${Math.floor(uncompressed.length / 1024)} KB uncompressed) in ${Date.now() - startedAt} ms`)
+            console.debug(`[DataPool > LocalStorageMap] Saved ${items.length} items, using ${Math.floor(uncompressed.length / 1024)} KB of data in ${Date.now() - startedAt} ms`)
 
         } catch (err) {
 
