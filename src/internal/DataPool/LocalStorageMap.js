@@ -41,7 +41,7 @@ export default class Database {
             if (window.Blob && window.URL && window.Worker) {
 
                 // Worker available
-                let blob = new Blob([LZUTF8WorkerScript])
+                let blob = new Blob([atob(LZUTF8WorkerScript)])
                 let url = URL.createObjectURL(blob)
                 LZUTF8.WebWorker.scriptURI = url
 
