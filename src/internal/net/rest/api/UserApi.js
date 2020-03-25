@@ -154,11 +154,11 @@ export default class UserApi {
 
   /**
    * Gets a list of the current users tokens
-   * @return JSON Object
+   * @return {Promise<object[]>} Array of token objects
    */
 
   getUserTokens () {
-    return this.client.request('GET', '/v1/user/tokens', '', true)
+    return this.client.request('GET', '/v1/user/tokens', '', true).then(v => v || [])
   }
 
   /**
