@@ -99,6 +99,8 @@ export default class BaseWebFace extends BaseFace {
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
         return this.BridgeV2.encodeResource(payload)
+      case 'core.inventory.stats':
+        return this.BridgeV2.inventoryStats(payload)
       default:
         // Unknown event. Pass on to VatomView listener
         if (this.vatomView && this.vatomView.onMessage) {

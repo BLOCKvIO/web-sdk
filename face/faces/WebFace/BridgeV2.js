@@ -136,4 +136,18 @@ export default class BridgeV2 {
     }
   }
 
+  /** Fetches information about the inventory */
+  inventoryStats(payload) {
+
+    // Get variations
+    let template_variations = payload.template_variations || []
+
+    // Ensure only template variations with the same FQDN as this vatom are allowed
+    template_variations = template_variations.filter(tv => tv.startsWith(this.vatom['vAtom::vAtomType'].publisher_fqdn + ':'))
+
+    // Call it
+    return this.blockv.client.request('POST', '/v1/user/vatom/inventorystats', { template_variations }, true)
+
+  }
+
 }
