@@ -79,7 +79,7 @@ export default class Client extends EventEmitter {
   async authRequest (method, endpoint, payload, headers) {
     
     // Send request start event
-    let t0 = performance.now();
+    let t0 = Date.now();
     let statekey = Math.random().toString(36).substr(2)
     this.emit('requestTimerStart', {
       url: this.store.server + endpoint,
@@ -119,7 +119,7 @@ export default class Client extends EventEmitter {
       json = await response.json()
 
       // Send timing event
-      var t1 = performance.now();
+      var t1 = Date.now();
       this.emit('requestTimerEnd', {
         url: this.store.server + endpoint,
         method,
@@ -131,7 +131,7 @@ export default class Client extends EventEmitter {
     } catch (err) {
 
       // Request failed, send timing event
-      var t1 = performance.now();
+      var t1 = Date.now();
       this.emit('requestTimerEnd', {
         url: this.store.server + endpoint,
         method,
