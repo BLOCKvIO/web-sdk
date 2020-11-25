@@ -12,7 +12,7 @@
 import EventEmitter from '../../internal/EventEmitter'
 
 export default class WebSockets extends EventEmitter {
-  constructor (store, client, address) {
+  constructor(store, client, address) {
     super()
     this.store = store
     this.client = client
@@ -29,7 +29,7 @@ export default class WebSockets extends EventEmitter {
   }
 
   /** This will be true if the connection is ready to send and receive messages */
-  get isOpen () {
+  get isOpen() {
     return this.socket && this.socket.readyState === 1
   }
 
@@ -38,7 +38,7 @@ export default class WebSockets extends EventEmitter {
    * @public
    * @return {Promise<WebSockets>}
    */
-  async connect () {
+  async connect() {
     // Stay connected after this point
     this.shouldRetry = true
 
@@ -77,7 +77,7 @@ export default class WebSockets extends EventEmitter {
    * This sends a message through the web socket
    * @param {*} cmd
    */
-  sendMessage (cmd) {
+  sendMessage(cmd) {
     if (this.socket && this.socket.readyState === 1) {
       this.socket.send(JSON.stringify(cmd))
     } else {
@@ -92,7 +92,7 @@ export default class WebSockets extends EventEmitter {
    * @param  {JSON<Object>} e A JSON Object that is passed into the function from connect()
    * @return {JSON<Object>}  A JSON Object is returned containing the list of chosen message types
    */
-  handleMessage (e) {
+  handleMessage(e) {
     const ed = JSON.parse(e.data)
     this.trigger('websocket.raw', ed)
 
@@ -131,7 +131,7 @@ export default class WebSockets extends EventEmitter {
    * @param  {Event<SocketStatus>} e no need for inputting the parameter
    * @return {Function<connected>} triggers the connected function
    */
-  handleConnected (e) {
+  handleConnected(e) {
     this.delayTime = 1000
     this.trigger('connected', e)
   }
@@ -142,7 +142,7 @@ export default class WebSockets extends EventEmitter {
    * @private
    * @return {Promise<WebSockets>} returns the connection function
    */
-  retryConnection () {
+  retryConnection() {
     // Clear previous retry timer
     if (this.retryTimer) {
       clearTimeout(this.retryTimer)
@@ -159,8 +159,8 @@ export default class WebSockets extends EventEmitter {
       }
 
       // Increase retry delay for next time
-      if (this.delayTime < 8000) {
-        this.delayTime *= 2
+      if (this.delayTime < 4000) {
+        this.delayTime += 1000
       }
 
       // connect again
@@ -173,7 +173,7 @@ export default class WebSockets extends EventEmitter {
    * @private
    * @param {Error} err The error that happened
    */
-  handleError (err) {
+  handleError(err) {
     this.socket = null
     console.warn('[WebSocket] Connection failed: ' + err.message)
   }
@@ -183,7 +183,7 @@ export default class WebSockets extends EventEmitter {
    * @private
    * @param  {Event} e no need for inputting, It is a Websocket Event
    */
-  handleClose () {
+  handleClose() {
     this.socket = null
     this.retryConnection()
   }
@@ -193,7 +193,7 @@ export default class WebSockets extends EventEmitter {
    * Forcefully closes the Web socket.
      Note: Socket will be set to null. Auto connect will be disabled.
    */
-  close () {
+  close() {
     // Prevent retrying
     this.shouldRetry = false
 
