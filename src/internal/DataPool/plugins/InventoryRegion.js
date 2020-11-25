@@ -19,11 +19,22 @@ export default class InventoryRegion extends BLOCKvRegion {
     }
     // Store current user ID
     this.currentUserID = this.dataPool.sessionInfo.userID
+
+    // Listen for events
+    this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
+    this.socket.addEventListener('connected', this.onWebSocketOpen)
   }
 
   /** Our state key is the current user's ID */
   get stateKey () {
     return 'inventory:' + this.currentUserID
+  }
+
+  /** Called when this region is going to be shut down */
+  close () {
+    super.close()
+    // Remove listeners
+    this.socket.removeEventListener('connected', this.onWebSocketOpen)
   }
 
   /** There should only be one inventory region */
@@ -51,7 +62,6 @@ export default class InventoryRegion extends BLOCKvRegion {
    * 
    */
   async load () {
-
     // Pause websocket events
     this.pauseMessages()
 
@@ -76,6 +86,12 @@ export default class InventoryRegion extends BLOCKvRegion {
     this.resumeMessages()
     return ids
 
+  }
+
+  /** Called when the WebSocket connection re-opens */
+  onWebSocketOpen () {
+    // Full refresh this region, in case any messages were missed
+    this.forceSynchronize()
   }
 
   /** Fetches changed faces and actions since the last vatom was modified. */
