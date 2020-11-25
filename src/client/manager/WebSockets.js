@@ -159,8 +159,8 @@ export default class WebSockets extends EventEmitter {
       }
 
       // Increase retry delay for next time
-      if (this.delayTime < 8000) {
-        this.delayTime *= 2
+      if (this.delayTime < 4000) {
+        this.delayTime += 1000
       }
 
       // connect again
