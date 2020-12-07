@@ -156,7 +156,6 @@ export default class WebSockets extends EventEmitter {
   handleConnected(e) {
     this.delayTime = 1000
     this.trigger('connected', e, this.id)
-    console.log("websocekt connected " + this.id);
     this.sendNextCommand();
   }
 
