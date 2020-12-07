@@ -12,30 +12,23 @@
 import VatomApi from '../../internal/net/rest/api/VatomApi'
 import GeoPosRegion from '../../internal/DataPool/plugins/GeoPosRegion'
 export default class Vatoms {
-  constructor (blockv) {
+  constructor(blockv) {
     this.Blockv = blockv
     this.vatomApi = new VatomApi(blockv.client)
   }
 
-  /**
-   * Returns a list of actions that can be performed on a template
-   * @param  {[String]} templateID Template ID is the vAtom template iD
-   * @return {[Promise<Object>]} returns a object containing a list of available actions
-   */
-
-  getActions (templateID) {
-    return this.vatomApi.getActions(templateID)
+  getActions(vatom) {
+    return this.vatomApi.getActions(vatom.properties.template_variation, vatom.platformId)
   }
-
   /**
    * [performAction description]
-   * @param  {String} vatomId id of the vatom to perform action
+   * @param  {String} vatom the vatom to perform action
    * @param  {String} action  can be either of the following : Drop, Pickup , Transfer , Require
    * @param  {Object} payload contains geo-coordianates or anything else sent along with vatomid
    * @return {Promise<Object>}   json payload nested
    */
 
-  transferTo (user, actionName = 'Transfer', vatomId) {
+  transferTo(user, actionName = 'Transfer', vatom) {
     // Check if user is a VatomUser
     var payload = {}
     if (typeof user === 'string') {
@@ -69,10 +62,10 @@ export default class Vatoms {
     }
 
     // Send request
-    return this.performAction(vatomId, actionName, payload)
+    return this.performAction(vatom, actionName, payload)
   }
 
-  performAction (vatomId, action, payload) {
+  performActionById(vatomId, platformId, action, payload) {
 
     // Create pre-emptive action in DataPool for known actions
     let undos = []
@@ -99,7 +92,7 @@ export default class Vatoms {
     }
 
     // Perform the action
-    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId }, payload)).catch(err => {
+    return this.vatomApi.performAction(action, Object.assign({ 'this.id': vatomId }, payload), platformId).catch(err => {
 
       // An error occurred, undo preemptive actions
       undos.map(u => u())
@@ -115,14 +108,18 @@ export default class Vatoms {
     })
 
   }
+  performAction(vatom, action, payload) {
+
+    return this.performActionById(vatom.id, vatom.platformId, action, payload)
+  }
 
   /** Called to combine the specified vatom into this one. Note that some faces override the Combine action,
    *  so in order to get those actions as well you should use `combineWith()` on `VatomView` instead. */
-  combineWith (vatom, otherVatom) {
+  combineWith(vatom, otherVatom) {
     // Pre-emptively set the parent ID
     let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(otherVatom.id, 'vAtom::vAtomType.parent_id', vatom.id)
     // Set parent
-    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [otherVatom.id], parent_id: vatom.id }, true).catch(err => {
+    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [otherVatom.id], parent_id: vatom.id }, true, undefined, vatom.platformId).catch(err => {
       // Failed, reset vatom reference
       undo()
       throw err
@@ -130,17 +127,17 @@ export default class Vatoms {
   }
 
   /** Called to remove all child vatoms from this vatom */
-  split (vatom) {
+  split(vatom) {
     // Get vatom's parent ID
-    let newParentID = vatom.properties.parent_id || '.'
+    let parentId = vatom.properties.parent_id || '.'
     // Get all children
     return this.getVatomChildren(vatom.id).then(children => {
       // Remove parent IDs
       return Promise.all(children.map(child => {
         // Pre-emptively update parent ID
-        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', newParentID)
+        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', parentId)
         // Do patch
-        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: newParentID }, true).catch(err => {
+        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: parentId }, true, undefined, vatom.platformId).catch(err => {
           // Failed, reset vatom reference
           undo()
           throw err
@@ -155,7 +152,7 @@ export default class Vatoms {
    * No parameters are required for this call
    */
 
-  getUserInventory () {
+  getUserInventory() {
     return this.Blockv.dataPool.region('inventory').get()
   }
 
@@ -165,7 +162,7 @@ export default class Vatoms {
    * @return {[Promise<Object>} returns a JSON Object containing the vAtom.
    */
 
-  async getUserVatoms (vatomIds) {
+  async getUserVatoms(vatomIds) {
     // Make sure it's an array
     if (typeof vatomIds === 'string') {
       vatomIds = [vatomIds]
@@ -197,7 +194,7 @@ export default class Vatoms {
    * @param  {[String]} filter     defaults to "all"
    * @return {[Promise<Object>}  returns a list of vAtoms, faces and actions
    */
-  geoDiscover (bottomLeft, topRight, filter = 'vatoms') {
+  async geoDiscover(bottomLeft, topRight, filter = 'vatoms') {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
@@ -210,7 +207,14 @@ export default class Vatoms {
       filter
     }
 
-    return this.vatomApi.geoDiscover(payload)
+    const platformIds = await this.Blockv.getPlatformIds();
+    let vatomsArray = []
+    for (let platformId of platformIds) {
+      const result = await this.vatomApi.geoDiscover(payload, platformId);
+      vatomsArray = vatomsArray.concat(result)
+    }
+
+    return vatomsArray;
   }
 
   /**
@@ -223,7 +227,7 @@ export default class Vatoms {
    * @param  {String} filter     defaults to all
    * @return {Promise<Object>}   Returns a list of groups
    */
-  geoDiscoverGroups (bottomLeft, topRight, precision = 2, filter = 'all') {
+  async geoDiscoverGroups(bottomLeft, topRight, precision = 2, filter = 'all') {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
@@ -236,19 +240,29 @@ export default class Vatoms {
       precision,
       filter
     }
-
-    return this.vatomApi.geoDiscoverGroups(payload)
+    let groups = [];
+    const platformIds = await this.Blockv.getPlatformIds();
+    for (let platformId of platformIds) {
+      const result = await this.vatomApi.geoDiscoverGroups(payload, platformId);
+      if (result.groups) {
+        groups.forEach(group => {
+          group.platform = platformId;
+          groups.push(group);
+        })
+      }
+    }
+    return groups;
   }
 
   /**
    *
-   * @param {String} parentID   ID of the vatom that you would like to list the children
+   * @param {String} parent the vatom that you would like to list the children
    * @returns {Promise<Vatom[]>} Array of vatoms
    */
-  getVatomChildren (parentID) {
+  getVatomChildren(parent) {
 
     // Check if vatom is in the inventory
-    if (this.Blockv.dataPool.region('inventory').has(parentID)) {
+    if (this.Blockv.dataPool.region('inventory').has(parent.id)) {
 
       // It is, read children from inventory region
       return this.Blockv.dataPool.region('inventory').get().then(children => {
@@ -258,17 +272,17 @@ export default class Vatoms {
     }
 
     // Not in inventory region, read from API
-    return this.vatomApi.getVatomChildren(parentID)
-    
+    return this.vatomApi.getVatomChildren(parent.id, parent.platformId)
+
   }
 
-  setParentID(childID, newParentID) {
+  setParentID(vatom, parentId) {
 
     // Pre-emptively update parent ID
-    let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(childID, 'vAtom::vAtomType.parent_id', newParentID)
+    let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.parent_id', parentId)
 
     // Do patch
-    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [childID], parent_id: newParentID }, true).catch(err => {
+    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [vatom.id], parent_id: parentId }, true, undefined, vatom.platformId).catch(err => {
 
       // Failed, reset vatom reference
       undo()
@@ -283,23 +297,23 @@ export default class Vatoms {
    * @param {*} vatomIds Array of vatoms that will be changed 
    * @param {*} parentId ID or . to set the children to
    */
-  setParent (payload) {
+  setParent(payload, platformId) {
     let parentPayload = {
       ids: [payload.id],
       parent_id: payload.parent_id
     }
-    return this.vatomApi.setParent(parentPayload)
+    return this.vatomApi.setParent(parentPayload, platformId)
   }
 
   /**
    * Removes the specified vAtom from the current user's inventory
-   * @param  {String} vatomID  Id of the vAtom you want to remove
+   * @param  {String} vatom the vAtom you want to remove
    * @return {Promise<Object>} An object containing a success message
    */
-  trashVatom (vatomID) {
+  trashVatom(vatom) {
     let undos = []
-    undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomID, 'vAtom::vAtomType.owner', '.'))
-    return this.vatomApi.trashVatom(vatomID).catch(err => {
+    undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.owner', '.'))
+    return this.vatomApi.trashVatom(vatom.id, vatom.platformId).catch(err => {
       undos.map(u => u())
       throw err
     })

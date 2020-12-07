@@ -1,7 +1,6 @@
 /* gloabl Events */
-import BLOCKvRegion from './BLOCKvRegion'
-import DataObject from '../DataObject'
-import Events from '../EventEmitter'
+import BLOCKvRegion from '../BLOCKvRegion'
+import DataObject from '../../DataObject'
 
 /**
  * This region plugin provides access to a collection of vatoms that has been dropped within the specified region on the map.
@@ -11,22 +10,21 @@ import Events from '../EventEmitter'
 export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Plugin ID */
-  static get id () { return 'geopos' }
+  static get id() { return 'geopos-' + this.platformId }
 
   /** Constructor */
-  constructor (dataPool, coordinates) {
-    super(dataPool)
+  constructor(dataPool, platformId, config) {
+    super(dataPool, platformId)
 
+    console.log(config);
+    this.matches = config.matches;
     // Don't cache this content
     this.noCache = true
 
-    // Fail if coordinates are invalid
-    if (!coordinates || !coordinates.top_right || !coordinates.top_right.lat || !coordinates.top_right.lon || !coordinates.bottom_left || !coordinates.bottom_left.lat || !coordinates.bottom_left.lon) {
-      throw new Error('Please specify the top_right and bottom_left coordinates in the region descriptor.')
-    }
+    // Store geo hash
+    this.geoHash = config.geoHash;
 
-    // Store coordinates
-    this.coordinates = coordinates
+    this.fqdn = config.fqdn;
 
     // Send region command to the WebSocket
     this.sendRegionCommand()
@@ -35,54 +33,39 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
     this.socket.addEventListener('connected', this.onWebSocketOpen)
 
-    // Start refresh timer
-    this.timer = setInterval(this.onTimer.bind(this), 30000)
-
   }
 
   /** Called when this region is going to be shut down */
-  close () {
+  close() {
     super.close()
 
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
 
-    // Remove timer
-    clearInterval(this.timer)
-
-  }
-
-  /** Called on timer */
-  onTimer() {
-    this.forceSynchronize()
   }
 
   /** Called when the WebSocket connection re-opens */
-  onWebSocketOpen () {
+  onWebSocketOpen(_, id) {
+    if (!this.platformId || id === this.platformId) {
 
-    // Full refresh this region, in case any messages were missed
-    this.forceSynchronize()
+      // Full refresh this region, in case any messages were missed
+      this.forceSynchronize()
 
-    // Send region command again
-    this.sendRegionCommand()
-
+      // Send region command again
+      this.sendRegionCommand()
+    }
   }
 
   /** Sends the region command up the websocket to enable region monitoring */
-  sendRegionCommand () {
+  sendRegionCommand() {
 
-    // Stop if WebSocket is not connected
-    if (!this.socket.isOpen)
-      return
-
-    // Convert our coordinates into the ones needed by the command
-    let topLeft = {
-      lat: Math.max(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
-      lon: Math.min(this.coordinates.top_right.lon, this.coordinates.bottom_left.lon)
+    if (this.geoHash.length < 4) {
+      console.warn('Region is to large to monitor ' + this.geoHash);
+      return;
     }
-    let bottomRight = {
-      lat: Math.min(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
-      lon: Math.max(this.coordinates.top_right.lon, this.coordinates.bottom_left.lon)
+    if (this.geoHash.length > 8) {
+      console.warn('Region is to small to monitor ' + this.geoHash);
+      return;
     }
 
     // Create command payload
@@ -92,15 +75,11 @@ export default class GeoPosRegion extends BLOCKvRegion {
       type: 'command',
       cmd: 'monitor',
       payload: {
-        top_left: topLeft,
-        bottom_right: bottomRight
+        geohash: this.geoHash
       }
     }
-
     // Send it up
-    console.log('Sending WS command: ' + JSON.stringify(cmd))
-    this.dataPool.Blockv.WebSockets.sendMessage(cmd)
-
+    this.dataPool.Blockv.WebSockets.sendMessage(cmd, this.platformId)
   }
 
   /**
@@ -109,12 +88,12 @@ export default class GeoPosRegion extends BLOCKvRegion {
    * @param {*} id The object's ID
    * @returns {boolean} True if the object exists.
    */
-  has (id) {
+  has(id) {
 
     // Check super implementation
-    if(!super.has(id))
+    if (!super.has(id))
       return false
-      
+
     // Check if dropped
     let object = this.objects.get(id)
     let props = object.data['vAtom::vAtomType'] || {}
@@ -124,40 +103,25 @@ export default class GeoPosRegion extends BLOCKvRegion {
   }
 
   /** Our state key is the region */
-  get stateKey () {
-    return 'geopos:' + this.coordinates.top_right.lat + ',' + this.coordinates.top_right.lon + ' ' + this.coordinates.bottom_left.lat + ',' + this.coordinates.bottom_left.lon
-  }
-
-  /** Check if a region request matches our region */
-  matches (id, descriptor) {
-    // Check all filters match
-    if (id !== 'geopos') return false
-    if (!descriptor || !descriptor.top_right || !descriptor.bottom_left) return false
-    if (descriptor.top_right.lat !== this.coordinates.top_right.lat) return false
-    if (descriptor.top_right.lon !== this.coordinates.top_right.lon) return false
-    if (descriptor.bottom_left.lat !== this.coordinates.bottom_left.lat) return false
-    if (descriptor.bottom_left.lon !== this.coordinates.bottom_left.lon) return false
-
-    // Yes they do
-    return true
+  get stateKey() {
+    return 'geopos-' + this.platformId + ":" + this.geoHash;
   }
 
   /** Load current state from the server */
-  async load () {
+  async load() {
     // Pause websocket events
     this.pauseMessages()
 
     let payload = {
-      top_right: this.coordinates.top_right,
-      bottom_left: this.coordinates.bottom_left,
+      geohash: this.geoHash,
       filter: 'all',
       limit: 10000
     }
 
-    if (this.coordinates.publisher_fqdn)
-      payload['publisher_fqdn'] = this.coordinates.publisher_fqdn
+    if (this.fqdn)
+      payload['publisher_fqdn'] = this.fqdn
     // Fetch data
-    let response = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/geodiscover', payload, true)
+    let response = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/geodiscover', payload, true, undefined, this.platformId)
 
     // Add vatom to new objects list
     let objects = []
@@ -180,20 +144,20 @@ export default class GeoPosRegion extends BLOCKvRegion {
   }
 
   /** This region type should not be cached */
-  save () {}
+  save() { }
 
   /** Override to only return dropped vatoms */
-  map (object) {
+  map(object) {
 
     // Check FQDN filter
-    if(this.coordinates.publisher_fqdn && object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].publisher_fqdn !== this.coordinates.publisher_fqdn)
+    if (this.fqdn && object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].publisher_fqdn !== this.fqdn)
       return null
-      
+
     // Check if dropped
     let props = object.data['vAtom::vAtomType'] || {}
-    if (props.dropped && props.geo_pos && props.geo_pos.coordinates && props.geo_pos.coordinates[0])
+    if (props.parent_id === '.' && props.dropped && props.geo_pos && props.geo_pos.coordinates && props.geo_pos.coordinates[0])
       return super.map(object)
-    
+
     // Vatom is not dropped!
     return null
 
@@ -214,7 +178,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
       // A vatom was added to the map. Fetch vatom, add components to data pool
       let objects = []
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [msg.payload.vatom_id] }, true)
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [msg.payload.vatom_id] }, true, undefined, this.platformId)
       let vatom = new DataObject('vatom', response.vatoms[0].id, response.vatoms[0])
       objects.push(vatom)
       response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
@@ -223,9 +187,9 @@ export default class GeoPosRegion extends BLOCKvRegion {
       return
 
     } else if (msg.msg_type === 'map' && msg.payload.op === 'remove') {
-
-      // A vatom was removed from the map. Undrop it
-      this.preemptiveChange(msg.payload.vatom_id, 'vAtom::vAtomType.dropped', false)
+      console.log("remove " + msg.payload.vatom_id)
+      // A vatom was removed from the map.
+      this.preemptiveRemove(msg.payload.vatom_id)
       return
 
     } else if (msg.msg_type == 'state_update') {
@@ -251,7 +215,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
       this.pauseMessages()
 
       // Fetch vatom payload
-      this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true).then(response => {
+      this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true, undefined, this.platformId).then(response => {
         // Add vatom to new objects list
         let objects = []
         objects.push(new DataObject('vatom', response.vatoms[0].id, response.vatoms[0]))

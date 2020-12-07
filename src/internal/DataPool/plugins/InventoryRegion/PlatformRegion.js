@@ -1,6 +1,6 @@
 
-import BLOCKvRegion from './BLOCKvRegion'
-import DataObject from '../DataObject'
+import BLOCKvRegion from '../BLOCKvRegion'
+import DataObject from '../../DataObject'
 /**
  * This region plugin provides access to the current user's inventory.
  *
@@ -8,11 +8,12 @@ import DataObject from '../DataObject'
  */
 export default class InventoryRegion extends BLOCKvRegion {
   /** Plugin ID */
-  static get id () { return 'inventory' }
+  static get id() { return 'inventory-' + this.platformId }
 
   /** Constructor */
-  constructor (dataPool) {
-    super(dataPool)
+  constructor(dataPool, platformId) {
+    super(dataPool, platformId)
+    console.log("New inventory region created...");
     // Make sure we have a valid current user
     if (!this.dataPool.sessionInfo || !this.dataPool.sessionInfo.userID) {
       throw new Error('You cannot query the inventory region without being logged in.')
@@ -26,24 +27,24 @@ export default class InventoryRegion extends BLOCKvRegion {
   }
 
   /** Our state key is the current user's ID */
-  get stateKey () {
-    return 'inventory:' + this.currentUserID
+  get stateKey() {
+    return 'inventory-' + this.platformId + ":" + this.currentUserID
   }
 
   /** Called when this region is going to be shut down */
-  close () {
+  close() {
     super.close()
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
   }
 
   /** There should only be one inventory region */
-  matches (id, descriptor) {
-    return id === 'inventory'
+  matches(id, descriptor) {
+    return id === 'inventory-' + this.platformId
   }
 
   /** Shut down this region if the current user changes */
-  onSessionInfoChanged () {
+  onSessionInfoChanged() {
     this.close()
   }
 
@@ -61,7 +62,7 @@ export default class InventoryRegion extends BLOCKvRegion {
    * 2. For any vatoms in our db not returned by /inventory, remove
    * 
    */
-  async load () {
+  async load() {
     // Pause websocket events
     this.pauseMessages()
 
@@ -89,9 +90,11 @@ export default class InventoryRegion extends BLOCKvRegion {
   }
 
   /** Called when the WebSocket connection re-opens */
-  onWebSocketOpen () {
-    // Full refresh this region, in case any messages were missed
-    this.forceSynchronize()
+  onWebSocketOpen(_, id) {
+    if (!this.platformId || id === this.platformId) {
+      // Full refresh this region, in case any messages were missed
+      this.forceSynchronize()
+    }
   }
 
   /** Fetches changed faces and actions since the last vatom was modified. */
@@ -119,13 +122,13 @@ export default class InventoryRegion extends BLOCKvRegion {
     // 
     let maxPerRequest = 100
     let allChanges = []
-    for (let i = 0 ; i < templateIDs.length ; i += maxPerRequest) {
+    for (let i = 0; i < templateIDs.length; i += maxPerRequest) {
 
       // Load next page
       let data = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/actions/changes', {
         templates: templateIDs.slice(i, Math.min(i + maxPerRequest, templateIDs.length)),
         since: lastStableSync
-      }, true)
+      }, true, undefined, this.platformId)
 
       // Add changes for each key
       for (let templateID in data.actions_changes)
@@ -135,14 +138,14 @@ export default class InventoryRegion extends BLOCKvRegion {
       console.debug(`[DataPool > InventoryRegion] Fetched action changes for templates ${i} to ${Math.min(i + maxPerRequest, templateIDs.length)}`)
 
     }
-    
-    for (let i = 0 ; i < templateIDs.length ; i += maxPerRequest) {
+
+    for (let i = 0; i < templateIDs.length; i += maxPerRequest) {
 
       // Load next page
       let data = await this.dataPool.Blockv.client.request('POST', '/v1/vatom/faces/changes', {
         templates: templateIDs.slice(i, Math.min(i + maxPerRequest, templateIDs.length)),
         since: lastStableSync
-      }, true)
+      }, true, undefined, this.platformId)
 
       // Add changes for each key
       for (let templateID in data.faces_changes)
@@ -190,7 +193,7 @@ export default class InventoryRegion extends BLOCKvRegion {
       // Stop if no cached vatom
       if (!object.cached)
         continue
-        
+
       // Remove cached vatom and notify
       object.cached = null
       this.emit('object.updated', object.id)
@@ -201,7 +204,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     if (clearCacheForTemplates.length > 0) {
       this.emit('updated')
     }
-    
+
     // Store latest sync date
     this.objects.setExtra('last-stable-sync', Date.now())
 
@@ -225,12 +228,12 @@ export default class InventoryRegion extends BLOCKvRegion {
 
     // Get current inventory hash and compare with server's
     let currentHash = this.objects.getExtra('hash')
-    let serverHashReq = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/hash', null, true)
+    let serverHashReq = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/hash', null, true, undefined, this.platformId)
     if (!serverHashReq.hash)
       throw new Error('The server did not return a hash for our current inventory.')
     if (currentHash && currentHash == serverHashReq.hash)
       return console.log('[DataPool > InventoryRegion] Sync complete, our hash matches the server, no changes needed.')
-    
+
     // We are not in sync with the server. Fetch all vatom IDs and their sync numbers
     var allSyncs = []
     var page = 0
@@ -240,7 +243,7 @@ export default class InventoryRegion extends BLOCKvRegion {
       // Fetch next page of IDs
       page += 1
       console.log(`[DataPool > InventoryRegion] Fetching page ${page} of sync statuses...`)
-      let res = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/index?limit=1000' + (nextToken ? `&next_token=${nextToken}` : ''), null, true)
+      let res = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/index?limit=1000' + (nextToken ? `&next_token=${nextToken}` : ''), null, true, undefined, this.platformId)
 
       // Add to array
       allSyncs = allSyncs.concat(res.vatoms || [])
@@ -278,7 +281,7 @@ export default class InventoryRegion extends BLOCKvRegion {
       let ids = remainingIds.slice(0, VatomsPerPage)
       remainingIds = remainingIds.slice(VatomsPerPage)
       console.log(`[DataPool > InventoryRegion] Fetching ${ids.length} updates, ${remainingIds.length} vatoms left...`)
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids }, true)
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids }, true, undefined, this.platformId)
 
       // Create list of new objects
       let newObjects = []
@@ -313,14 +316,14 @@ export default class InventoryRegion extends BLOCKvRegion {
     let pageCount = 1
     let loadedIDs = []
     while (true) {
-      
+
       // Fetch all vatoms the user owns, via a Discover call
       console.debug(`[DataPool > InventoryRegion] Fetching owned vatoms, page ${pageCount}...`)
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/inventory', { 
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/inventory', {
         parent_id: "*",
         limit: 1000,
         page: pageCount
-      }, true)
+      }, true, undefined, this.platformId)
 
       // Create list of new objects
       let newObjects = []
@@ -363,7 +366,7 @@ export default class InventoryRegion extends BLOCKvRegion {
   }
 
   /** @override Called on WebSocket message. */
-  async processMessage (msg) {
+  async processMessage(msg) {
     // Call super
     super.processMessage(msg)
     // We only handle inventory update messages after this.
@@ -383,8 +386,8 @@ export default class InventoryRegion extends BLOCKvRegion {
     } else if (msg.payload.old_owner !== this.currentUserID && msg.payload.new_owner === this.currentUserID) {
 
       // Vatom is now our inventory! Fetch vatom payload
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true)
-      
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: [vatomID] }, true, undefined, this.platformId)
+
       // Add vatom to new objects list
       let objects = []
       response.vatoms.map(v => new DataObject('vatom', v.id, v)).forEach(v => objects.push(v))
@@ -420,26 +423,26 @@ export default class InventoryRegion extends BLOCKvRegion {
   // When a preemptive change occurs, clear our stored hash so that the next inventory refresh will query with the server.
   // Normally this should not be needed since the hash on the server should change as well, but sometimes if an action fails
   // and we fail to rollback the DB we'll be stuck with an outdated vatom.
-  willAdd (object) {
+  willAdd(object) {
     super.willAdd(object)
-    this.onObjectPreemptivelyChanged(object) 
-  }
-  
-  willUpdateFields (object, newData) {
-    super.willUpdateFields(object, newData)
-    this.onObjectPreemptivelyChanged(object) 
+    this.onObjectPreemptivelyChanged(object)
   }
 
-  willUpdateField (object, keyPath, oldValue, newValue) {
+  willUpdateFields(object, newData) {
+    super.willUpdateFields(object, newData)
+    this.onObjectPreemptivelyChanged(object)
+  }
+
+  willUpdateField(object, keyPath, oldValue, newValue) {
     super.willUpdateField(object, keyPath, oldValue, newValue)
     this.onObjectPreemptivelyChanged(object)
   }
-  
-  willRemove (objectOrID) {
+
+  willRemove(objectOrID) {
     super.willRemove(objectOrID)
     this.objects.setExtra('hash', '')
   }
-  
+
   onObjectPreemptivelyChanged(object) {
 
     // Update object's sync # so that on the next refresh we fetch it's state from the server.

@@ -10,10 +10,11 @@
 //
 import urlParse from 'url-parse'
 export default class Vatom {
-  constructor (payload, faces, actions) {
+  constructor (payload, faces, actions, platformId) {
     this.payload = payload
     this.faces = faces
     this.actions = actions
+    this.platformId = platformId
   }
 
   get id () {

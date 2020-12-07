@@ -13,26 +13,28 @@ import DataObject from '../DataObject'
  */
 export default class VatomIDRegion extends BLOCKvRegion {
   /** Plugin ID */
-  static get id () { return 'ids' }
+  static get id() { return 'ids' }
 
   /** Constructor */
-  constructor (dataPool, ids) {
+  constructor(dataPool, ids) {
     super(dataPool)
-    
+
     // Don't cache this content
     this.noCache = true
 
     // Store IDs. Sort them to keep our stateKey in check.
     this.ids = ids.sort()
+
+    this.platformIdMap = new Map();
   }
 
   /** Our state key is the list of IDs */
-  get stateKey () {
+  get stateKey() {
     return 'ids:' + this.ids.join(',')
   }
 
   /** Check if a region request matches our region */
-  matches (id, descriptor) {
+  matches(id, descriptor) {
     // Check all filters match
     if (id !== 'ids') return false
     if (!descriptor || descriptor.length !== this.ids.length) return false
@@ -47,25 +49,30 @@ export default class VatomIDRegion extends BLOCKvRegion {
   }
 
   /** Load current state from the server */
-  async load () {
+  async load() {
     // Pause websocket events
     this.pauseMessages()
 
-    // Fetch data
-    let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: this.ids }, true)
+    const platformIds = await this.dataPool.Blockv.platform.getIds();
 
-    // Add vatom to new objects list
-    let objects = []
-    response.vatoms.map(v => new DataObject('vatom', v.id, v)).forEach(f => objects.push(f))
+    platformIds.forEach(async platformId => {
+      // Fetch data
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: this.ids }, true, undefined, platformId)
 
-    // Add faces to new objects list
-    response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
+      // Add vatom to new objects list
+      let objects = []
+      response.vatoms.map(v => new DataObject('vatom', v.id, v)).forEach(f => objects.push(f))
 
-    // Add actions to new objects list
-    response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+      // Add faces to new objects list
+      response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
 
-    // Add new objects
-    this.addObjects(objects)
+      // Add actions to new objects list
+      response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+
+      this.platformIdMap.set(v.id, platformId);
+      // Add new objects
+      this.addObjects(objects)
+    });
 
     // Resume websocket messages
     this.resumeMessages()
@@ -73,4 +80,11 @@ export default class VatomIDRegion extends BLOCKvRegion {
     // Return array of IDs
     return objects.map(o => o.id)
   }
+
+  map(object) {
+    const vatom = super.map(object);
+    vatom.platformId = this.platformIdMap.get(vatom.id);
+    return vatom;
+  }
+
 }
