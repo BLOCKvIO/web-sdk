@@ -12,12 +12,12 @@ import BaseFace from './BaseFace'
 
 export default class LayeredImage extends BaseFace {
   /** @private @override Called on startup */
-  onLoad () {
+  onLoad() {
     // Reload images
     return this.reloadImages()
   }
 
-  encodeUrl (vatom, name) {
+  encodeUrl(vatom, name) {
     let res = vatom.properties.resources.find(r => r.name === name)
     if (!res) {
       return null
@@ -27,19 +27,19 @@ export default class LayeredImage extends BaseFace {
   }
 
   /** @override On vatom properties changed, refresh images */
-  onVatomUpdated () {
+  onVatomUpdated() {
     return this.reloadImages()
   }
 
   /** @private Gets the image resource to use for the specified vAtom */
-  getLayerImage (vatom) {
+  getLayerImage(vatom) {
     // Find vatom's layered image face
     // Check for the image config field
     return this.encodeUrl(vatom, this.face.properties.config && this.face.properties.config.layerImage) || this.encodeUrl(vatom, 'LayeredImage') || this.encodeUrl(vatom, 'ActivatedImage')
   }
 
   /** @private Recreates the layered images */
-  reloadImages () {
+  async reloadImages() {
     // Get resource
     var resource = this.getLayerImage(this.vatom)
 
@@ -51,7 +51,7 @@ export default class LayeredImage extends BaseFace {
     var imagePromises = [LayeredImage.waitForImage(resource)]
 
     // Fetch vatom children
-    var children = this.vatomView.blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id == this.vatom.id)
+    var children = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.parent_id == this.vatom.id))
 
     // Go through each child vatom
     for (let child of children) {
@@ -76,13 +76,13 @@ export default class LayeredImage extends BaseFace {
     for (let imgs of newImages) {
       this.element.appendChild(imgs)
     }
-    
+
     // Wait for all images to load
     return Promise.all(imagePromises)
   }
 
   /** Creates the dom node to display an image */
-  createImageNode (url) {
+  createImageNode(url) {
     // Create it
     let div = document.createElement('div')
     div.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background-position: center; background-size: contain; background-repeat: no-repeat; '
@@ -91,7 +91,7 @@ export default class LayeredImage extends BaseFace {
   }
 
   /** This returns a promise which resolves when the specified image URL has been downloaded by the browser. */
-  static waitForImage (url) {
+  static waitForImage(url) {
     return new Promise((resolve, reject) => {
       // Create new image tag to do the loading. Browsers cache requests together, so by
       // creating a new image tag and loading the same image in it, we can track the load

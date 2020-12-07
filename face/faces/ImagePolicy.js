@@ -13,18 +13,18 @@ import BaseFace from './BaseFace'
 
 /** This face displays an image depending on the policy defined in the vatom's properties. */
 export default class ImagePolicy extends BaseFace {
-/** @override On load, refresh image */
-  onLoad () {
+  /** @override On load, refresh image */
+  onLoad() {
     return this.refreshImage()
   }
 
   /** @override On vatom properties changed, refresh image */
-  onVatomUpdated () {
+  onVatomUpdated() {
     this.refreshImage()
   }
 
   /** Refresh the image displayed */
-  refreshImage () {
+  async refreshImage() {
 
     // Set image display options
     this.element.style.backgroundSize = (this.face.properties.config && this.face.properties.config.image_mode) || this.vatomView.vatom.properties['image_mode'] || 'contain'
@@ -32,7 +32,7 @@ export default class ImagePolicy extends BaseFace {
     this.element.style.backgroundRepeat = 'no-repeat'
 
     // Fetch URI
-    let uri = ImagePolicy.imageURL(this.vatomView.blockv, this.vatom, this.face)
+    let uri = await ImagePolicy.imageURL(this.vatomView.blockv, this.vatom, this.face)
     if (!uri) {
       throw new Error('No policy found, and no ActivatedImage resource available.')
     }
@@ -45,18 +45,18 @@ export default class ImagePolicy extends BaseFace {
 
     // Return promise
     return ImagePolicy.waitForImage(uri)
-    
+
   }
 
   /** Returns the URL to the image to use for this vatom in it's current state.*/
-  static imageURL(blockv, vatom, face) {
+  static async imageURL(blockv, vatom, face) {
 
     // Fetch vatom children
-    var children = blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id == vatom.id)
-    
+    var children = await blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.parent_id == vatom.id))
+
     // Fetch policy
     let policies = (face.properties.config && face.properties.config.image_policy) || vatom.private['image_policy'] || vatom.properties['icon_stages'] || []
-    
+
     // Find matching policy
     for (let policy of policies) {
 
@@ -106,7 +106,7 @@ export default class ImagePolicy extends BaseFace {
   }
 
   /** This returns a promise which resolves when the specified image URL has been downloaded by the browser. */
-  static waitForImage (url) {
+  static waitForImage(url) {
     return new Promise((resolve, reject) => {
       // Create new image tag to do the loading. Browsers cache requests together, so by
       // creating a new image tag and loading the same image in it, we can track the load
