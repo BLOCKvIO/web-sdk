@@ -52,7 +52,10 @@ export default class VatomChildrenRegion extends BLOCKvRegion {
 
       // Add vatom to new objects list
       let objects = []
-      response.results.map(v => new DataObject('vatom', v.id, v)).forEach(f => objects.push(f))
+      response.results.map(v => {
+        this.platformIdMap.set(v.id, platformId);
+        return new DataObject('vatom', v.id, v);
+      }).forEach(f => objects.push(f))
 
       // Add faces to new objects list
       response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
@@ -60,7 +63,6 @@ export default class VatomChildrenRegion extends BLOCKvRegion {
       // Add actions to new objects list
       response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
 
-      this.platformIdMap.set(v.id, platformId);
       // Add new objects
       this.addObjects(objects)
 

@@ -7,13 +7,9 @@ import DataObject from '../../DataObject'
  * To get an instance, call `DataPool.region('inventory')`
  */
 export default class InventoryRegion extends BLOCKvRegion {
-  /** Plugin ID */
-  static get id() { return 'inventory-' + this.platformId }
-
   /** Constructor */
   constructor(dataPool, platformId) {
     super(dataPool, platformId)
-    console.log("New inventory region created...");
     // Make sure we have a valid current user
     if (!this.dataPool.sessionInfo || !this.dataPool.sessionInfo.userID) {
       throw new Error('You cannot query the inventory region without being logged in.')
@@ -232,7 +228,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     if (!serverHashReq.hash)
       throw new Error('The server did not return a hash for our current inventory.')
     if (currentHash && currentHash == serverHashReq.hash)
-      return console.log('[DataPool > InventoryRegion] Sync complete, our hash matches the server, no changes needed.')
+      return console.log(`[DataPool > InventoryRegion:${this.platformId}] Sync complete, our hash matches the server, no changes needed.`)
 
     // We are not in sync with the server. Fetch all vatom IDs and their sync numbers
     var allSyncs = []
@@ -242,7 +238,7 @@ export default class InventoryRegion extends BLOCKvRegion {
 
       // Fetch next page of IDs
       page += 1
-      console.log(`[DataPool > InventoryRegion] Fetching page ${page} of sync statuses...`)
+      console.log(`[DataPool > InventoryRegion: ${this.platformId}] Fetching page ${page} of sync statuses...`)
       let res = await this.dataPool.Blockv.client.request('GET', '/v1/user/vatom/inventory/index?limit=1000' + (nextToken ? `&next_token=${nextToken}` : ''), null, true, undefined, this.platformId)
 
       // Add to array
@@ -259,7 +255,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     let keysToRemove = Array.from(this.objects.values()).filter(obj => obj.type == 'vatom' && !allSyncs.find(sync => sync.id == obj.id)).map(obj => obj.id)
     this.removeObjects(keysToRemove)
     if (keysToRemove.length > 0)
-      console.log(`DataPool > InventoryRegion] Removed ${keysToRemove.length} vatoms which are no longer in the inventory`)
+      console.log(`DataPool > InventoryRegion: ${this.platformId}] Removed ${keysToRemove.length} vatoms which are no longer in the inventory`)
 
     // Check which vatoms are out of sync
     var idsToFetch = []
@@ -280,7 +276,7 @@ export default class InventoryRegion extends BLOCKvRegion {
       // Fetch next 100 vatoms
       let ids = remainingIds.slice(0, VatomsPerPage)
       remainingIds = remainingIds.slice(VatomsPerPage)
-      console.log(`[DataPool > InventoryRegion] Fetching ${ids.length} updates, ${remainingIds.length} vatoms left...`)
+      console.log(`[DataPool > InventoryRegion: ${this.platformId}] Fetching ${ids.length} updates, ${remainingIds.length} vatoms left...`)
       let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids }, true, undefined, this.platformId)
 
       // Create list of new objects
@@ -305,7 +301,7 @@ export default class InventoryRegion extends BLOCKvRegion {
 
     // Done! Store the inventory hash for next sync
     this.objects.setExtra('hash', serverHashReq.hash)
-    console.log(`[DataPool > InventoryRegion] Sync complete! We fetched ${idsToFetch.length} vatoms, and removed ${keysToRemove.length} vatoms.`)
+    console.log(`[DataPool > InventoryRegion: ${this.platformId}] Sync complete! We fetched ${idsToFetch.length} vatoms, and removed ${keysToRemove.length} vatoms.`)
 
   }
 
@@ -318,7 +314,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     while (true) {
 
       // Fetch all vatoms the user owns, via a Discover call
-      console.debug(`[DataPool > InventoryRegion] Fetching owned vatoms, page ${pageCount}...`)
+      console.log(`[DataPool > InventoryRegion: ${this.platformId}] Fetching owned vatoms, page ${pageCount}...`)
       let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/inventory', {
         parent_id: "*",
         limit: 1000,

@@ -74,8 +74,8 @@ export default class Client extends EventEmitter {
     let server = undefined;
     if (platformId) {
       const platform = await this.Blockv.platform.get(platformId);
-      if (platform && platform.server) {
-        server = platform.server
+      if (platform && platform.api_gateway) {
+        server = platform.api_gateway
       }
     }
     // Send request

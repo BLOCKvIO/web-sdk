@@ -74,7 +74,7 @@ export default class Region extends EventEmitter {
 
     // Remove pending error
     this.error = null
-    
+
     // Do the sync
     this._syncPromise = this._synchronize().catch(err => {
       // Error handling, notify listeners of an error

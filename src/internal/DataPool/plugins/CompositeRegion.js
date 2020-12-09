@@ -85,7 +85,8 @@ export default class CompositeRegion extends Region {
     let items = [];
     const regions = await this.getPlatformRegions();
     for (let region of regions) {
-      items = items.concat(region.get(false));
+      const temp = region.get(false);
+      items = items.concat(temp);
     }
     // Done
     return items
