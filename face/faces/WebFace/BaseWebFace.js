@@ -14,7 +14,7 @@ import BridgeV2 from './BridgeV2'
 
 export default class BaseWebFace extends BaseFace {
   /** @private Called on startup */
-  onLoad () {
+  onLoad() {
 
     // Pending requests
     this.pendingRequests = {}
@@ -43,7 +43,7 @@ export default class BaseWebFace extends BaseFace {
   }
 
   /** @private Called when the view is unloaded */
-  onUnload () {
+  onUnload() {
     // Remove iframe
     this.element.removeChild(this.iframe)
     this.iframe.onload = null
@@ -56,7 +56,7 @@ export default class BaseWebFace extends BaseFace {
     }
   }
 
-  processIncomingBridgeMessage (name, payload) {
+  processIncomingBridgeMessage(name, payload) {
     switch (name) {
       case 'vatom.init':
         this.version = 1
@@ -111,7 +111,7 @@ export default class BaseWebFace extends BaseFace {
     }
   }
 
-  onIncomingBridgeMessage (event) {
+  onIncomingBridgeMessage(event) {
     // Get payload
     let payload = event.data
     // Check source is from this face's iframe
@@ -160,24 +160,24 @@ export default class BaseWebFace extends BaseFace {
     }).catch(err => {
 
       if (payload.version === '2.0.0') {
-        this.sendV2Message(payload.request_id, payload.name,{
+        this.sendV2Message(payload.request_id, payload.name, {
           error_code: err.code || 'unknown_error',
           error_message: err.message
         }, false)
-      } else { 
+      } else {
         // Failed, send error response
         this.sendv1Message(responseID, {
           errorCode: err.code,
           errorText: err.message
         })
-     }
+      }
 
-      
+
 
     })
   }
 
-  sendv1Message (name, data) {
+  sendv1Message(name, data) {
     // Check if iframe is setup
     if (!this.iframe || !this.iframe.contentWindow) {
       return
@@ -191,7 +191,7 @@ export default class BaseWebFace extends BaseFace {
     }, '*')
   }
 
-  sendV2Message (id, name, data, isRequest) {
+  sendV2Message(id, name, data, isRequest) {
     // Check if iframe is setup
     if (!this.iframe || !this.iframe.contentWindow) {
       return
@@ -199,7 +199,7 @@ export default class BaseWebFace extends BaseFace {
 
     // Send payload
     this.iframe.contentWindow.postMessage({
-      [ isRequest ? 'request_id' : 'response_id' ]: id,
+      [isRequest ? 'request_id' : 'response_id']: id,
       source: 'BLOCKv SDK',
       name: name,
       payload: data,
@@ -221,7 +221,7 @@ export default class BaseWebFace extends BaseFace {
 
   }
 
-  vatomStateChanged (vatom) {
+  vatomStateChanged(vatom) {
     if (this.version === 1) {
       if (vatom.id === this.vatom.id && this.face) {
         var resources = {}
@@ -246,24 +246,24 @@ export default class BaseWebFace extends BaseFace {
     }
   }
 
-  async observeChildren (payload) {
+  async observeChildren(payload) {
     console.log('payload from observe', payload)
-    
+
     if (this.vatom.id === payload) {
-      let children = this.vatomView.blockv.dataPool.region('inventory').get(false).filter(v => v.properties.parent_id === payload).map(this.mapVatom)
+      let children = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.parent_id === payload).map(this.mapVatom));
       this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children }, true)
     }
-    
+
   }
 
-  onVatomUpdated () {
+  onVatomUpdated() {
     this.vatomStateChanged(this.vatom)
   }
   /**
    * pass in vatom model recieve out packaged vatom for bridge
    * @param {*} vatom 
    */
-  mapVatom (vatom) {
-    return Object.assign({actions: vatom.actions, faces: vatom.faces}, vatom.payload)
+  mapVatom(vatom) {
+    return Object.assign({ actions: vatom.actions, faces: vatom.faces }, vatom.payload)
   }
 }
