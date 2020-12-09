@@ -131,7 +131,7 @@ export default class Vatoms {
     // Get vatom's parent ID
     let parentId = vatom.properties.parent_id || '.'
     // Get all children
-    return this.getVatomChildren(vatom.id).then(children => {
+    return this.getVatomChildren(vatom).then(children => {
       // Remove parent IDs
       return Promise.all(children.map(child => {
         // Pre-emptively update parent ID
@@ -266,7 +266,7 @@ export default class Vatoms {
 
       // It is, read children from inventory region
       return this.Blockv.dataPool.region('inventory').get().then(children => {
-        return children.filter(v => v.properties.parent_id === parentID)
+        return children.filter(v => v.properties.parent_id === parent.id)
       })
 
     }

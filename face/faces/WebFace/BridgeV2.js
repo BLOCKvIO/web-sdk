@@ -34,7 +34,7 @@ export default class BridgeV2 {
   }
 
   getVatomChildren () {
-    return this.blockv.Vatoms.getVatomChildren(this.vatom.id).then(v => {
+    return this.blockv.Vatoms.getVatomChildren(this.vatom).then(v => {
       return {
         vatoms: v.map(vatom => Object.assign({actions: vatom.actions, faces: vatom.faces}, vatom.payload))
       }
