@@ -1,5 +1,3 @@
-import Geohash from 'latlon-geohash';
-import { getDistance, getCenter } from 'geolib';
 import Region from '../CompositeRegion'
 import PlatformGeoRegion from './PlatformRegion'
 
@@ -27,36 +25,23 @@ export default class GeoPosRegion extends Region {
 
     // Store coordinates
     this.coordinates = coordinates
-    this.geoHash = this.calculateGeoHash(coordinates);
-  }
-
-  calculateGeoHash(coordinates) {
-    let center = getCenter([coordinates.top_right, coordinates.bottom_left]);
-    let height = getDistance({ lat: coordinates.top_right.lat, lon: coordinates.bottom_left.lon }, coordinates.bottom_left);
-    let width = getDistance({ lat: coordinates.bottom_left.lat, lon: coordinates.top_right.lon }, coordinates.bottom_left);
-    let dist = width > height ? width : height;
-    const percisionHeight = [5000000, 625000, 156000, 19500, 4890, 610, 153, 19.1];
-    const percision = [1, 2, 3, 4, 5, 6, 7, 8];
-    let selectedPercision = 1;
-    for (let i = percisionHeight.length - 1; i >= 0; i--) {
-      if (dist < percisionHeight[i]) {
-        selectedPercision = percision[i];
-        break;
-      }
-    }
-    return Geohash.encode(center.latitude, center.longitude, selectedPercision);
   }
 
   createRegion(datapool, platformId) {
-    console.log(this.geoHash);
     return new PlatformGeoRegion(datapool, platformId, {
-      geoHash: this.geoHash,
+      coordinates: this.coordinates,
       matches: (id, descriptor) => {
         // Check all filters match
         if (id !== 'geopos-' + this.platformId) return false
         if (!descriptor || !descriptor.top_right || !descriptor.bottom_left) return false
+        if (descriptor.top_right.lat !== this.coordinates.top_right.lat) return false
+        if (descriptor.top_right.lon !== this.coordinates.top_right.lon) return false
+        if (descriptor.bottom_left.lat !== this.coordinates.bottom_left.lat) return false
+        if (descriptor.bottom_left.lon !== this.coordinates.bottom_left.lon) return false
 
-        return this.calculateGeoHash(descriptor) === this.geoHash;
+        // Yes they do
+        return true
+
       },
       fqdn: this.coordinates.publisher_fqdn
     });
@@ -64,7 +49,7 @@ export default class GeoPosRegion extends Region {
 
   /** Our state key is the region */
   get stateKey() {
-    return 'geopos:' + this.geoHash
+    return 'geopos:' + this.coordinates.top_right.lat + ',' + this.coordinates.top_right.lon + ' ' + this.coordinates.bottom_left.lat + ',' + this.coordinates.bottom_left.lon
   }
 
   /** Check if a region request matches our region */
@@ -72,8 +57,14 @@ export default class GeoPosRegion extends Region {
     // Check all filters match
     if (id !== 'geopos') return false
     if (!descriptor || !descriptor.top_right || !descriptor.bottom_left) return false
+    if (descriptor.top_right.lat !== this.coordinates.top_right.lat) return false
+    if (descriptor.top_right.lon !== this.coordinates.top_right.lon) return false
+    if (descriptor.bottom_left.lat !== this.coordinates.bottom_left.lat) return false
+    if (descriptor.bottom_left.lon !== this.coordinates.bottom_left.lon) return false
 
-    return this.calculateGeoHash(descriptor) === this.geoHash;
+    // Yes they do
+    return true
+
   }
   /** This region type should not be cached */
   save() { }

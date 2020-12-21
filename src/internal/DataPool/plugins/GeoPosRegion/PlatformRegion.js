@@ -22,7 +22,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.noCache = true
 
     // Store geo hash
-    this.geoHash = config.geoHash;
+    this.coordinates = config.coordinates;
 
     this.fqdn = config.fqdn;
 
@@ -33,6 +33,8 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
     this.socket.addEventListener('connected', this.onWebSocketOpen)
 
+    // Start refresh timer
+    this.timer = setInterval(this.onTimer.bind(this), 30000)
   }
 
   /** Called when this region is going to be shut down */
@@ -42,6 +44,13 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
 
+    // Remove timer
+    clearInterval(this.timer)
+  }
+
+  /** Called on timer */
+  onTimer() {
+    this.forceSynchronize()
   }
 
   /** Called when the WebSocket connection re-opens */
@@ -58,14 +67,18 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Sends the region command up the websocket to enable region monitoring */
   sendRegionCommand() {
+    // Stop if WebSocket is not connected
+    if (!this.socket.isOpen)
+      return
 
-    if (this.geoHash.length < 4) {
-      console.warn('Region is to large to monitor ' + this.geoHash);
-      return;
+    // Convert our coordinates into the ones needed by the command
+    let topLeft = {
+      lat: Math.max(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
+      lon: Math.min(this.coordinates.top_right.lon, this.coordinates.bottom_left.lon)
     }
-    if (this.geoHash.length > 8) {
-      console.warn('Region is to small to monitor ' + this.geoHash);
-      return;
+    let bottomRight = {
+      lat: Math.min(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
+      lon: Math.max(this.coordinates.top_right.lon, this.coordinates.bottom_left.lon)
     }
 
     // Create command payload
@@ -75,10 +88,13 @@ export default class GeoPosRegion extends BLOCKvRegion {
       type: 'command',
       cmd: 'monitor',
       payload: {
-        geohash: this.geoHash
+        top_left: topLeft,
+        bottom_right: bottomRight
       }
     }
+
     // Send it up
+    console.log('Sending WS command: ' + JSON.stringify(cmd))
     this.dataPool.Blockv.WebSockets.sendMessage(cmd, this.platformId)
   }
 
@@ -104,7 +120,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Our state key is the region */
   get stateKey() {
-    return 'geopos-' + this.platformId + ":" + this.geoHash;
+    return 'geopos-' + this.platformId + ":" + this.coordinates.top_right.lat + ',' + this.coordinates.top_right.lon + ' ' + this.coordinates.bottom_left.lat + ',' + this.coordinates.bottom_left.lon
   }
 
   /** Load current state from the server */
@@ -113,7 +129,8 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.pauseMessages()
 
     let payload = {
-      geohash: this.geoHash,
+      top_right: this.coordinates.top_right,
+      bottom_left: this.coordinates.bottom_left,
       filter: 'all',
       limit: 10000
     }
@@ -187,7 +204,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
       return
 
     } else if (msg.msg_type === 'map' && msg.payload.op === 'remove') {
-      console.log("remove " + msg.payload.vatom_id)
       // A vatom was removed from the map.
       this.preemptiveRemove(msg.payload.vatom_id)
       return
