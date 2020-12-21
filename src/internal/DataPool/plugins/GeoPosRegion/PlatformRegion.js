@@ -10,13 +10,12 @@ import DataObject from '../../DataObject'
 export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Plugin ID */
-  static get id() { return 'geopos-' + this.platformId }
+  get id() { return 'geopos-' + this.platformId }
 
   /** Constructor */
   constructor(dataPool, platformId, config) {
     super(dataPool, platformId)
 
-    console.log(config);
     this.matches = config.matches;
     // Don't cache this content
     this.noCache = true
@@ -29,6 +28,10 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Send region command to the WebSocket
     this.sendRegionCommand()
 
+    if (config.cached) {
+      //adding cached objects
+      this.addObjects(config.cached);
+    }
     // Listen for events
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
     this.socket.addEventListener('connected', this.onWebSocketOpen)

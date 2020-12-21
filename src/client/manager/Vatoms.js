@@ -194,7 +194,7 @@ export default class Vatoms {
    * @param  {[String]} filter     defaults to "all"
    * @return {[Promise<Object>}  returns a list of vAtoms, faces and actions
    */
-  async geoDiscover(bottomLeft, topRight, filter = 'vatoms') {
+  async geoDiscover(bottomLeft, topRight, filter = 'vatoms', publisherFqdn) {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
@@ -204,8 +204,9 @@ export default class Vatoms {
         lat: topRight.lat,
         lon: topRight.lon
       },
-      filter
+      filter,
     }
+    if (publisherFqdn) { payload['publisher_fqdn'] = publisherFqdn; }
 
     const platformIds = await this.Blockv.getPlatformIds();
     let vatomsArray = []
@@ -227,7 +228,8 @@ export default class Vatoms {
    * @param  {String} filter     defaults to all
    * @return {Promise<Object>}   Returns a list of groups
    */
-  async geoDiscoverGroups(bottomLeft, topRight, precision = 2, filter = 'all') {
+
+  async geoDiscoverGroups(bottomLeft, topRight, precision = 2, filter = 'all', publisherFqdn) {
     const payload = {
       bottom_left: {
         lat: bottomLeft.lat,
@@ -240,12 +242,13 @@ export default class Vatoms {
       precision,
       filter
     }
+    if (publisherFqdn) { payload['publisher_fqdn'] = publisherFqdn; }
     let groups = [];
     const platformIds = await this.Blockv.getPlatformIds();
     for (let platformId of platformIds) {
       const result = await this.vatomApi.geoDiscoverGroups(payload, platformId);
       if (result.groups) {
-        groups.forEach(group => {
+        result.groups.forEach(group => {
           group.platform = platformId;
           groups.push(group);
         })

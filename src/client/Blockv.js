@@ -48,7 +48,7 @@ export default class Blockv extends EventEmitter {
     }
   }
   
-  getPlatormIds() {
+  getPlatformIds() {
     return this.platform.getIds();
   }
 }
