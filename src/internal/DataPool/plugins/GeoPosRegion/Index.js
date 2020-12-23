@@ -111,9 +111,9 @@ export default class GeoPosRegion extends Region {
       matches: (id, descriptor) => {
         // Check all filters match
         if (id !== 'geopos-' + this.platformId) return false
-        if (!descriptor || !descriptor.geo_hash) return false
+        if (!descriptor || !descriptor.geohash) return false
 
-        return descriptor.geo_hash === this.geoHash;
+        return descriptor.geohash === this.geoHash;
       },
       fqdn: this.descriptor.publisher_fqdn,
       cached
@@ -129,9 +129,9 @@ export default class GeoPosRegion extends Region {
   matches(id, descriptor) {
     // Check all filters match
     if (id !== 'geopos') return false
-    if (!descriptor || !descriptor.geo_hash) return false
+    if (!descriptor || !descriptor.geohash) return false
 
-    return descriptor.geo_hash === this.geoHash;
+    return descriptor.geohash === this.geoHash;
   }
   /** This region type should not be cached */
   save() { }
