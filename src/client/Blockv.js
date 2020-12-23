@@ -32,6 +32,9 @@ export default class Blockv extends EventEmitter {
     this.client = new Client(this)
     this.platform = new Platform(this.client, this.store, payload.connectAllPlatforms);
 
+    this.dataPool = new DataPool(this)
+    this.dataPool.disableSyncV2 = payload.disableSyncV2
+    
     const userApi = new UserApi(this)
     const activityApi = new ActivityApi(this.client)
 
@@ -40,8 +43,6 @@ export default class Blockv extends EventEmitter {
     this.UserManager = new UserManager(userApi, this.store)
     this.Vatoms = new Vatoms(this)
 
-    this.dataPool = new DataPool(this)
-    this.dataPool.disableSyncV2 = payload.disableSyncV2
 
     if (this.UserManager.isLoggedIn) {
       this.dataPool.setSessionInfo({ userID: this.store.userID, client: this.client })

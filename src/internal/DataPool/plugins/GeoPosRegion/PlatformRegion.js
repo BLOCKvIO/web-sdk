@@ -78,7 +78,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
       type: 'command',
       cmd: 'monitor',
       payload: {
-        geohash: this.geoHash
+        geohash: this.geohash
       }
     }
     // Send it up
@@ -190,7 +190,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
       return
 
     } else if (msg.msg_type === 'map' && msg.payload.op === 'remove') {
-      console.log("remove " + msg.payload.vatom_id)
       // A vatom was removed from the map.
       this.preemptiveRemove(msg.payload.vatom_id)
       return

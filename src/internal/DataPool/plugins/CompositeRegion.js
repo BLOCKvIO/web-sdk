@@ -53,13 +53,15 @@ export default class CompositeRegion extends Region {
   }
 
   async _synchronize() {
+    this.emit('synchronize.start');
     const regions = await this.getPlatformRegions();
     for (let region of regions) {
-      await region.synchronize();
+      await region.forceSynchronize();
     }
     // All data is up to date!
     this.synchronized = true;
     this._syncPromise = null;
+    this.emit('synchronize.complete');
     this.emit('updated');
     console.log(`[DataPool > Region] Region '${this.stateKey}' is now in sync!`);
   }
