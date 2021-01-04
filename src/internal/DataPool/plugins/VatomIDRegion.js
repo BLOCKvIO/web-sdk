@@ -54,14 +54,15 @@ export default class VatomIDRegion extends BLOCKvRegion {
     this.pauseMessages()
 
     const platformIds = await this.dataPool.Blockv.platform.getIds();
-
-    platformIds.forEach(async platformId => {
+    let objects = [];
+    const vatomIds = [...this.ids];
+    for (let platformId of platformIds) {
+      if (vatomIds.length <= 0) break;
       // Fetch data
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: this.ids }, true, undefined, platformId)
-
+      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: vatomIds }, true, undefined, platformId)
       // Add vatom to new objects list
-      let objects = []
       response.vatoms.map(v => {
+        delete vatomIds[v.id];
         this.platformIdMap.set(v.id, platformId);
         return new DataObject('vatom', v.id, v);
       }).forEach(f => objects.push(f))
@@ -72,10 +73,11 @@ export default class VatomIDRegion extends BLOCKvRegion {
       // Add actions to new objects list
       response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
 
-      // Add new objects
-      this.addObjects(objects)
-    });
+    }
+    // Add new objects
+    this.addObjects(objects)
 
+    console.log(objects);
     // Resume websocket messages
     this.resumeMessages()
 
@@ -85,7 +87,9 @@ export default class VatomIDRegion extends BLOCKvRegion {
 
   map(object) {
     const vatom = super.map(object);
-    vatom.platformId = this.platformIdMap.get(vatom.id);
+    if (vatom) {
+      vatom.platformId = this.platformIdMap.get(vatom.id);
+    }
     return vatom;
   }
 

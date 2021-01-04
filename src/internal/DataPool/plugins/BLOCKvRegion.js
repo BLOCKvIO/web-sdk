@@ -9,7 +9,7 @@ import Delayer from '../Delayer'
  * Intermediate class which handles updates via the BLOCKv websocket and returning Vatom objects. Regions can subclass this to automatically
  * get updates via WebSocket.
  */
-export default class BLOCKvRegion extends Region {
+export default class  BLOCKvRegion extends Region {
   constructor(dataPool, platformId) {
     super(dataPool)
     // Vatom network id this region is interacting with
