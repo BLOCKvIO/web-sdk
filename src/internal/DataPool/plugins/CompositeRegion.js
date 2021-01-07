@@ -56,7 +56,11 @@ export default class CompositeRegion extends Region {
     this.emit('synchronize.start');
     const regions = await this.getPlatformRegions();
     for (let region of regions) {
-      await region.forceSynchronize();
+      try {
+        await region.forceSynchronize();
+      } catch (error) {
+        console.warn(error);
+      }
     }
     // All data is up to date!
     this.synchronized = true;
