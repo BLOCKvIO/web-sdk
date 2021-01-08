@@ -58,20 +58,22 @@ export default class VatomIDRegion extends BLOCKvRegion {
     const vatomIds = [...this.ids];
     for (let platformId of platformIds) {
       if (vatomIds.length <= 0) break;
-      // Fetch data
-      let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: vatomIds }, true, undefined, platformId)
-      // Add vatom to new objects list
-      response.vatoms.map(v => {
-        delete vatomIds[v.id];
-        this.platformIdMap.set(v.id, platformId);
-        return new DataObject('vatom', v.id, v);
-      }).forEach(f => objects.push(f))
+      try {
+        // Fetch data
+        let response = await this.dataPool.Blockv.client.request('POST', '/v1/user/vatom/get', { ids: vatomIds }, true, undefined, platformId)
+        // Add vatom to new objects list
+        response.vatoms.map(v => {
+          delete vatomIds[v.id];
+          this.platformIdMap.set(v.id, platformId);
+          return new DataObject('vatom', v.id, v);
+        }).forEach(f => objects.push(f))
 
-      // Add faces to new objects list
-      response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
+        // Add faces to new objects list
+        response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
 
-      // Add actions to new objects list
-      response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+        // Add actions to new objects list
+        response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+      } catch (error) { }
 
     }
     // Add new objects
