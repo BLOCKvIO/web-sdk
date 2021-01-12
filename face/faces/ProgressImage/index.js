@@ -10,7 +10,7 @@
 //
 
 import BaseFace from '../BaseFace'
-import ResizeSensor from './ResizeSensor'
+import { ResizeSensor } from 'css-element-queries'
 
 export default class ProgressImage extends BaseFace {
   onLoad() {
@@ -41,7 +41,7 @@ export default class ProgressImage extends BaseFace {
     this.percentContainer.style.cssText = 'position:absolute; top: 0px; right: 0px; width:auto; height:auto; padding:5px; font-size:9px; color: rgba(0,0,0,0.5)';
     this.element.appendChild(this.percentContainer)
 
-    this.resizeDispose = ResizeSensor(this.element, () => {
+    this.resizeSensor = new ResizeSensor(this.element, () => {
       this.onResize();
     });
 
@@ -124,9 +124,8 @@ export default class ProgressImage extends BaseFace {
     }
   }
   onUnload() {
-    if (this.resizeDispose) {
-      this.resizeDispose();
-      this.resizeDispose = null;
+    if (this.resizeSensor) {
+      this.resizeSensor.detach();
     }
   }
   onVatomUpdated() {
