@@ -54,7 +54,7 @@ export default class BridgeV1 {
 
   performAction (payload) {
     // Perform vAtom action
-    return this.blockv.Vatoms.performAction(payload.actionData['this.id'], payload.actionName, payload.actionData)
+    return this.blockv.Vatoms.performAction(this.vatom, payload.actionName, payload.actionData)
   }
 
   getProfile (payload) {
