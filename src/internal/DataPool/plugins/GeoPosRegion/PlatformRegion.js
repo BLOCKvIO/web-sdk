@@ -21,7 +21,8 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.noCache = true
 
     // Store geo hash
-    this.geoHash = config.geoHash;
+    this.hashes = config.hashes;
+    this.coordinates = config.coordinates;
 
     this.fqdn = config.fqdn;
 
@@ -44,7 +45,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
-
   }
 
   /** Called when the WebSocket connection re-opens */
@@ -61,15 +61,9 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Sends the region command up the websocket to enable region monitoring */
   sendRegionCommand() {
-
-    if (this.geoHash.length < 4) {
-      console.warn('Region is to large to monitor ' + this.geoHash);
-      return;
-    }
-    if (this.geoHash.length > 8) {
-      console.warn('Region is to small to monitor ' + this.geoHash);
-      return;
-    }
+    // Stop if WebSocket is not connected
+    if (!this.socket.isOpen)
+      return
 
     // Create command payload
     let cmd = {
@@ -78,10 +72,12 @@ export default class GeoPosRegion extends BLOCKvRegion {
       type: 'command',
       cmd: 'monitor',
       payload: {
-        geohash: this.geohash
+        geohashes: this.hashes
       }
     }
+
     // Send it up
+    console.log('Sending WS command: ' + JSON.stringify(cmd))
     this.dataPool.Blockv.WebSockets.sendMessage(cmd, this.platformId)
   }
 
@@ -107,7 +103,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Our state key is the region */
   get stateKey() {
-    return 'geopos-' + this.platformId + ":" + this.geoHash;
+    return 'geopos-' + this.platformId;
   }
 
   /** Load current state from the server */
@@ -116,7 +112,8 @@ export default class GeoPosRegion extends BLOCKvRegion {
     this.pauseMessages()
 
     let payload = {
-      geohash: this.geoHash,
+      top_right: this.coordinates.top_right,
+      bottom_left: this.coordinates.bottom_left,
       filter: 'all',
       limit: 10000
     }

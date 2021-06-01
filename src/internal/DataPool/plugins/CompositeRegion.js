@@ -20,13 +20,18 @@ export default class CompositeRegion extends Region {
       .then(platformIds => {
         const regions = [];
         platformIds.forEach(platformId => {
-          const region = this.createRegion(this.dataPool, platformId);
-          region.trigger = this.trigger.bind(this);
-          region.triggerEvent = this.triggerEvent.bind(this);
-          region.emit = this.emit.bind(this);
-          regions.push(region);
+          regions.push(this.createRegion(this.dataPool, platformId)
+          .then(region=>{
+            region.trigger = this.trigger.bind(this);
+            region.triggerEvent = this.triggerEvent.bind(this);
+            region.emit = this.emit.bind(this);
+            return region;
+          }));
         });
         this.getPlatformsPromise = null;
+        return Promise.all(regions);
+      })
+      .then((regions)=>{
         this.platformRegions = regions;
         return regions;
       })
@@ -56,7 +61,11 @@ export default class CompositeRegion extends Region {
     this.emit('synchronize.start');
     const regions = await this.getPlatformRegions();
     for (let region of regions) {
-      await region.forceSynchronize();
+      try {
+        await region.forceSynchronize();
+      } catch (error) {
+        console.warn(error);
+      }
     }
     // All data is up to date!
     this.synchronized = true;

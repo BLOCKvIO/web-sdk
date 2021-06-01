@@ -54,7 +54,7 @@ export default class DataObjectAnimator {
           id: msg.payload.id,
           time: p.time,
           new_data: {
-            'when_modified':new Date(p).toISOString(),
+            'when_modified':new Date(p.time).toISOString(),
             'vAtom::vAtomType': {
               'geo_pos': {
                 'coordinates': p.geo_pos

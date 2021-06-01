@@ -65,26 +65,26 @@ export default class Vatoms {
     return this.performAction(vatom, actionName, payload)
   }
 
-  performActionById(vatomId, platformId, action, payload) {
+  async performActionById(vatomId, platformId, action, payload) {
 
     // Create pre-emptive action in DataPool for known actions
     let undos = []
     switch (action) {
       case 'Transfer':
-        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.'))
+        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.')))
         break
 
       case 'Drop':
-        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.geo_pos', payload))
-        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', true))
+        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.geo_pos', payload)))
+        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', true)))
         break
 
       case 'Pickup':
-        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false))
+        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false)))
         break
 
       case 'Redeem':
-        undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.'))
+        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.')))
         break
 
       default:
@@ -184,7 +184,7 @@ export default class Vatoms {
     }
 
     // Not all the vatoms were in the inventory, create a new region
-    return this.Blockv.dataPool.region('ids', vatomIds).get()
+    return this.Blockv.dataPool.region('ids', vatomIds).get(true)
   }
 
   /**

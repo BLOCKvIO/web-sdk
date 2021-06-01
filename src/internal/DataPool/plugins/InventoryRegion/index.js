@@ -28,7 +28,7 @@ export default class InventoryRegion extends Region {
     }
   }
 
-  createRegion(datapool, platformId)
+  async createRegion(datapool, platformId)
   {
     return new PlatformInventoryRegion(datapool, platformId);
   }
