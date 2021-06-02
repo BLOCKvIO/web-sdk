@@ -31,6 +31,7 @@ export default class DataPool {
    * @param {*} descriptor Region-specific filtering information. See plugins for more info.
    */
   region(id, descriptor) {
+    console.log(id);
     // Find existing region
     let region = this.regions.find(r => r.matches(id, descriptor))
     if (region) {

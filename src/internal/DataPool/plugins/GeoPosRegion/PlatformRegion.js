@@ -10,18 +10,18 @@ import DataObject from '../../DataObject'
 export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Plugin ID */
-  static get id() { return 'geopos-' + this.platformId }
+  get id() { return 'geopos-' + this.platformId }
 
   /** Constructor */
   constructor(dataPool, platformId, config) {
     super(dataPool, platformId)
 
-    console.log(config);
     this.matches = config.matches;
     // Don't cache this content
     this.noCache = true
 
     // Store geo hash
+    this.hashes = config.hashes;
     this.coordinates = config.coordinates;
 
     this.fqdn = config.fqdn;
@@ -29,12 +29,14 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Send region command to the WebSocket
     this.sendRegionCommand()
 
+    if (config.cached) {
+      //adding cached objects
+      this.addObjects(config.cached);
+    }
     // Listen for events
     this.onWebSocketOpen = this.onWebSocketOpen.bind(this)
     this.socket.addEventListener('connected', this.onWebSocketOpen)
 
-    // Start refresh timer
-    this.timer = setInterval(this.onTimer.bind(this), 30000)
   }
 
   /** Called when this region is going to be shut down */
@@ -43,14 +45,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
     // Remove listeners
     this.socket.removeEventListener('connected', this.onWebSocketOpen)
-
-    // Remove timer
-    clearInterval(this.timer)
-  }
-
-  /** Called on timer */
-  onTimer() {
-    this.forceSynchronize()
   }
 
   /** Called when the WebSocket connection re-opens */
@@ -71,16 +65,6 @@ export default class GeoPosRegion extends BLOCKvRegion {
     if (!this.socket.isOpen)
       return
 
-    // Convert our coordinates into the ones needed by the command
-    let topLeft = {
-      lat: Math.max(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
-      lon: Math.min(this.coordinates.top_right.lon, this.coordinates.bottom_left.lon)
-    }
-    let bottomRight = {
-      lat: Math.min(this.coordinates.top_right.lat, this.coordinates.bottom_left.lat),
-      lon: Math.max(this.coordinates.top_right.lon, this.coordinates.bottom_left.lon)
-    }
-
     // Create command payload
     let cmd = {
       id: '1',
@@ -88,8 +72,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
       type: 'command',
       cmd: 'monitor',
       payload: {
-        top_left: topLeft,
-        bottom_right: bottomRight
+        geohashes: this.hashes
       }
     }
 
@@ -120,7 +103,7 @@ export default class GeoPosRegion extends BLOCKvRegion {
 
   /** Our state key is the region */
   get stateKey() {
-    return 'geopos-' + this.platformId + ":" + this.coordinates.top_right.lat + ',' + this.coordinates.top_right.lon + ' ' + this.coordinates.bottom_left.lat + ',' + this.coordinates.bottom_left.lon
+    return 'geopos-' + this.platformId;
   }
 
   /** Load current state from the server */
