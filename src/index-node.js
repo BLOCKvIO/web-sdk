@@ -11,8 +11,8 @@
 
 // This is the entry point when importing this library from Node.
 
-import Blockv from './client/Blockv'
-import Discover from './client/Discover'
+import Blockv from './client/blockv'
+import Discover from './client/discover'
 
 module.exports = Blockv
 module.exports.Discover = Discover

@@ -11,10 +11,10 @@ export default class DataPool {
     this.Blockv = blockv;
     // Region plugins
     this.plugins = [
-      require('./plugins/InventoryRegion').default,
-      require('./plugins/VatomIDRegion').default,
-      require('./plugins/VatomChildrenRegion').default,
-      require('./plugins/GeoPosRegion').default
+      require('./plugins/inventory-region').default,
+      require('./plugins/vatom-id-region').default,
+      require('./plugins/Vatom-children-region').default,
+      require('./plugins/geo-region').default
     ]
 
     // Currently active regions

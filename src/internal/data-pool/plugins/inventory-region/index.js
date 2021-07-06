@@ -1,5 +1,5 @@
-import Region from '../CompositeRegion'
-import PlatformInventoryRegion from './PlatformRegion'
+import Region from '../composite-region'
+import PlatformInventoryRegion from './platform-region'
 /**
  * This region plugin provides access to the current user's inventory.
  *

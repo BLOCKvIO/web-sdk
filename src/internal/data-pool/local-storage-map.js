@@ -1,6 +1,4 @@
-import DataObject from './DataObject'
-import LZUTF8 from 'lzutf8'
-import LZUTF8WorkerScript from './LZUTF8WorkerScript.js'
+import DataObject from './data-object'
 
 /** 
  * A version of the built-in Map class, but which synchronizes to localStorage for offline access. Key must be a string,

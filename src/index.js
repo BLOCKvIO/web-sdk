@@ -11,8 +11,8 @@
 
 // This is the entry point when importing this library into a web app.
 
-export { default } from './client/Blockv'
-export { default as Discover } from './client/Discover'
+export { default } from './client/blockv'
+export { default as Discover } from './client/discover'
 
 // Attach SDK version information to the window
 if (typeof window != 'undefined') window.BlockvSDKInfo = {

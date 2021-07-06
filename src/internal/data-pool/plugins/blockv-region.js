@@ -1,9 +1,9 @@
 
-import Region from '../Region'
-import Vatom from '../../../model/Vatom'
-import DataObjectAnimator from '../DataObjectAnimator'
+import Region from '../region'
+import Vatom from '../../../model/vatom'
+import DataObjectAnimator from '../data-object-animator'
 import { merge } from 'lodash'
-import Delayer from '../Delayer'
+import Delayer from '../delayer'
 
 /**
  * Intermediate class which handles updates via the BLOCKv websocket and returning Vatom objects. Regions can subclass this to automatically

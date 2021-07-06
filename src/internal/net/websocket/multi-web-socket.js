@@ -1,7 +1,7 @@
 //
 
-import EventEmitter from '../../EventEmitter'
-import WebSockets from './WebSockets'
+import EventEmitter from '../../event-emitter'
+import WebSockets from './web-socket'
 // This is a wrapper around the WebSockets class, which allows for multiple sockets to be active at once.
 // It matches the API of that class exactly.
 export default class MultiWebSockets extends EventEmitter {

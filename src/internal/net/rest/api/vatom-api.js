@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 
-import Vatom from '../../../../model/Vatom'
+import Vatom from '..../../../../model/vatom
 
 export default class VatomApi {
   constructor(client) {

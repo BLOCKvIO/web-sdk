@@ -1,6 +1,6 @@
 
-import BLOCKvRegion from './BLOCKvRegion'
-import DataObject from '../DataObject'
+import BLOCKvRegion from './blockv-region'
+import DataObject from '../data-object'
 
 /**
  * This region plugin provides access to a collection of vatoms identified by their IDs.

@@ -1,4 +1,4 @@
-import Region from '../Region'
+import Region from '../region'
 /**
  * Intermediate class which handles updates maintaining multiple regions for the different blockv platforms
  *

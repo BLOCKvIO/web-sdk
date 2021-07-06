@@ -1,11 +1,10 @@
 /* global localStorage */
-import EventEmitter from './EventEmitter'
-import DataObject from './DataObject'
-import Filter from './Filter'
-import LZString from 'lz-string'
+import EventEmitter from './event-emitter'
+import DataObject from './data-object'
+import Filter from './filter'
 import { merge, get, set } from 'lodash'
-import Delayer from './Delayer'
-import LocalStorageMap from './LocalStorageMap'
+import Delayer from './delayer'
+import LocalStorageMap from './local-storage-map'
 
 /**
  * Base class for a region.

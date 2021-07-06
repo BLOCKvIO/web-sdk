@@ -9,8 +9,8 @@
 //  governing permissions and limitations under the License.
 //
 
-import VatomApi from '../../internal/net/rest/api/VatomApi'
-import GeoPosRegion from '../../internal/DataPool/plugins/GeoPosRegion'
+import VatomApi from '../../internal/net/rest/api/vatom-api'
+import GeoPosRegion from '../../internal/data-pool/plugins/geo-region'
 export default class Vatoms {
   constructor(blockv) {
     this.Blockv = blockv

@@ -1,6 +1,6 @@
 
 import PouchDB from 'pouchdb'
-import DataObject from './DataObject'
+import DataObject from './data-object'
 
 /** 
  * A version of the built-in Map class, but which synchronizes to a local database for offline access. Key must be a string,

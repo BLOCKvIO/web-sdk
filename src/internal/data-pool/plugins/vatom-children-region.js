@@ -1,7 +1,7 @@
 
-import BLOCKvRegion from './BLOCKvRegion'
-import Discover from '../../../client/Discover'
-import DataObject from '../DataObject'
+import BLOCKvRegion from './blockv-Region'
+import Discover from '../../../client/discover'
+import DataObject from '../data-object'
 
 /**
  * This region plugin provides access to a collection of vatoms that are children of another vatom.

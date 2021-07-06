@@ -1,5 +1,5 @@
-import Region from '../CompositeRegion'
-import PlatformGeoRegion from './PlatformRegion'
+import Region from '../composite-region'
+import PlatformGeoRegion from './platform-region'
 import { getCenter } from 'geolib';
 import Geohash from 'latlon-geohash';
 

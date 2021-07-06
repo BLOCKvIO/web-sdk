@@ -8,17 +8,17 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import DataPool from '../internal/DataPool'
-import Store from '../internal/repo/Store'
-import UserManager from './manager/UserManager'
-import UserApi from '../internal/net/rest/api/UserApi'
-import Vatoms from './manager/Vatoms'
-import Activity from './manager/Activity'
-import ActivityApi from '../internal/net/rest/api/ActivityApi'
-import Client from '../internal/net/Client'
-import MultiWebSockets from '../internal/net/websocket/MultiWebSockets'
-import EventEmitter from '../internal/EventEmitter';
-import Platform from '../internal/net/rest/Platform'
+import DataPool from '../internal/data-pool'
+import Store from '../internal/repo/storage'
+import UserManager from './manager/user-manager'
+import UserApi from '../internal/net/rest/api/user-api'
+import Vatoms from './manager/vatom-manager'
+import Activity from './manager/activity-manager'
+import ActivityApi from '../internal/net/rest/api/activity-api'
+import Client from '../internal/net/network'
+import MultiWebSockets from '../internal/net/websocket/multi-web-socket'
+import EventEmitter from '../internal/event-emitter';
+import Platform from '../internal/net/rest/platform'
 
 export default class Blockv extends EventEmitter {
   constructor(payload) {

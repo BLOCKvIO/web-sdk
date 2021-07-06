@@ -9,7 +9,7 @@
 //  governing permissions and limitations under the License.
 //
 
-import Vatom from '../model/Vatom'
+import Vatom from '../model/vatom'
 
 export default class Discover {
   constructor (bv, customPayload) {
