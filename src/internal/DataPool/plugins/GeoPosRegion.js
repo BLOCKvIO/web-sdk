@@ -147,12 +147,18 @@ export default class GeoPosRegion extends BLOCKvRegion {
     // Pause websocket events
     this.pauseMessages()
 
+    
     let payload = {
       top_right: this.coordinates.top_right,
       bottom_left: this.coordinates.bottom_left,
       filter: 'all',
       limit: 10000
     }
+
+    // look for geohash coords
+    if(this.coordinates?.geohash) 
+      payload['geohash'] = this.coordinates.geohash
+
 
     if (this.coordinates.publisher_fqdn)
       payload['publisher_fqdn'] = this.coordinates.publisher_fqdn
