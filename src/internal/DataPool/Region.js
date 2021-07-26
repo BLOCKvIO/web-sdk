@@ -18,7 +18,7 @@ import LocalStorageMap from './LocalStorageMap'
  */
 export default class Region extends EventEmitter {
   /** @private Subclasses should use this to update and start monitoring the region */
-  constructor (dataPool) {
+  constructor(dataPool) {
     super()
 
     /** If true, this region will not be cached to disk. */
@@ -54,7 +54,7 @@ export default class Region extends EventEmitter {
   /**
      * Re-synchronizes the region by manually fetching everything from the server again.
      */
-  forceSynchronize () {
+  forceSynchronize() {
     this.synchronized = false
     return this.synchronize()
   }
@@ -65,16 +65,15 @@ export default class Region extends EventEmitter {
      * @private Called by the Region superclass.
      * @returns {Promise} Resolves once the region is in sync with the backend.
      */
-  synchronize () {
+  synchronize() {
     // Stop if already running
     if (this._syncPromise) { return this._syncPromise }
 
-    // Remove pending error
-    this.error = null
-    this.emit('updated')
-
     // Stop if already in sync
     if (this.synchronized) { return Promise.resolve() }
+
+    // Remove pending error
+    this.error = null
 
     // Do the sync
     this._syncPromise = this._synchronize().catch(err => {
@@ -118,7 +117,7 @@ export default class Region extends EventEmitter {
 
       // Remove vatoms
       this.removeObjects(keysToRemove)
-      
+
     }
 
     // All data is up to date!
@@ -126,7 +125,7 @@ export default class Region extends EventEmitter {
     this._syncPromise = null
     this.emit('updated')
     console.log(`[DataPool > Region] Region '${this.stateKey}' is now in sync!`)
-    
+
   }
 
   /**
@@ -135,7 +134,7 @@ export default class Region extends EventEmitter {
      * @abstract Subclasses should override this.
      * @returns {String} The state key.
      */
-  get stateKey () {
+  get stateKey() {
     throw new Error(`Subclasses must override 'get stateKey()' in order to correctly handle saving/restoring state to disk.`)
   }
 
@@ -146,7 +145,7 @@ export default class Region extends EventEmitter {
      * @abstract Subclasses should override this.
      * @returns {Promise<>} Once this promise resolves, the region should be stable.
      */
-  async load () {
+  async load() {
     throw new Error(`Subclasses must override Region.load()`)
   }
 
@@ -155,7 +154,7 @@ export default class Region extends EventEmitter {
      *
      * @abstract Subclasses should override this, but call super.close()
      */
-  close () {
+  close() {
     // Notify data pool we have closed
     this.dataPool.removeRegion(this)
     this.emit('closed')
@@ -170,7 +169,7 @@ export default class Region extends EventEmitter {
      * @param {string} id The region plugin ID
      * @param {*} descriptor The region-specific filter data.
      */
-  matches (id, descriptor) {
+  matches(id, descriptor) {
     throw new Error('Subclasses must override Region.matches()')
   }
 
@@ -180,7 +179,7 @@ export default class Region extends EventEmitter {
      * @private Called by subclasses.
      * @param {DataObject[]} objects List of new data objects added to the pool.
      */
-  addObjects (objects) {
+  addObjects(objects) {
 
     // Go through each object
     for (let obj of objects) {
@@ -215,7 +214,7 @@ export default class Region extends EventEmitter {
     }
 
     // Notify updated
-    if (objects.length > 0) 
+    if (objects.length > 0)
       this.emit('updated')
 
   }
@@ -226,7 +225,7 @@ export default class Region extends EventEmitter {
      * @private Called by subclasses
      * @param {Object[]} objects An array of changes. Each object contains an `id` string and a `new_data` sparse object containing the changed fields.
      */
-  updateObjects (objects) {
+  updateObjects(objects) {
     // Go through each object
     let didUpdate = false
     for (let obj of objects) {
@@ -261,7 +260,7 @@ export default class Region extends EventEmitter {
      * @private Called by subclasses.
      * @param {String[]} ids An array of object IDs to remove.
      */
-  removeObjects (ids) {
+  removeObjects(ids) {
     // Remove all data objects with the specified IDs
     let didUpdate = false
     for (let id of ids) {
@@ -287,7 +286,7 @@ export default class Region extends EventEmitter {
      * @abstract Subclasses can override this if they want.
      * @param {*} info The new session info.
      */
-  onSessionInfoChanged (info) {}
+  onSessionInfoChanged(info) { }
 
   /**
      * If the plugin wants, it can map DataObjects to another type. This takes in a DataObject and returns a new type.
@@ -298,7 +297,7 @@ export default class Region extends EventEmitter {
      * @param {DataObject} object The input raw object
      * @returns {*} The output object.
      */
-  map (object) {
+  map(object) {
     return object
   }
 
@@ -308,7 +307,7 @@ export default class Region extends EventEmitter {
      *
      * @param {Function(*)} callback Gets called once for each objbect in the region.
      */
-  forEach (callback) {
+  forEach(callback) {
     // Go through all data objects
     for (let object of this.objects.values()) {
       // Check for cached object
@@ -334,7 +333,7 @@ export default class Region extends EventEmitter {
      * @param {Boolean} waitUntilStable If true, will wait until all data objects have been retrieved. If false, will return immediately with current data.
      * @returns {Promise<Object[]>} An array of objects in this region. If `waitUntilStable` is false, returns the array immediately (without the promise).
      */
-  get (waitUntilStable = true) {
+  get(waitUntilStable = true) {
     // Synchronize now
     if (waitUntilStable) {
       return this.synchronize().then(e => this.get(false))
@@ -372,7 +371,7 @@ export default class Region extends EventEmitter {
      * @param {Boolean} waitUntilStable If true, will wait until all data objects have been retrieved. If false, will return immediately with current data.
      * @returns {Promise<Object>} An object in this region. If `waitUntilStable` is false, returns immediately (without the promise).
      */
-  getItem (id, waitUntilStable = true) {
+  getItem(id, waitUntilStable = true) {
     // Synchronize now
     if (waitUntilStable) {
       return this.synchronize().then(e => this.getItem(id, false))
@@ -404,7 +403,7 @@ export default class Region extends EventEmitter {
      * @param {*} id The object's ID
      * @returns {boolean} True if the object exists.
      */
-  has (id) {
+  has(id) {
     return this.objects.has(id)
   }
 
@@ -416,10 +415,10 @@ export default class Region extends EventEmitter {
      * @param {*} value The new value
      * @returns {Function} An undo function
      */
-  preemptiveChange (id, keyPath, value) {
+  preemptiveChange(id, keyPath, value) {
     // Get object. If it doesn't exist, do nothing and return an undo function which does nothing.
     let object = this.objects.get(id)
-    if (!object) { return function () {} }
+    if (!object) { return function () { } }
 
     // Get current value
     let oldValue = get(object.data, keyPath)
@@ -458,10 +457,10 @@ export default class Region extends EventEmitter {
      * @param {String} id The ID of the object to remove.
      * @returns {Function} An undo function
      */
-  preemptiveRemove (id) {
+  preemptiveRemove(id) {
     // Get object. If it doesn't exist, do nothing and return an undo function which does nothing.
     let object = this.objects.get(id)
-    if (!object) { return function () {} }
+    if (!object) { return function () { } }
 
     // Notify
     this.willRemove(object)
@@ -490,7 +489,7 @@ export default class Region extends EventEmitter {
      * @param {*} value The value to check for
      * @returns {Filter} The filtered region
      */
-  filter (keyPath, value) {
+  filter(keyPath, value) {
     return new Filter(this, keyPath, value)
   }
 
@@ -501,7 +500,7 @@ export default class Region extends EventEmitter {
      * @abstract Can be overridden by subclasses which need to get these events.
      * @param {DataObject} object The object which will be added.
      */
-  willAdd (object) {}
+  willAdd(object) { }
 
   /**
      * Called when an object is about to be updated.
@@ -511,7 +510,7 @@ export default class Region extends EventEmitter {
      * @param {DataObject} object The object which will be updated.
      * @param {Object} newData The sparse object containing the changed fields
      */
-  willUpdateFields (object, newData) {}
+  willUpdateFields(object, newData) { }
 
   /**
      * Called when an object is about to be updated.
@@ -523,7 +522,7 @@ export default class Region extends EventEmitter {
      * @param {*} oldValue The current field value.
      * @param {*} newValue The new field value.
      */
-  willUpdateField (object, keyPath, oldValue, newValue) {}
+  willUpdateField(object, keyPath, oldValue, newValue) { }
 
   /**
      * Called when an object is about to be removed.
@@ -532,5 +531,5 @@ export default class Region extends EventEmitter {
      * @abstract Can be overridden by subclasses which need to get these events.
      * @param {DataObject|String} objectOrID The object (or ID) which will be updated.
      */
-  willRemove (objectOrID) {}
+  willRemove(objectOrID) { }
 }

@@ -11,12 +11,12 @@
 import Vatom from '../../../../model/Vatom'
 
 export default class VatomApi {
-  constructor (client) {
+  constructor(client) {
     this.client = client
   }
 
-  getActions (templateID) {
-    return this.client.request('GET', `/v1/user/actions/${templateID}`, {}, true)
+  getActions(templateID, platformId = 'primary') {
+    return this.client.request('GET', `/v1/user/actions/${templateID}`, {}, true, undefined, platformId)
       .then((data) => {
         const len = data.length
         const actions = []
@@ -34,12 +34,12 @@ export default class VatomApi {
       })
   }
 
-  performAction (action, payload) {
-    return this.client.request('POST', `/v1/user/vatom/action/${action}`, payload, true).then(data => data.main.output)
+  performAction(action, payload, platformId = 'primary') {
+    return this.client.request('POST', `/v1/user/vatom/action/${action}`, payload, true, undefined, platformId).then(data => data.main.output)
   }
 
-  getUserInventory (payload) {
-    return this.client.request('POST', '/v1/user/vatom/inventory', payload, true).then((data) => {
+  getUserInventory(payload, platformId = 'primary') {
+    return this.client.request('POST', '/v1/user/vatom/inventory', payload, true, undefined, platformId).then((data) => {
       const { actions, faces, vatoms } = data
 
       const actionsArray = []
@@ -77,8 +77,8 @@ export default class VatomApi {
     })
   }
 
-  getUserVatoms (payload) {
-    return this.client.request('POST', '/v1/user/vatom/get', payload, true).then((data) => {
+  getUserVatoms(payload, platformId = 'primary') {
+    return this.client.request('POST', '/v1/user/vatom/get', payload, true, undefined, platformId).then((data) => {
       const { actions, faces, vatoms } = data
 
       const actionsArray = []
@@ -107,15 +107,15 @@ export default class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType']
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template), platformId)
         vatomsArray.push(obj)
       }
       return vatomsArray
     })
   }
 
-  geoDiscover (payload) {
-    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true).then((data) => {
+  geoDiscover(payload, platformId = 'primary') {
+    return this.client.request('POST', '/v1/vatom/geodiscover', payload, true, undefined, platformId).then((data) => {
       const { actions, faces, vatoms } = data
 
       const actionsArray = []
@@ -144,28 +144,28 @@ export default class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType']
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template), platformId)
         vatomsArray.push(obj)
       }
       return vatomsArray
     })
   }
 
-  geoDiscoverGroups (payload) {
-    return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true).then(data => data)
+  geoDiscoverGroups(payload, platformId = 'primary') {
+    return this.client.request('POST', '/v1/vatom/geodiscovergroups', payload, true, undefined, platformId).then(data => data)
   }
 
-  getVatomChildren (parentID) {
-    return this.client.request('POST', '/v1/vatom/discover', { 
+  getVatomChildren(parentID, platformId = 'primary') {
+    return this.client.request('POST', '/v1/vatom/discover', {
       scope: {
-        key: "vAtom::vAtomType.parent_id" ,
+        key: "vAtom::vAtomType.parent_id",
         value: parentID
       },
       return: {
         type: "*",
         fields: []
       }
-    }, true).then(data => {
+    }, true, undefined, platformId).then(data => {
       const { actions, faces, results } = data
       const vatoms = results
 
@@ -195,21 +195,21 @@ export default class VatomApi {
       // eslint-disable-next-line
       for (let v of vatoms) {
         const { template } = v['vAtom::vAtomType']
-        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template))
+        const obj = new Vatom(v, facesArray.filter(f => f.template === template), actionsArray.filter(a => a.template === template), platformId)
         vatomsArray.push(obj)
       }
       return vatomsArray
     })
   }
 
-  setParent (payload) {
-    return this.client.request('PATCH', '/v1/vatoms', payload, true).then(data => data)
+  setParent(payload, platformId = 'primary') {
+    return this.client.request('PATCH', '/v1/vatoms', payload, true, undefined, platformId).then(data => data)
   }
 
-  trashVatom (vatomID) {
+  trashVatom(vatomID, platformId = 'primary') {
     const payload = {
       'this.id': vatomID
     }
-    return this.client.request('POST', '/v1/user/vatom/trash', payload, true).then(data => data)
+    return this.client.request('POST', '/v1/user/vatom/trash', payload, true, undefined, platformId).then(data => data)
   }
 }

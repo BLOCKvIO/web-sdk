@@ -16,11 +16,12 @@ import Vatoms from './manager/Vatoms'
 import Activity from './manager/Activity'
 import ActivityApi from '../internal/net/rest/api/ActivityApi'
 import Client from '../internal/net/Client'
-import MultiWebSockets from './manager/MultiWebSockets'
+import MultiWebSockets from '../internal/net/websocket/MultiWebSockets'
 import EventEmitter from '../internal/EventEmitter';
+import Platform from '../internal/net/rest/Platform'
 
 export default class Blockv extends EventEmitter {
-  constructor (payload) {
+  constructor(payload) {
     super()
     const prefix = payload.prefix || payload.appID
 
@@ -28,22 +29,27 @@ export default class Blockv extends EventEmitter {
     this.store.appID = payload.appID
     this.store.server = payload.server || 'https://api.blockv.io'
     this.store.websocketAddress = payload.websocketAddress || 'wss://newws.blockv.io'
+    this.client = new Client(this)
+    this.platform = new Platform(this.client, this.store, payload.connectAllPlatforms);
 
     this.dataPool = new DataPool(this)
-    this.dataPool.Blockv = this
     this.dataPool.disableSyncV2 = payload.disableSyncV2
-    this.client = new Client(this)
-
+    
     const userApi = new UserApi(this)
     const activityApi = new ActivityApi(this.client)
 
     this.Activity = new Activity(activityApi)
-    this.WebSockets = new MultiWebSockets(this.store, this.client)
+    this.WebSockets = new MultiWebSockets(this.store, this.client, this.platform)
     this.UserManager = new UserManager(userApi, this.store)
     this.Vatoms = new Vatoms(this)
+
 
     if (this.UserManager.isLoggedIn) {
       this.dataPool.setSessionInfo({ userID: this.store.userID, client: this.client })
     }
+  }
+  
+  getPlatformIds() {
+    return this.platform.getIds();
   }
 }

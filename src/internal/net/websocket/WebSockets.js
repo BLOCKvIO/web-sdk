@@ -9,10 +9,10 @@
 //  governing permissions and limitations under the License.
 //
 
-import EventEmitter from '../../internal/EventEmitter'
+import EventEmitter from '../../EventEmitter'
 
 export default class WebSockets extends EventEmitter {
-  constructor (store, client, address) {
+  constructor(store, client, address, id) {
     super()
     this.store = store
     this.client = client
@@ -26,10 +26,16 @@ export default class WebSockets extends EventEmitter {
 
     /** If true, the websocket will continue to retry the connection if it fails */
     this.shouldRetry = false
+
+    this.id = id;
+
+    this.commandQueue = [];
+    this.sendingCommands = false;
+    this.messageId = 1;
   }
 
   /** This will be true if the connection is ready to send and receive messages */
-  get isOpen () {
+  get isOpen() {
     return this.socket && this.socket.readyState === 1
   }
 
@@ -38,7 +44,7 @@ export default class WebSockets extends EventEmitter {
    * @public
    * @return {Promise<WebSockets>}
    */
-  async connect () {
+  async connect() {
     // Stay connected after this point
     this.shouldRetry = true
 
@@ -62,7 +68,7 @@ export default class WebSockets extends EventEmitter {
     }
 
     // Create the websocket
-    const url = `${this.address}/ws?app_id=${encodeURIComponent(this.store.appID)}&token=${encodeURIComponent(this.store.token)}`
+    const url = `${this.address}?app_id=${encodeURIComponent(this.store.appID)}&token=${encodeURIComponent(this.store.token)}`
     this.socket = new WebSocket(url)
     this.socket.addEventListener('open', this.handleConnected.bind(this))
     this.socket.addEventListener('message', this.handleMessage.bind(this))
@@ -77,14 +83,30 @@ export default class WebSockets extends EventEmitter {
    * This sends a message through the web socket
    * @param {*} cmd
    */
-  sendMessage (cmd) {
-    if (this.socket && this.socket.readyState === 1) {
-      this.socket.send(JSON.stringify(cmd))
-    } else {
-      console.warn('WebSocket: Attempted to send message up, but the socket is not ready.')
-    }
+  sendMessage(cmd) {
+    cmd.id = "" + this.messageId;
+    this.messageId++;
+    this.commandQueue.push(cmd);
+    this.sendNextCommand();
   }
 
+  async sendNextCommand() {
+    if (!this.sendCommands) {
+      this.sendCommands = true;
+      if (this.socket && this.socket.readyState === 1) {
+        const cmd = this.commandQueue.shift();
+        if (cmd) {
+          this.socket.send(JSON.stringify(cmd));
+          this.sendCommands = false;
+          this.sendNextCommand();
+          console.log('Sending WS command: ' + JSON.stringify(cmd))
+        }
+      } else {
+        console.warn('WebSocket: Attempted to send message up, but the socket is not ready.');
+      }
+      this.sendCommands = false;
+    }
+  }
   /**
    * The handleMessage function allows the different types of messages to be returned:
    * stateUpdate, inventory, activity, and, info.
@@ -92,36 +114,36 @@ export default class WebSockets extends EventEmitter {
    * @param  {JSON<Object>} e A JSON Object that is passed into the function from connect()
    * @return {JSON<Object>}  A JSON Object is returned containing the list of chosen message types
    */
-  handleMessage (e) {
+  handleMessage(e) {
     const ed = JSON.parse(e.data)
-    this.trigger('websocket.raw', ed)
+    this.trigger('websocket.raw', ed, this.id)
 
     // if the message is a RPC message
     if (ed.msg_type === 'rpc') {
-      this.trigger('websocket.rpc', ed)
+      this.trigger('websocket.rpc', ed, this.id)
     }
     // if the user only wants state updates
     if (ed.msg_type === 'state_update') {
-      this.trigger('stateUpdate', ed)
+      this.trigger('stateUpdate', ed, this.id)
     }
 
     // if the user only wants inventory updates
     if (ed.msg_type === 'inventory') {
-      this.trigger('inventory', ed)
+      this.trigger('inventory', ed, this.id)
     }
 
     // if the user only wants activity updates
     if (ed.msg_type === 'my_events') {
-      this.trigger('activity', ed)
+      this.trigger('activity', ed, this.id)
     }
 
     // if the user only wants info updates
     if (ed.msg_type === 'info') {
-      this.trigger('info', ed)
+      this.trigger('info', ed, this.id)
     }
 
     if (ed) {
-      this.trigger('all', ed)
+      this.trigger('all', ed, this.id)
     }
   }
 
@@ -131,9 +153,10 @@ export default class WebSockets extends EventEmitter {
    * @param  {Event<SocketStatus>} e no need for inputting the parameter
    * @return {Function<connected>} triggers the connected function
    */
-  handleConnected (e) {
+  handleConnected(e) {
     this.delayTime = 1000
-    this.trigger('connected', e)
+    this.trigger('connected', e, this.id)
+    this.sendNextCommand();
   }
 
   /**
@@ -142,7 +165,7 @@ export default class WebSockets extends EventEmitter {
    * @private
    * @return {Promise<WebSockets>} returns the connection function
    */
-  retryConnection () {
+  retryConnection() {
     // Clear previous retry timer
     if (this.retryTimer) {
       clearTimeout(this.retryTimer)
@@ -173,7 +196,7 @@ export default class WebSockets extends EventEmitter {
    * @private
    * @param {Error} err The error that happened
    */
-  handleError (err) {
+  handleError(err) {
     this.socket = null
     console.warn('[WebSocket] Connection failed: ' + err.message)
   }
@@ -183,7 +206,8 @@ export default class WebSockets extends EventEmitter {
    * @private
    * @param  {Event} e no need for inputting, It is a Websocket Event
    */
-  handleClose () {
+  handleClose() {
+    console.warn('[WebSocket] closed')
     this.socket = null
     this.retryConnection()
   }
@@ -193,7 +217,7 @@ export default class WebSockets extends EventEmitter {
    * Forcefully closes the Web socket.
      Note: Socket will be set to null. Auto connect will be disabled.
    */
-  close () {
+  close() {
     // Prevent retrying
     this.shouldRetry = false
 

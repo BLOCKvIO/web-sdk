@@ -47,7 +47,7 @@ const ErrorCodes = {
 
 export default class Client extends EventEmitter {
   /** @private */
-  constructor (bv) {
+  constructor(bv) {
     super()
     this.Blockv = bv
     this.store = bv.store
@@ -62,7 +62,7 @@ export default class Client extends EventEmitter {
    * @param {object} headers Optional extra HTTP headers to add to the request.
    * @returns {Promise<object>} The server's response payload.
    */
-  async request (method, endpoint, payload, auth, headers) {
+  async request(method, endpoint, payload, auth, headers, platformId) {
     // Ensure our access token is up to date, if this is an authenticated request
     if (auth) await this.checkToken()
 
@@ -71,18 +71,25 @@ export default class Client extends EventEmitter {
     headers['App-Id'] = this.store.appID
     if (auth) headers['Authorization'] = `Bearer ${this.store.token}`
 
+    let server = undefined;
+    if (platformId) {
+      const platform = await this.Blockv.platform.get(platformId);
+      if (platform && platform.api_gateway) {
+        server = platform.api_gateway
+      }
+    }
     // Send request
-    return this.authRequest(method, endpoint, payload, headers)
+    return this.authRequest(method, endpoint, payload, headers, server)
   }
 
   /** @private */
-  async authRequest (method, endpoint, payload, headers) {
-    
+  async authRequest(method, endpoint, payload, headers, server = this.store.server) {
+
     // Send request start event
     let t0 = Date.now();
     let statekey = Math.random().toString(36).substr(2)
     this.emit('requestTimerStart', {
-      url: this.store.server + endpoint,
+      url: server + endpoint,
       method,
       event: 'start',
       statekey,
@@ -106,14 +113,14 @@ export default class Client extends EventEmitter {
       body = payload
       if (!extraHeaders['Content-Type']) headers['Content-Type'] = 'application/json'
     }
-    
+
     // try get a response
     let response = null
     let json = null
     try {
 
       // Send request
-      response = await fetch(this.store.server + endpoint, { method, body, headers })
+      response = await fetch(server + endpoint, { method, body, headers })
 
       // Decode JSON
       json = await response.json()
@@ -133,18 +140,18 @@ export default class Client extends EventEmitter {
       // Request failed, send timing event
       var t1 = Date.now();
       this.emit('requestTimerEnd', {
-        url: this.store.server + endpoint,
+        url: server + endpoint,
         method,
         milliseconds: t1 - t0,
         statekey,
         event: 'end'
       })
 
-       throw err
+      throw err
 
     }
-    
-    
+
+
     // Check for server error
     if (json.payload === undefined && json.error === 2051) {
 
@@ -172,7 +179,7 @@ export default class Client extends EventEmitter {
       json = {
         payload: json
       }
-      
+
     } else if (json.payload === undefined) {
 
       // Throw the error returned by the server
@@ -182,7 +189,7 @@ export default class Client extends EventEmitter {
       error.requestID = json.request_id
       error.serverMessage = json.message
       throw error
-      
+
     }
 
     // Check for main reactor error payload
@@ -196,7 +203,7 @@ export default class Client extends EventEmitter {
       error.requestID = json.request_id
       throw error
     }
-    
+
     // No error, continue
     return json.payload
   }
@@ -205,7 +212,7 @@ export default class Client extends EventEmitter {
   * Uses the refresh token to fetch and store a new access token from the backend.
   * @private
   */
-  refreshToken () {
+  refreshToken() {
 
     // Check if currently fetching an access token
     if (this.tokenFetchPromise)
@@ -242,7 +249,7 @@ export default class Client extends EventEmitter {
    * @private
    * @returns {Promise} Resolves when the access token is valid.
    */
-  async checkToken () {
+  async checkToken() {
     // define our vars
     let decodedToken
     let nowDate

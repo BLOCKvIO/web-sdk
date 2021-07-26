@@ -9,10 +9,11 @@ import Delayer from '../Delayer'
  * Intermediate class which handles updates via the BLOCKv websocket and returning Vatom objects. Regions can subclass this to automatically
  * get updates via WebSocket.
  */
-export default class BLOCKvRegion extends Region {
-  constructor (dataPool) {
+export default class  BLOCKvRegion extends Region {
+  constructor(dataPool, platformId) {
     super(dataPool)
-
+    // Vatom network id this region is interacting with
+    this.platformId = platformId;
     // Queue of pending WebSocket messages
     this.queuedMessages = []
     this.socketPaused = false
@@ -31,11 +32,11 @@ export default class BLOCKvRegion extends Region {
   }
 
   /** Called when this region is going to be shut down */
-  close () {
+  close() {
     super.close()
     // Remove listeners
     this.socket.removeEventListener('websocket.raw', this.onWebSocketMessage)
-    
+
     DataObjectAnimator.withBlockv(this.dataPool.Blockv).removeRegion(this)
   }
 
@@ -43,7 +44,7 @@ export default class BLOCKvRegion extends Region {
    * Called to pause processing of websocket messages
    * @private Called by subclasses.
    */
-  pauseMessages () {
+  pauseMessages() {
     this.socketPaused = true
   }
 
@@ -52,7 +53,7 @@ export default class BLOCKvRegion extends Region {
    *
    * @private Called by subclasses.
    */
-  resumeMessages () {
+  resumeMessages() {
     // Unpause
     this.socketPaused = false
 
@@ -68,20 +69,23 @@ export default class BLOCKvRegion extends Region {
    * @private
    * @param {Object} msg The raw JSON from the websocket event message
    */
-  onWebSocketMessage (msg) {
-    // Add to queue
-    this.queuedMessages.push(msg)
+  onWebSocketMessage(msg, id) {
+    if (!this.platformId || id === this.platformId) {
 
-    // Process it if necessary
-    if (!this.socketPaused && !this.socketProcessing) {
-      this.processNextMessage()
+      // Add to queue
+      this.queuedMessages.push(msg)
+
+      // Process it if necessary
+      if (!this.socketPaused && !this.socketProcessing) {
+        this.processNextMessage()
+      }
     }
   }
 
   /**
    * Called to process the next WebSocket message.
    */
-  async processNextMessage () {
+  async processNextMessage() {
     // Stop if socket is paused
     if (this.socketPaused) {
       return
@@ -128,7 +132,7 @@ export default class BLOCKvRegion extends Region {
     * @abstract Subclasses can override to process other WebSocket messages. Always call super.processMessage(msg) though.
     * @param {Object} msg The raw JSON from the websocket event message
     */
-  async processMessage (msg) {
+  async processMessage(msg) {
 
     // We only handle state_update messages here
     if (msg.msg_type != 'state_update')
@@ -153,7 +157,7 @@ export default class BLOCKvRegion extends Region {
   }
 
   /** Map our data objects to Vatom objects */
-  map (object) {
+  map(object) {
     // Only handle vatoms
     if (object.type !== 'vatom') {
       return null
@@ -166,7 +170,7 @@ export default class BLOCKvRegion extends Region {
     let actions = Array.from(this.objects.values()).filter(o => o.type === 'action' && o.data.name.startsWith(object.data['vAtom::vAtomType'].template + '::Action::')).map(o => o.data)
 
     // Create vatom object
-    return new Vatom(object.data, faces, actions)
+    return new Vatom(object.data, faces, actions, this.platformId)
   }
 
   /**
@@ -176,7 +180,7 @@ export default class BLOCKvRegion extends Region {
    * @abstract Can be overridden by subclasses which need to get these events.
    * @param {DataObject} object The object which will be added.
    */
-  willAdd (object) {
+  willAdd(object) {
     // Notify parent as well
     let parent = object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].parent_id
     if (parent) {
@@ -197,7 +201,7 @@ export default class BLOCKvRegion extends Region {
     * @param {DataObject} object The object which will be updated.
     * @param {Object} newData The sparse object containing the changed fields
   */
-  willUpdateFields (object, newData) {
+  willUpdateFields(object, newData) {
     // Notify parent as well
     let oldParent = object.data && object.data['vAtom::vAtomType'] && object.data['vAtom::vAtomType'].parent_id
     let newParent = newData && newData['vAtom::vAtomType'] && newData['vAtom::vAtomType'].parent_id
@@ -215,7 +219,7 @@ export default class BLOCKvRegion extends Region {
    * @param {*} oldValue The current field value.
    * @param {*} newValue The new field value.
    */
-  willUpdateField (object, keyPath, oldValue, newValue) {
+  willUpdateField(object, keyPath, oldValue, newValue) {
     // Only do if modifying the parent ID field
     if (keyPath !== 'vAtom::vAtomType.parent_id') {
       return
@@ -232,7 +236,7 @@ export default class BLOCKvRegion extends Region {
    * @abstract Can be overridden by subclasses which need to get these events.
    * @param {DataObject|String} objectOrID The object (or ID) which will be updated.
    */
-  willRemove (objectOrID) {
+  willRemove(objectOrID) {
     // Get object if needed
     let object = objectOrID
     if (typeof objectOrID === 'string') {

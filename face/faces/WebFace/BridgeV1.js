@@ -34,7 +34,7 @@ export default class BridgeV1 {
   }
 
   getChildren (payload) {
-    return this.blockv.Vatoms.getVatomChildren(payload.id).then(children => {
+    return this.blockv.Vatoms.getVatomChildren(this.vatom).then(children => {
       let vatomInfos = []
       for (let vatom of children) {
         vatomInfos.push(this.encodeVatom(vatom))
@@ -54,7 +54,7 @@ export default class BridgeV1 {
 
   performAction (payload) {
     // Perform vAtom action
-    return this.blockv.Vatoms.performAction(payload.actionData['this.id'], payload.actionName, payload.actionData)
+    return this.blockv.Vatoms.performAction(this.vatom, payload.actionName, payload.actionData)
   }
 
   getProfile (payload) {

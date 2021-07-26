@@ -11,21 +11,22 @@
 import _ from 'lodash'
 
 export default class BridgeV2 {
-  constructor (bv, vatom, face) {
+  constructor(bv, vatom, face) {
     this.blockv = bv
+    this.vatomObject = vatom;
     this.vatom = this.encodeVatom(vatom)
     this.face = face
     this.version = 2
   }
 
-  init () {
+  init() {
     return {
       vatom: this.vatom,
       face: this.face
     }
   }
 
-  getVatom () {
+  getVatom() {
     return this.blockv.Vatoms.getUserVatoms([this.vatom.id]).then(v => {
       return {
         vatom: this.encodeVatom(v[0])
@@ -33,15 +34,15 @@ export default class BridgeV2 {
     })
   }
 
-  getVatomChildren () {
-    return this.blockv.Vatoms.getVatomChildren(this.vatom.id).then(v => {
+  getVatomChildren() {
+    return this.blockv.Vatoms.getVatomChildren(this.vatomObject).then(v => {
       return {
-        vatoms: v.map(vatom => Object.assign({actions: vatom.actions, faces: vatom.faces}, vatom.payload))
+        vatoms: v.map(vatom => Object.assign({ actions: vatom.actions, faces: vatom.faces }, vatom.payload))
       }
     })
   }
 
-  vatomParentSet (payload) {
+  vatomParentSet(payload) {
     return this.blockv.Vatoms.setParent(payload).then(pId => {
       return {
         new_parent_id: pId
@@ -49,7 +50,7 @@ export default class BridgeV2 {
     })
   }
 
-  observeChildren (payload) {
+  observeChildren(payload) {
     let vId = payload
     return this.blockv.Vatoms.observeChildren(payload.id).then(v => {
       return {
@@ -59,19 +60,19 @@ export default class BridgeV2 {
     })
   }
 
-  performAction (payload) { 
+  performAction(payload) {
     if (this.vatom.id === payload.payload['this.id']) {
-      return this.blockv.Vatoms.performAction(payload.payload['this.id'], payload.action_name, payload.payload)
+      return this.blockv.Vatoms.performAction(this.vatomObject, payload.action_name, payload.payload)
     }
   }
 
-  getUserProfile (payload) {
+  getUserProfile(payload) {
     return this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner).then(u => {
       return this.encodeUser(u)
     })
   }
 
-  getCurrentUser (payload) {
+  getCurrentUser(payload) {
     let user = {}
     return Promise.all([
       this.blockv.UserManager.getPublicUserProfile(this.vatom['vAtom::vAtomType'].owner),
@@ -80,7 +81,7 @@ export default class BridgeV2 {
       let user = data[0]
       let tokens = data[1]
       return {
-        user : {
+        user: {
           id: user.id,
           properties: {
             avatar_uri: user.properties.avatar_uri,
@@ -99,7 +100,7 @@ export default class BridgeV2 {
     })
   }
 
-  encodeResource (res) {
+  encodeResource(res) {
     let encodedUrls = []
     for (let u of res.urls) {
       let eur = this.blockv.UserManager.encodeAssetProvider(u)
@@ -111,19 +112,20 @@ export default class BridgeV2 {
     }
   }
 
-  updateVatom (vatom) {
-    this.vatom = vatom
+  updateVatom(vatom) {
+    this.vatomObject = vatom;
+    this.vatom = this.encodeVatom(vatom);
   }
 
-  customMessage (payload) {
+  customMessage(payload) {
     return payload
   }
 
-  encodeVatom (vatom) {
+  encodeVatom(vatom) {
     return Object.assign({}, vatom.payload, { faces: vatom.faces }, { actions: vatom.actions })
   }
 
-  encodeUser (user) {
+  encodeUser(user) {
     return {
       user: {
         id: user.id,

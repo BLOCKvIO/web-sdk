@@ -9,28 +9,28 @@
 //  governing permissions and limitations under the License.
 
 export default class ActivityApi {
-  constructor (client) {
+  constructor(client) {
     this.client = client
   }
 
-  threads () {
-    return this.client.request('POST', '/v1/activity/mythreads', {}, true).then(data => data.threads)
+  threads(platformId = 'primary') {
+    return this.client.request('POST', '/v1/activity/mythreads', {}, true, undefined, platformId).then(data => data.threads)
   }
 
-  threadMessages (name) {
+  threadMessages(name, platformId = 'primary') {
     const payload = {
       name,
       cursor: '',
       count: 100
     }
-    return this.client.request('POST', '/v1/activity/mythreadmessages', payload, true).then(data => data)
+    return this.client.request('POST', '/v1/activity/mythreadmessages', payload, true, undefined, platformId).then(data => data)
   }
 
-  sendMessage (id, message) {
+  sendMessage(id, message, platformId = 'primary') {
     const payload = {
       message,
       id
     }
-    return this.client.request('POST', '/v1/user/message', payload, true).then(data => data)
+    return this.client.request('POST', '/v1/user/message', payload, true, undefined, platformId).then(data => data)
   }
 }

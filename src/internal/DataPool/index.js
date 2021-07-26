@@ -7,7 +7,8 @@
  *
  */
 export default class DataPool {
-  constructor () {
+  constructor(blockv) {
+    this.Blockv = blockv;
     // Region plugins
     this.plugins = [
       require('./plugins/InventoryRegion').default,
@@ -29,7 +30,8 @@ export default class DataPool {
    * @param {string} id The plugin ID.
    * @param {*} descriptor Region-specific filtering information. See plugins for more info.
    */
-  region (id, descriptor) {
+  region(id, descriptor) {
+    console.log(id);
     // Find existing region
     let region = this.regions.find(r => r.matches(id, descriptor))
     if (region) {
@@ -49,7 +51,7 @@ export default class DataPool {
   }
 
   /** Removes the specified region */
-  removeRegion (region) {
+  removeRegion(region) {
     for (let i = 0; i < this.regions.length; i++) {
       if (this.regions[i] === region) {
         return this.regions.splice(i, 1)
@@ -60,7 +62,7 @@ export default class DataPool {
   /**
    * Update session-specific information used by plugins.
    */
-  setSessionInfo (info) {
+  setSessionInfo(info) {
     // Store it
     this.sessionInfo = info
 

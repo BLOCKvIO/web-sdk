@@ -10,64 +10,65 @@
 //
 import urlParse from 'url-parse'
 export default class Vatom {
-  constructor (payload, faces, actions) {
+  constructor(payload, faces, actions, platformId) {
     this.payload = payload
     this.faces = faces
     this.actions = actions
+    this.platformId = platformId
   }
 
-  get id () {
+  get id() {
     return this.payload.id
   }
 
-  get private () {
+  get private() {
     return this.payload.private
   }
 
-  get unpublished () {
+  get unpublished() {
     return this.payload.unpublished
   }
 
-  get version () {
+  get version() {
     return this.payload.version
   }
 
-  get sync () {
+  get sync() {
     return this.payload.sync
-  } 
+  }
 
-  get whenCreated () {
+  get whenCreated() {
     return this.payload.when_created
   }
 
-  get whenModified () {
+  get whenModified() {
     return this.payload.when_modified
   }
 
-  get properties () {
+  get properties() {
     return this.payload['vAtom::vAtomType']
   }
 
   /** True if this is a folder vatom */
-  get isFolder () {
+  get isFolder() {
     return this.properties['root_type'].indexOf('ContainerType') !== -1
   }
 
   /** True if this is a defined folder vatom, ie a folder that can only accept certain types of child vatoms. */
-  get isDefinedFolder () {
+  get isDefinedFolder() {
     return this.properties['root_type'].indexOf('DefinedFolderContainerType') !== -1
   }
 
   /** True if this is a discover folder vatom, ie a folder whose contents are fetched by performing the `Discover` action on it. */
-  get isDiscoverFolder () {
+  get isDiscoverFolder() {
     return this.properties['root_type'].indexOf('DiscoverFolderContainerType') != -1
   }
 
-  canPerformAction (action) {
+  canPerformAction(action) {
     return this.actions.find(a => a.name.indexOf(action) !== -1)
   }
 
-  canCombineWith (otherVatom) {
+  canCombineWith(otherVatom) {
     // Stop if null or ourselves
     if (!otherVatom || this.id === otherVatom.id) {
       return false
@@ -106,17 +107,17 @@ export default class Vatom {
   }
 
   /** Checks if this vatom has an icon face */
-  containsIconFace () {
+  containsIconFace() {
     return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'icon')
   }
 
   /** Checks if this vatom has a card face */
-  containsCardFace () {
+  containsCardFace() {
     return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'card')
   }
 
   /** Checks if this vatom has a fullscreen face */
-  containsFullscreenFace () {
+  containsFullscreenFace() {
     return !!this.faces.find(f => (f.properties.constraints.platform === 'web' || f.properties.constraints.platform === 'generic') && f.properties.constraints.view_mode === 'fullscreen')
   }
 
