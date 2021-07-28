@@ -23,7 +23,7 @@ export default class BaseWebFace extends BaseFace {
     this.iframe = document.createElement('iframe')
     this.iframe.style.cssText = 'display: block; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden; border: none; background: none; outline: none; z-index:0;'
     this.iframe.setAttribute('allowfullscreen',true);
-    this.iframe.setAttribute('allow','fullscreen *; camera *; microphone *;');
+    this.iframe.setAttribute('allow','fullscreen *; camera *; microphone *; gyroscope *; accelerometer *;');
     this.iframe.setAttribute('src', this.face.properties.display_url)
     this.element.appendChild(this.iframe)
     this.owner = this.vatomView.vatom.properties.owner
