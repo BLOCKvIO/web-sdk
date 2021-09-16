@@ -118,6 +118,20 @@ export default class Vatoms {
   combineWith(vatom, otherVatom) {
     // Pre-emptively set the parent ID
     let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(otherVatom.id, 'vAtom::vAtomType.parent_id', vatom.id)
+
+    const combineAction = vatom.actions.find((action) => action.name.endsWith('::Action::Combine'));
+
+    if(combineAction)
+    {
+      return this.performAction(vatom, 'Combine', {
+        'child.id': otherVatom.id,
+      })
+      .catch(err => {
+        // Failed, reset vatom reference
+        undo()
+        throw err;
+      })
+    }
     // Set parent
     return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [otherVatom.id], parent_id: vatom.id }, true, undefined, vatom.platformId).catch(err => {
       // Failed, reset vatom reference
