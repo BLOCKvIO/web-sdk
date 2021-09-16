@@ -170,23 +170,24 @@ export default class Vatoms {
       // Remove parent IDs
       return Promise.all(children.map(child => {
         // Pre-emptively update parent ID
-        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', '.')
-
-        const uncombineAction = child.actions.find((action) => action.name.endsWith('::Action::Uncombine'));
-        if(uncombineAction)
-        {
-          return this.performAction(child, 'Uncombine',{})
-          .catch(err => {
+        return this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', '.')
+        .then((undo)=>{
+          const uncombineAction = child.actions.find((action) => action.name.endsWith('::Action::Uncombine'));
+          if(uncombineAction)
+          {
+            return this.performAction(child, 'Uncombine',{})
+            .catch(err => {
+              // Failed, reset vatom reference
+              undo()
+              throw err
+            })
+          }
+          // Do patch
+          return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: '.' }, true, undefined, vatom.platformId).catch(err => {
             // Failed, reset vatom reference
             undo()
             throw err
           })
-        }
-        // Do patch
-        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: '.' }, true, undefined, vatom.platformId).catch(err => {
-          // Failed, reset vatom reference
-          undo()
-          throw err
         })
       }))
     })
