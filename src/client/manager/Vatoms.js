@@ -115,22 +115,21 @@ export default class Vatoms {
 
   /** Called to combine the specified vatom into this one. Note that some faces override the Combine action,
    *  so in order to get those actions as well you should use `combineWith()` on `VatomView` instead. */
-  combineWith(vatom, otherVatom) {
+  async combineWith(vatom, otherVatom) {
     // Pre-emptively set the parent ID
-    let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(otherVatom.id, 'vAtom::vAtomType.parent_id', vatom.id)
+    let undo = await this.Blockv.dataPool.region('inventory').preemptiveChange(otherVatom.id, 'vAtom::vAtomType.parent_id', vatom.id)
 
     const combineAction = vatom.actions.find((action) => action.name.endsWith('::Action::Combine'));
 
-    if(combineAction)
-    {
+    if (combineAction) {
       return this.performAction(vatom, 'Combine', {
         'child.id': otherVatom.id,
       })
-      .catch(err => {
-        // Failed, reset vatom reference
-        undo()
-        throw err;
-      })
+        .catch(err => {
+          // Failed, reset vatom reference
+          undo()
+          throw err;
+        })
     }
     // Set parent
     return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [otherVatom.id], parent_id: vatom.id }, true, undefined, vatom.platformId).catch(err => {
@@ -141,23 +140,90 @@ export default class Vatoms {
   }
 
   /** Called to remove all child vatoms from this vatom */
-  split(vatom) {
-    // Get vatom's parent ID
-    let parentId = vatom.properties.parent_id || '.'
+  async split(vatom) {
+    const splitAction = vatom.actions.find((action) => action.name.endsWith('::Action::Split'));
     // Get all children
-    return this.getVatomChildren(vatom).then(children => {
+    return this.getVatomChildren(vatom).then(async children => {
+
+      if (splitAction && splitAction.properties.reactor.endsWith('/Split')) {
+        let ids = [];
+        let undos = [];
+        for (let i = 0; i < children.length; i += 1) {
+          const child = children[i];
+          ids.push(child.id);
+          const undo = await this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', '.')
+          undos.push(undo)
+        }
+
+        return this.performAction(vatom, 'Split', {
+          'vatom.ids': ids,
+        })
+          .catch(err => {
+            // Failed, reset vatom reference
+            undos.forEach((undo) => undo());
+            throw err;
+          })
+      }
       // Remove parent IDs
       return Promise.all(children.map(child => {
         // Pre-emptively update parent ID
-        let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', parentId)
+        return this.Blockv.dataPool.region('inventory').preemptiveChange(child.id, 'vAtom::vAtomType.parent_id', '.')
+          .then((undo) => {
+            const uncombineAction = child.actions.find((action) => action.name.endsWith('::Action::Uncombine'));
+            if (uncombineAction) {
+              return this.performAction(child, 'Uncombine', {})
+                .catch(err => {
+                  // Failed, reset vatom reference
+                  undo()
+                  throw err
+                })
+            }
+            // Do patch
+            return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: '.' }, true, undefined, vatom.platformId).catch(err => {
+              // Failed, reset vatom reference
+              undo()
+              throw err
+            })
+          })
+      }))
+    })
+  }
+
+  uncombine(vatom) {
+    const parentId = vatom.properties.parent_id;
+    return this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.parent_id', '.')
+      .then(async (undo) => {
+        const uncombineAction = vatom.actions.find((action) => action.name.endsWith('::Action::Uncombine'));
+        if (uncombineAction) {
+          return this.performAction(vatom, 'Uncombine', {})
+            .catch(err => {
+              // Failed, reset vatom reference
+              undo()
+              throw err
+            })
+        }
+
+        if (parentId !== ".") {
+          const parent = await this.Blockv.dataPool.region('inventory').getItem(parentId, false);
+          if (parent) {
+            const splitAction = parent.actions.find((action) => action.name.endsWith('::Action::Split'));
+            if (splitAction && splitAction.properties.reactor.endsWith('/Split')) {
+              return this.performAction(parent, 'Split', { 'vatom.ids': [vatom.id] })
+                .catch(err => {
+                  // Failed, reset vatom reference
+                  undo()
+                  throw err
+                })
+            }
+          }
+        }
         // Do patch
-        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [child.id], parent_id: parentId }, true, undefined, vatom.platformId).catch(err => {
+        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [vatom.id], parent_id: '.' }, true, undefined, vatom.platformId).catch(err => {
           // Failed, reset vatom reference
           undo()
           throw err
         })
-      }))
-    })
+      })
   }
 
   /**
