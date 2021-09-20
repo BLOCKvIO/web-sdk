@@ -100,7 +100,7 @@ export default class Vatoms {
       // Workaround: If error was an attempt to pick up a vatom but the vatom is already picked up, it's possible
       // that the GeoPos region missed an update. Notify all GeoPos regions that this vatom is no longer available.
       if (err.code == 1645)
-        this.Blockv.dataPool.regions.filter(r => r instanceof GeoPosRegion).forEach(r => r.preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false))
+        this.Blockv.dataPool.regions.filter(r => r instanceof GeoPosRegion).forEach(async r => await r.preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false))
 
       // Pass on the error
       throw err
@@ -362,16 +362,18 @@ export default class Vatoms {
   setParentID(vatom, parentId) {
 
     // Pre-emptively update parent ID
-    let undo = this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.parent_id', parentId)
+    return this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.parent_id', parentId)
+      .then(undo => {
 
-    // Do patch
-    return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [vatom.id], parent_id: parentId }, true, undefined, vatom.platformId).catch(err => {
+        // Do patch
+        return this.Blockv.client.request('PATCH', '/v1/vatoms', { ids: [vatom.id], parent_id: parentId }, true, undefined, vatom.platformId).catch(err => {
 
-      // Failed, reset vatom reference
-      undo()
-      throw err
+          // Failed, reset vatom reference
+          undo()
+          throw err
 
-    })
+        })
+      });
 
   }
 
@@ -394,11 +396,12 @@ export default class Vatoms {
    * @return {Promise<Object>} An object containing a success message
    */
   trashVatom(vatom) {
-    let undos = []
-    undos.push(this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.owner', '.'))
-    return this.vatomApi.trashVatom(vatom.id, vatom.platformId).catch(err => {
-      undos.map(u => u())
-      throw err
-    })
+    return this.Blockv.dataPool.region('inventory').preemptiveChange(vatom.id, 'vAtom::vAtomType.owner', '.')
+      .then((undo) => {
+        return this.vatomApi.trashVatom(vatom.id, vatom.platformId).catch(err => {
+          undo();
+          throw err
+        });
+      })
   }
 }
