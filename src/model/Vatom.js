@@ -73,6 +73,10 @@ export default class Vatom {
     if (!otherVatom || this.id === otherVatom.id) {
       return false
     }
+    // If platforms don't match, deny 
+    if (otherVatom.platformId != this.platformId) {
+      return false
+    }
 
     // If it's not a folder, deny
     if (!this.isFolder) {
