@@ -96,7 +96,10 @@ export default class BaseWebFace extends BaseFace {
           this.vatomView.blockv.dataPool.region('inventory').addEventListener('object.updated', this.observeChildren)
           this.observeListenerSet = true
         }
-        return this.observeChildren(payload.id)
+        return this.vatomView.blockv.dataPool.region('inventory').get(false)
+          .then(result => result.filter(v => v.properties.parent_id === this.vatom.id)
+          .map(this.mapVatom))
+          .then((vatoms)=>({id:this.vatom.id,vatoms}));
       case 'core.action.perform':
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
@@ -249,13 +252,10 @@ export default class BaseWebFace extends BaseFace {
   }
 
   async observeChildren(payload) {
-    console.log('payload from observe', payload)
-
     if (this.vatom.id === payload) {
       let children = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.parent_id === payload).map(this.mapVatom));
       this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children }, true)
     }
-
   }
 
   onVatomUpdated() {
