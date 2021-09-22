@@ -65,7 +65,7 @@ export default class Vatom {
   }
 
   canPerformAction(action) {
-    return this.actions.find(a => a.name.indexOf(action) !== -1)
+    return this.actions.find(a => a.name.endsWith(':'+action))
   }
 
   canCombineWith(otherVatom) {
