@@ -8,7 +8,7 @@
 //  ANY KIND, either express or implied. See the License for the specific language
 //  governing permissions and limitations under the License.
 //
-import fetch from '@brillout/fetch'
+import fetch from 'cross-fetch'
 import jwtDecode from 'jwt-decode'
 import EventEmitter from '../EventEmitter'
 
