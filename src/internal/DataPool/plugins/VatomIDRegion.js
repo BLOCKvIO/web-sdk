@@ -55,6 +55,7 @@ export default class VatomIDRegion extends BLOCKvRegion {
 
     const platformIds = await this.dataPool.Blockv.platform.getIds();
     let objects = [];
+    let templateIds = new Set();
     const vatomIds = [...this.ids];
     for (let platformId of platformIds) {
       if (vatomIds.length <= 0) break;
@@ -65,17 +66,40 @@ export default class VatomIDRegion extends BLOCKvRegion {
         response.vatoms.map(v => {
           delete vatomIds[v.id];
           this.platformIdMap.set(v.id, platformId);
+          templateIds.add(v['vAtom::vAtomType'].template);
           return new DataObject('vatom', v.id, v);
         }).forEach(f => objects.push(f))
 
+        // Fetch all faces linked to this vatom
+        let existingFaces = new Set();
+        
+        Array.from(this.objects.values()).filter(o => o.type === 'face' && templateIds.has(o.data.template)).forEach(o => existingFaces.add(o.id));
+        // Fetch all actions linked to this vatom
+        let existingActions = new Set();
+        
+        Array.from(this.objects.values()).filter(o => {
+          let templateId = o.data.name.split('::Action::')[0]
+          return o.type === 'action' && templateIds.has(templateId)}).map(o => existingActions.add(o.id));
+
         // Add faces to new objects list
-        response.faces.map(f => new DataObject('face', f.id, f)).forEach(f => objects.push(f))
+        response.faces.map(f => {
+          existingFaces.delete(f.id);
+          return new DataObject('face', f.id, f);
+        }).forEach(f => objects.push(f))
 
         // Add actions to new objects list
-        response.actions.map(a => new DataObject('action', a.name, a)).forEach(a => objects.push(a))
+        response.actions.map(a => {
+          existingActions.delete(a.name);
+          return new DataObject('action', a.name, a)
+        }).forEach(a => objects.push(a))
+
+        console.log("remove old faces and actions");
+        this.removeObjects(Array.from(existingFaces));
+        this.removeObjects(Array.from(existingActions));
       } catch (error) { }
 
     }
+
     // Add new objects
     this.addObjects(objects)
 

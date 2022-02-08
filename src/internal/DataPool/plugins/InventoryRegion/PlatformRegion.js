@@ -118,6 +118,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     // 
     let maxPerRequest = 100
     let allChanges = []
+    let newStableSync = Date.now();
     for (let i = 0; i < templateIDs.length; i += maxPerRequest) {
 
       // Load next page
@@ -202,7 +203,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     }
 
     // Store latest sync date
-    this.objects.setExtra('last-stable-sync', Date.now())
+    this.objects.setExtra('last-stable-sync', newStableSync)
 
   }
 
