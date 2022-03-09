@@ -22,8 +22,8 @@ export default class BaseWebFace extends BaseFace {
     // Create iframe
     this.iframe = document.createElement('iframe')
     this.iframe.style.cssText = 'display: block; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden; border: none; background: none; outline: none; z-index:0;'
-    this.iframe.setAttribute('allowfullscreen',true);
-    this.iframe.setAttribute('allow','fullscreen *; camera *; microphone *; gyroscope *; accelerometer *;');
+    this.iframe.setAttribute('allowfullscreen', true);
+    this.iframe.setAttribute('allow', 'fullscreen *; camera *; microphone *; gyroscope *; accelerometer *;');
     this.iframe.setAttribute('src', this.face.properties.display_url)
     this.element.appendChild(this.iframe)
     this.owner = this.vatomView.vatom.properties.owner
@@ -32,6 +32,7 @@ export default class BaseWebFace extends BaseFace {
     this.BridgeV1 = new BridgeV1(this.vatomView.blockv, this.vatom, this.face)
     this.BridgeV2 = new BridgeV2(this.vatomView.blockv, this.vatom, this.face)
     this.observeListenerSet = false
+    this.observeInventoryListenerSet = false
     this.listChildren = []
 
     // Bind functions
@@ -55,6 +56,10 @@ export default class BaseWebFace extends BaseFace {
     window.removeEventListener('message', this.onIncomingBridgeMessage)
     if (this.observeListenerSet) {
       this.vatomView.blockv.dataPool.region('inventory').removeEventListener('object.updated', this.observeChildren)
+    }
+    if (this.observeInventoryListenerSet) {
+      this.vatomView.blockv.dataPool.region('inventory').removeEventListener('object.updated', this.observeInventoryUpdate)
+      this.vatomView.blockv.dataPool.region('inventory').removeEventListener('object.removed', this.observeInventoryRemove)
     }
   }
 
@@ -99,14 +104,33 @@ export default class BaseWebFace extends BaseFace {
         this.observeChildren(this.vatom.id)
         return this.vatomView.blockv.dataPool.region('inventory').get(false)
           .then(result => result.filter(v => v.properties.parent_id === this.vatom.id)
-          .map(this.mapVatom))
-          .then((vatoms)=>({id:this.vatom.id,vatoms:vatoms}));
+            .map(this.mapVatom))
+          .then((vatoms) => ({ id: this.vatom.id, vatoms: vatoms }));
       case 'core.action.perform':
         return this.BridgeV2.performAction(payload)
       case 'core.resource.encode':
         return this.BridgeV2.encodeResource(payload)
       case 'core.inventory.stats':
         return this.BridgeV2.inventoryStats(payload)
+      case 'core.inventory.stats.observe':
+        if (!this.observeInventoryListenerSet) {
+          this.observeInventoryUpdate = this.observeInventoryUpdate.bind(this)
+          this.observeInventoryRemove = this.observeInventoryRemove.bind(this)
+          this.vatomView.blockv.dataPool.region('inventory').addEventListener('object.updated', this.observeInventoryUpdate)
+          this.vatomView.blockv.dataPool.region('inventory').addEventListener('object.removed', this.observeInventoryRemove);
+          this.observeInventoryListenerSet = true
+          this.inventoryIds = new Set();
+        }
+        return this.vatomView.blockv.dataPool.region('inventory').get(false)
+          .then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn)
+            .map((vatom) => {
+              this.inventoryIds.add(vatom.id);
+              return vatom
+            }))
+          .then((vatoms) => {
+            const stats = this.calculateState(vatoms);
+            return { stats };
+          });
       default:
         // Unknown event. Pass on to VatomView listener
         if (this.vatomView && this.vatomView.onMessage) {
@@ -257,6 +281,41 @@ export default class BaseWebFace extends BaseFace {
       let children = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.parent_id === payload).map(this.mapVatom));
       this.sendV2Message(Math.random(), 'core.vatom.children.update', { id: payload, vatoms: children }, true)
     }
+  }
+
+  async observeInventoryUpdate(vatomId) {
+    const vatom = await this.vatomView.blockv.dataPool.region('inventory').getItem(vatomId, true);
+    if (vatom && vatom.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn) {
+      let vatoms = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn).map((vatom) => {
+        this.inventoryIds.add(vatom.id);
+        return vatom;
+      }));
+      this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+    }
+  }
+
+  async observeInventoryRemove(vatomId) {
+    if (this.inventoryIds.has(vatomId)) {
+      this.inventoryIds.delete(vatomId);
+      let vatoms = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn).map((vatom) => {
+        this.inventoryIds.add(vatom.id);
+        return vatom;
+      }));
+      this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+    }
+  }
+
+  calculateState(vatoms) {
+    let stats = {};
+    vatoms.forEach(vatom => {
+      if (!stats[vatom.properties.template_variation]) {
+        stats[vatom.properties.template_variation] = 1;
+      }
+      else {
+        stats[vatom.properties.template_variation] += 1;
+      }
+    })
+    return Object.keys(stats).map(key => ({ template_variation: key, count: stats[key] }));
   }
 
   onVatomUpdated() {
