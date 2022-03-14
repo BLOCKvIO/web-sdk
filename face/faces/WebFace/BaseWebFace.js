@@ -286,11 +286,13 @@ export default class BaseWebFace extends BaseFace {
   async observeInventoryUpdate(vatomId) {
     const vatom = await this.vatomView.blockv.dataPool.region('inventory').getItem(vatomId, true);
     if (vatom && vatom.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn) {
-      let vatoms = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn).map((vatom) => {
-        this.inventoryIds.add(vatom.id);
-        return vatom;
-      }));
-      this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+      if (!this.inventoryIds.has(vatomId)) {
+        let vatoms = await this.vatomView.blockv.dataPool.region('inventory').get(false).then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn).map((vatom) => {
+          this.inventoryIds.add(vatom.id);
+          return vatom;
+        }));
+        this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+      }
     }
   }
 
