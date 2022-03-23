@@ -141,6 +141,49 @@ export default class BaseWebFace extends BaseFace {
     }
   }
 
+  processLargeMessage(payload) {
+    if (!this.messageChunks) { this.messageChunks = {} }
+    if (!this.messageChunks[payload.id]) {
+      this.messageChunks[payload.id] = {};
+    }
+    const chunks = this.messageChunks[payload.id];
+    chunks[payload.chunk] = payload.payload;
+
+    for (let i = 0; i < payload.chunks; i += 1) {
+      if (!chunks[i]) {
+        this.sendV2Message(payload.id, payload.name, {}, false, payload.chunks, i);
+        return;
+      }
+    }
+
+    let message = '';
+    for (let i = 0; i < payload.chunks; i += 1) {
+      message += chunks[i];
+    }
+
+    try {
+      // Process it, get response
+      Promise.resolve(this.processIncomingBridgeMessage(payload.name, JSON.parse(message))).then(resp => {
+        this.sendV2Message(payload.request_id, payload.name, resp)
+      }).catch(err => {
+        if (payload.version === '2.0.0') {
+          this.sendV2Message(payload.request_id, payload.name, {
+            error_code: err.code || 'unknown_error',
+            error_message: err.message
+          }, false)
+        } else {
+          // Failed, send error response
+          this.sendv1Message(responseID, {
+            errorCode: err.code,
+            errorText: err.message
+          })
+        }
+      })
+    } catch (error) {
+      console.warn(error)
+    }
+  }
+
   onIncomingBridgeMessage(event) {
     // Get payload
     let payload = event.data
@@ -177,6 +220,10 @@ export default class BaseWebFace extends BaseFace {
 
       }
 
+    }
+    if (payload.chunks && payload.chunks > 1) {
+      this.processLargeMessage(payload);
+      return;
     }
 
     // Process it, get response
@@ -221,20 +268,23 @@ export default class BaseWebFace extends BaseFace {
     }, '*')
   }
 
-  sendV2Message(id, name, data, isRequest) {
+  sendV2Message(id, name, data, isRequest, chunks = 1, chunk = 0) {
     // Check if iframe is setup
     if (!this.iframe || !this.iframe.contentWindow) {
       return
     }
 
-    // Send payload
-    this.iframe.contentWindow.postMessage({
+    const payload = {
       [isRequest ? 'request_id' : 'response_id']: id,
       source: 'BLOCKv SDK',
       name: name,
       payload: data,
-      version: '2.0.0'
-    }, '*')
+      version: '2.0.0',
+      chunks: chunks,
+      chunk: chunk
+    }
+    // Send payload
+    this.iframe.contentWindow.postMessage(payload, '*')
   }
 
   /** Called when the viewer wants to send a request to the face. Only supported with the V2 bridge. */
