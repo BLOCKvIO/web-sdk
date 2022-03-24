@@ -112,6 +112,19 @@ export default class BaseWebFace extends BaseFace {
         return this.BridgeV2.encodeResource(payload)
       case 'core.inventory.stats':
         return this.BridgeV2.inventoryStats(payload)
+      case 'core.resource.upload':
+        const { bucketId,
+          prefix,
+          data, } = payload;
+
+        if (data.startsWith("data:")) {
+          return fetch(data).then(res => res.blob()).then(blob => {
+            return this.vatomView.blockv.ResourceManager.uploadResource(bucketId, prefix, blob);
+          })
+        }
+        else {
+          return Promise.reject("data is not base64");
+        }
       case 'core.inventory.stats.observe':
         if (!this.observeInventoryListenerSet) {
           this.observeInventoryUpdate = this.observeInventoryUpdate.bind(this)
@@ -149,35 +162,24 @@ export default class BaseWebFace extends BaseFace {
     const chunks = this.messageChunks[payload.id];
     chunks[payload.chunk] = payload.payload;
 
-    for (let i = 0; i < payload.chunks; i += 1) {
-      if (!chunks[i]) {
-        this.sendV2Message(payload.id, payload.name, {}, false, payload.chunks, i);
-        return;
-      }
+    if (payload.chunk + 1 < payload.chunks) {
+      this.sendV2Message(payload.request_id, payload.name, {}, false, payload.chunks, payload.chunk + 1);
+      return;
     }
-
     let message = '';
     for (let i = 0; i < payload.chunks; i += 1) {
       message += chunks[i];
     }
-
+    delete this.messageChunks[payload.id]
     try {
       // Process it, get response
       Promise.resolve(this.processIncomingBridgeMessage(payload.name, JSON.parse(message))).then(resp => {
-        this.sendV2Message(payload.request_id, payload.name, resp)
+        this.sendV2Message(payload.request_id, payload.name, resp, false, payload.chunks, payload.chunk + 1)
       }).catch(err => {
-        if (payload.version === '2.0.0') {
-          this.sendV2Message(payload.request_id, payload.name, {
-            error_code: err.code || 'unknown_error',
-            error_message: err.message
-          }, false)
-        } else {
-          // Failed, send error response
-          this.sendv1Message(responseID, {
-            errorCode: err.code,
-            errorText: err.message
-          })
-        }
+        this.sendV2Message(payload.request_id, payload.name, {
+          error_code: err.code || 'unknown_error',
+          error_message: err.message
+        }, false, payload.chunks, payload.chunk + 1)
       })
     } catch (error) {
       console.warn(error)
@@ -273,7 +275,6 @@ export default class BaseWebFace extends BaseFace {
     if (!this.iframe || !this.iframe.contentWindow) {
       return
     }
-
     const payload = {
       [isRequest ? 'request_id' : 'response_id']: id,
       source: 'BLOCKv SDK',
