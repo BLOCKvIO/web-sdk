@@ -53,6 +53,8 @@ module.exports = {
       stream: false,
       fs: 'empty',
       net: 'empty',
-      tls: 'empty' },
+      tls: 'empty',
+      buffer: require.resolve('buffer/')
+    },
   }
 };

@@ -65,6 +65,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-stage-0": "^6.24.1",
     "better-assert": "^1.0.2",
+    "buffer": "^6.0.3",
     "chai": "^4.3.4",
     "cross-fetch": "^3.1.4",
     "dotenv": "^8.6.0",
@@ -75,7 +76,6 @@
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "lzutf8": "^0.5.8",
-    "pouchdb": "^7.2.2",
     "url-parse": "^1.5.3"
   },
   "repository": "github:BLOCKvIO/web-sdk",
