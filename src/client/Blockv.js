@@ -19,6 +19,7 @@ import Client from '../internal/net/Client'
 import MultiWebSockets from '../internal/net/websocket/MultiWebSockets'
 import EventEmitter from '../internal/EventEmitter';
 import Platform from '../internal/net/rest/Platform'
+import ResourceManager from './manager/Resources';
 
 export default class Blockv extends EventEmitter {
   constructor(payload) {
@@ -42,6 +43,7 @@ export default class Blockv extends EventEmitter {
     this.WebSockets = new MultiWebSockets(this.store, this.client, this.platform)
     this.UserManager = new UserManager(userApi, this.store)
     this.Vatoms = new Vatoms(this)
+    this.ResourceManager = new ResourceManager(this);
 
 
     if (this.UserManager.isLoggedIn) {
