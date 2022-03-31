@@ -115,11 +115,13 @@ export default class BaseWebFace extends BaseFace {
       case 'core.resource.upload':
         const { bucketId,
           prefix,
-          data, } = payload;
+          data,
+          filename
+        } = payload;
 
         if (data.startsWith("data:")) {
           return fetch(data).then(res => res.blob()).then(blob => {
-            return this.vatomView.blockv.ResourceManager.uploadResource(bucketId, prefix, blob);
+            return this.vatomView.blockv.ResourceManager.uploadResource(bucketId, prefix, blob, filename);
           })
         }
         else {
