@@ -16,7 +16,7 @@ export default class VatomApi {
   }
 
   getActions(templateID, platformId = 'primary') {
-    return this.client.request('GET', `/v1/user/actions/${templateID}`, {}, true, undefined, platformId)
+    return this.client.request('GET', `/v1/user/actions/${templateID}`, null, true, undefined, platformId)
       .then((data) => {
         const len = data.length
         const actions = []

@@ -18,7 +18,7 @@ export default class Vatoms {
   }
 
   getActions(vatom) {
-    return this.vatomApi.getActions(vatom.properties.template_variation, vatom.platformId)
+    return this.vatomApi.getActions(vatom.properties.template, vatom.platformId)
   }
   /**
    * [performAction description]
