@@ -262,7 +262,7 @@ export default class Client extends EventEmitter {
       nowDate = Date.now()
 
       // quick calc to determine if the token has expired
-      if ((nowDate + 5000) > expirationTime) throw new Error('Token expired.')
+      if ((nowDate + 30000) > expirationTime) throw new Error('Token expired.')
     } catch (e) {
       // There was an error with the access token. Fetch a new one.
       return this.refreshToken()
