@@ -112,7 +112,7 @@ export default class ProgressImage extends BaseFace {
         // Filling from the top down
         this.fillContainer.style.top = `${(-1 * invertedScore)}%`
         this.fill.style.top = `${invertedScore}%`
-      } else if (direction === 'left') {
+      } else if (direction === 'right') {
         // Filling from the left to the right
         this.fillContainer.style.left = `${(-1 * invertedScore)}%`
         this.fill.style.left = `${invertedScore}%`
