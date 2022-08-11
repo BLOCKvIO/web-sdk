@@ -9,10 +9,11 @@
 //  governing permissions and limitations under the License.
 //
 
-import BaseFace from './BaseFace'
+import BaseFace from '../BaseFace'
+import { ResizeSensor } from 'css-element-queries'
 
 export default class ProgressImage extends BaseFace {
-  onLoad () {
+  onLoad() {
     // Set our element style
     this.element.style.overflow = 'hidden'
 
@@ -21,10 +22,14 @@ export default class ProgressImage extends BaseFace {
     this.base.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background-position: center; background-size: contain; background-repeat: no-repeat; '
     this.element.appendChild(this.base)
 
+    this.container = document.createElement('div')
+    this.container.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden;'
+    this.element.appendChild(this.container)
+
     // Create fill container element
     this.fillContainer = document.createElement('div')
     this.fillContainer.style.cssText = 'position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden;'
-    this.element.appendChild(this.fillContainer)
+    this.container.appendChild(this.fillContainer)
 
     // Create fill image
     this.fill = document.createElement('div')
@@ -36,36 +41,48 @@ export default class ProgressImage extends BaseFace {
     this.percentContainer.style.cssText = 'position:absolute; top: 0px; right: 0px; width:auto; height:auto; padding:5px; font-size:9px; color: rgba(0,0,0,0.5)';
     this.element.appendChild(this.percentContainer)
 
+    this.resizeSensor = new ResizeSensor(this.element, () => {
+      this.onResize();
+    });
+
     // Reload images
     return this.refresh()
   }
 
-  onVatomUpdated () {
-    return this.refresh()
-  }
+  onResize() {
+    if (this.images) {
+      const containerWidth = this.element.clientWidth;
+      const containerHeight = this.element.clientHeight;
+      const imageWidth = this.images[0].width;
+      const imageHeight = this.images[0].height;
+      const aspect = imageWidth / imageHeight;
+      let resizeWidth = containerWidth;
+      let resizeHeight = containerHeight;
+      if (containerHeight < containerWidth) {
+        resizeHeight = containerHeight;
+        resizeWidth = resizeHeight * aspect;
+        if (resizeWidth > containerWidth) {
+          resizeWidth = containerWidth;
+          resizeHeight = resizeWidth / aspect;
+        }
+      }
+      else {
+        resizeWidth = containerWidth;
+        resizeHeight = resizeWidth / aspect;
+        if (resizeHeight > containerHeight) {
+          resizeHeight = containerHeight;
+          resizeWidth = resizeHeight * aspect;
+        }
+      }
+      this.base.style.width = resizeWidth + 'px';
+      this.base.style.height = resizeHeight + 'px';
+      this.base.style.top = ((containerHeight - resizeHeight) / 2) + 'px';
+      this.base.style.left = ((containerWidth - resizeWidth) / 2) + 'px';
+      this.container.style.width = resizeWidth + 'px';
+      this.container.style.height = resizeHeight + 'px';
+      this.container.style.top = ((containerHeight - resizeHeight) / 2) + 'px';
+      this.container.style.left = ((containerWidth - resizeWidth) / 2) + 'px';
 
-  static calculateAspectRatioFit (srcWidth, srcHeight, maxWidth, maxHeight) {
-    let ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight)
-    return { width: srcWidth * ratio, height: srcHeight * ratio }
-  }
-
-  /** Refresh the face position and images. @returns Promise */
-  refresh () {
-    // Apply base image
-    const baseImg = (this.face.properties.config && this.face.properties.config.empty_image && this.vatom.properties.resources.find(r => r.name === this.face.properties.config.empty_image)) || this.vatom.properties.resources.find(r => r.name === 'BaseImage')
-    if (!baseImg) return Promise.reject(new Error('No BaseImage found.'))
-    this.base.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value)})`
-
-    // Apply fill image
-    const activatedImg = (this.face.properties.config && this.face.properties.config.full_image && this.vatom.properties.resources.find(r => r.name === this.face.properties.config.full_image)) || this.vatom.properties.resources.find(r => r.name === 'ActivatedImage')
-    if (!activatedImg) return Promise.reject(new Error('No ActivatedImage found.'))
-    this.fill.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value)})`
-
-    // Load images
-    return Promise.all([
-      ProgressImage.waitForImage(this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value)),
-      ProgressImage.waitForImage(this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value))
-    ]).then((imgs) => {
       // Get info
       const score = Math.min(1, Math.max(0, parseFloat(this.vatom.properties.cloning_score) || 0)) * 100
       let paddingStart = parseFloat((this.face.properties.config && this.face.properties.config.padding_start) || this.vatom.private.padding_start) || 0
@@ -74,11 +91,11 @@ export default class ProgressImage extends BaseFace {
 
       // Adjust padding to be percents instead of pixels of base image
       if (direction === 'up' || direction === 'down') {
-        paddingStart = paddingStart / imgs[0].height * 100
-        paddingEnd = paddingEnd / imgs[0].height * 100
+        paddingStart = paddingStart / this.images[0].height * 100
+        paddingEnd = paddingEnd / this.images[0].height * 100
       } else {
-        paddingStart = paddingStart / imgs[0].width * 100
-        paddingEnd = paddingEnd / imgs[0].width * 100
+        paddingStart = paddingStart / this.images[0].width * 100
+        paddingEnd = paddingEnd / this.images[0].width * 100
       }
 
       // Apply padding
@@ -95,7 +112,7 @@ export default class ProgressImage extends BaseFace {
         // Filling from the top down
         this.fillContainer.style.top = `${(-1 * invertedScore)}%`
         this.fill.style.top = `${invertedScore}%`
-      } else if (direction === 'left') {
+      } else if (direction === 'right') {
         // Filling from the left to the right
         this.fillContainer.style.left = `${(-1 * invertedScore)}%`
         this.fill.style.left = `${invertedScore}%`
@@ -104,22 +121,59 @@ export default class ProgressImage extends BaseFace {
         this.fillContainer.style.left = `${invertedScore}%`
         this.fill.style.left = `${(-1 * invertedScore)}%`
       }
+    }
+  }
+  onUnload() {
+    if (this.resizeSensor) {
+      this.resizeSensor.detach();
+    }
+  }
+  onVatomUpdated() {
+    return this.refresh()
+  }
+
+  static calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+    let ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight)
+    return { width: srcWidth * ratio, height: srcHeight * ratio }
+  }
+
+
+  /** Refresh the face position and images. @returns Promise */
+  refresh() {
+    // Apply base image
+    const baseImg = (this.face.properties.config && this.face.properties.config.empty_image && this.vatom.properties.resources.find(r => r.name === this.face.properties.config.empty_image)) || this.vatom.properties.resources.find(r => r.name === 'BaseImage')
+    if (!baseImg) return Promise.reject(new Error('No BaseImage found.'))
+    this.base.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value)})`
+
+    // Apply fill image
+    const activatedImg = (this.face.properties.config && this.face.properties.config.full_image && this.vatom.properties.resources.find(r => r.name === this.face.properties.config.full_image)) || this.vatom.properties.resources.find(r => r.name === 'ActivatedImage')
+    if (!activatedImg) return Promise.reject(new Error('No ActivatedImage found.'))
+
+    // Load images
+    return Promise.all([
+      ProgressImage.waitForImage(this.vatomView.blockv.UserManager.encodeAssetProvider(baseImg.value.value)),
+      ProgressImage.waitForImage(this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value))
+    ]).then((imgs) => {
+      this.images = imgs;
+      this.onResize();
+      this.fill.style.backgroundImage = `url(${this.vatomView.blockv.UserManager.encodeAssetProvider(activatedImg.value.value)})`
     })
   }
 
   /** This returns a promise which resolves when the specified
    * image URL has been downloaded by the browser. */
-  static waitForImage (url) {
+  static waitForImage(url) {
     return new Promise((resolve, reject) => {
       // Create new image tag to do the loading. Browsers cache requests together, so by
       // creating a new image tag and loading the same image in it, we can track the load
       // event of the background-image in the div above.
       const img = document.createElement('img')
-      img.src = url
 
       // Add event handlers
       img.onerror = reject
       img.onload = () => resolve(img)
+
+      img.src = url
     })
   }
 }
