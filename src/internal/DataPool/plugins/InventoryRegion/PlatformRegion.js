@@ -156,7 +156,7 @@ export default class InventoryRegion extends BLOCKvRegion {
     // Apply changes
     console.debug(`[DataPool > InventoryRegion] Applying ${allChanges.length} face/action changes`)
     let clearCacheForTemplates = []
-    for (let change of allChanges) {
+    for (let change of allChanges.reverse()) {
 
       // Check if delete or update
       if (change.operation == 'delete') {
