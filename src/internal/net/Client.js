@@ -62,7 +62,7 @@ export default class Client extends EventEmitter {
    * @param {object} headers Optional extra HTTP headers to add to the request.
    * @returns {Promise<object>} The server's response payload.
    */
-  async request(method, endpoint, payload, auth, headers, platformId) {
+  async request(method, endpoint, payload, auth, headers, platformId, serverAddress) {
     // Ensure our access token is up to date, if this is an authenticated request
     if (auth) await this.checkToken()
 
@@ -71,8 +71,8 @@ export default class Client extends EventEmitter {
     headers['App-Id'] = this.store.appID
     if (auth) headers['Authorization'] = `Bearer ${this.store.token}`
 
-    let server = undefined;
-    if (platformId) {
+    let server = serverAddress;
+    if (platformId && !serverAddress) {
       const platform = await this.Blockv.platform.get(platformId);
       if (platform && platform.api_gateway) {
         server = platform.api_gateway

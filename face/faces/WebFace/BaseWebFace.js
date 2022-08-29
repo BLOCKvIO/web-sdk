@@ -167,12 +167,11 @@ export default class BaseWebFace extends BaseFace {
           .then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn)
             .map((vatom) => {
               this.inventoryIds.add(vatom.id);
-              return vatom
+              return this.mapVatom(vatom);
             }))
-          .then((vatoms) => {
-            const stats = this.calculateState(vatoms);
-            return { stats };
-          });
+          .then(vatoms => {
+            return { vatoms };
+          })
       default:
         // Unknown event. Pass on to VatomView listener
         if (this.vatomView && this.vatomView.onMessage) {
@@ -375,7 +374,7 @@ export default class BaseWebFace extends BaseFace {
           this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
         }
         if (this.observeInventory) {
-          this.sendV2Message(Math.random(), 'core.inventory.update', { vatoms }, true)
+          this.sendV2Message(Math.random(), 'core.inventory.update', { vatoms: vatoms.map(this.mapVatom) }, true)
         }
       }
     }
@@ -392,7 +391,7 @@ export default class BaseWebFace extends BaseFace {
         this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
       }
       if (this.observeInventory) {
-        this.sendV2Message(Math.random(), 'core.inventory.update', { vatoms }, true)
+        this.sendV2Message(Math.random(), 'core.inventory.update', { vatoms: vatoms.map(this.mapVatom) }, true)
       }
     }
   }

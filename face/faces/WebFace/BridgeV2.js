@@ -102,11 +102,10 @@ export default class BridgeV2 {
 
   encodeResource(res) {
     let encodedUrls = []
-    for (let u of res.urls) {
-      let eur = this.blockv.UserManager.encodeAssetProvider(u)
-      encodedUrls.push(eur)
-    }
-
+    res.urls.forEach(url => {
+      encodedUrls.push(this.blockv.UserManager.encodeAssetProvider(url))
+    })
+    console.log(encodedUrls);
     return {
       urls: encodedUrls
     }
