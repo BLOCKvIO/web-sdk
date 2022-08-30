@@ -136,6 +136,7 @@ export default class BaseWebFace extends BaseFace {
           this.observeInventoryListenerSet = true
           this.inventoryIds = new Set();
         }
+        this.observeInventoryStats = true;
         return this.vatomView.blockv.dataPool.region('inventory').get(false)
           .then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn)
             .map((vatom) => {
@@ -146,6 +147,31 @@ export default class BaseWebFace extends BaseFace {
             const stats = this.calculateState(vatoms);
             return { stats };
           });
+      case `core.inventory.get`:
+        return this.vatomView.blockv.dataPool.region('inventory').get(false)
+          .then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn))
+          .then((vatoms) => {
+            return { vatoms };
+          });
+      case 'core.inventory.observe':
+        if (!this.observeInventoryListenerSet) {
+          this.observeInventoryUpdate = this.observeInventoryUpdate.bind(this)
+          this.observeInventoryRemove = this.observeInventoryRemove.bind(this)
+          this.vatomView.blockv.dataPool.region('inventory').addEventListener('object.updated', this.observeInventoryUpdate)
+          this.vatomView.blockv.dataPool.region('inventory').addEventListener('object.removed', this.observeInventoryRemove);
+          this.observeInventoryListenerSet = true
+          this.inventoryIds = new Set();
+        }
+        this.observeInventory = true;
+        return this.vatomView.blockv.dataPool.region('inventory').get(false)
+          .then(result => result.filter(v => v.properties.publisher_fqdn === this.vatom.properties.publisher_fqdn)
+            .map((vatom) => {
+              this.inventoryIds.add(vatom.id);
+              return this.mapVatom(vatom);
+            }))
+          .then(vatoms => {
+            return { vatoms };
+          })
       default:
         // Unknown event. Pass on to VatomView listener
         if (this.vatomView && this.vatomView.onMessage) {
@@ -344,7 +370,12 @@ export default class BaseWebFace extends BaseFace {
           this.inventoryIds.add(vatom.id);
           return vatom;
         }));
-        this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+        if (this.observeInventoryStats) {
+          this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+        }
+        if (this.observeInventory) {
+          this.sendV2Message(Math.random(), 'core.inventory.update', { vatoms: vatoms.map(this.mapVatom) }, true)
+        }
       }
     }
   }
@@ -356,7 +387,12 @@ export default class BaseWebFace extends BaseFace {
         this.inventoryIds.add(vatom.id);
         return vatom;
       }));
-      this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+      if (this.observeInventoryStats) {
+        this.sendV2Message(Math.random(), 'core.inventory.stats.update', { stats: this.calculateState(vatoms) }, true)
+      }
+      if (this.observeInventory) {
+        this.sendV2Message(Math.random(), 'core.inventory.update', { vatoms: vatoms.map(this.mapVatom) }, true)
+      }
     }
   }
 
