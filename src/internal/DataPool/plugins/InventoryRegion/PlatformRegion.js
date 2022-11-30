@@ -264,8 +264,9 @@ export default class InventoryRegion extends BLOCKvRegion {
 
       // Get local vatom
       let vatom = this.getItem(syncInfo.id, false)
-      if (!vatom || vatom.sync != syncInfo.sync)
-        idsToFetch.push(syncInfo.id)
+      if (!vatom || vatom.sync === -1 || vatom.whenModified !== syncInfo.when_modified) {
+        idsToFetch.push(syncInfo.id);
+      }
 
     }
 
