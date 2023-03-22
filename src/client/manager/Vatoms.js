@@ -65,30 +65,32 @@ export default class Vatoms {
     return this.performAction(vatom, actionName, payload)
   }
 
-  async performActionById(vatomId, platformId, action, payload) {
+  async performActionById(vatomId, platformId, action, payload, preemptiveReactor) {
 
     // Create pre-emptive action in DataPool for known actions
     let undos = []
-    switch (action) {
-      case 'Transfer':
-        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.')))
-        break
+    if (preemptiveReactor) {
+      switch (preemptiveReactor) {
+        case 'blockv://v1/Transfer':
+          undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.')))
+          break
 
-      case 'Drop':
-        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.geo_pos', payload)))
-        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', true)))
-        break
+        case 'blockv://v1/Drop':
+          undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.geo_pos', payload)))
+          undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', true)))
+          break
 
-      case 'Pickup':
-        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false)))
-        break
+        case 'blockv://v1/Pickup':
+          undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.dropped', false)))
+          break
 
-      case 'Redeem':
-        undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.')))
-        break
+        case 'blockv://v1/Redeem':
+          undos.push((await this.Blockv.dataPool.region('inventory').preemptiveChange(vatomId, 'vAtom::vAtomType.owner', '.')))
+          break
 
-      default:
-        break
+        default:
+          break
+      }
     }
 
     // Perform the action
@@ -108,9 +110,11 @@ export default class Vatoms {
     })
 
   }
-  performAction(vatom, action, payload) {
+  performAction(vatom, actionName, payload) {
 
-    return this.performActionById(vatom.id, vatom.platformId, action, payload)
+    const action = vatom.actions.find(data => data.name.endsWith("::Action::" + actionName));
+
+    return this.performActionById(vatom.id, vatom.platformId, actionName, payload, action?.properties?.reactor);
   }
 
   /** Called to combine the specified vatom into this one. Note that some faces override the Combine action,
