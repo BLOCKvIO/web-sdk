@@ -197,6 +197,10 @@ export default class UserManager {
     return this.UserApi.addRedeemable(payload)
   }
 
+  mergeAccounts (payload) {
+    return this.UserApi.mergeAccounts(payload)
+  }
+
   /**
      * Checked to see if the refresh token is valid
      * @return {Boolean} returns True / False if the refresh token is valid

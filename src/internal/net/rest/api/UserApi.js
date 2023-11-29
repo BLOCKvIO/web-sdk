@@ -12,6 +12,7 @@
 import urlParse from 'url-parse'
 import User from '../../../../model/User'
 
+
 export default class UserApi {
   constructor (bv) {
     this.Blockv = bv
@@ -430,5 +431,42 @@ export default class UserApi {
     this.dataPool.setSessionInfo({
       userID: profile.id
     })
+  }
+
+  async mergeAccounts(payload) {
+
+        try {
+
+            // Begin merge
+            await this.client.request('POST', '/v1/user/merge_accounts', payload, true)
+
+            // Wait until the specified token has been added to the account
+            let timeout = Date.now() + 30000
+            while (true) {
+
+                // Get current tokens
+                let tokens = await this.getUserTokens()
+                if (tokens.find(t => t.properties.token.toLowerCase().trim() == payload.token.toLowerCase().trim())) {
+
+                    // Found, account merging is probably finished now
+                    break
+
+                }
+
+                // Not found, check if timeout is exceeded
+                if (Date.now() > timeout)
+                    throw new Error('Could not find merged token. Please refresh the page and try again.')
+
+                // Wait a bit
+                await new Promise(c => setTimeout(c, 2000))
+
+            }
+            
+        } catch (err) {
+            
+            throw new Error(err)
+
+        }
+    
   }
 }
