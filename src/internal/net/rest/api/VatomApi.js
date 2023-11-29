@@ -15,6 +15,10 @@ export default class VatomApi {
     this.client = client
   }
 
+  getFaces(templateID, platformId = 'primary') {
+    return this.client.request('GET', `/v1/user/faces/${templateID}`, null, true, undefined, platformId)
+  }
+
   getActions(templateID, platformId = 'primary') {
     return this.client.request('GET', `/v1/user/actions/${templateID}`, null, true, undefined, platformId)
       .then((data) => {

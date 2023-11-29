@@ -17,6 +17,10 @@ export default class Vatoms {
     this.vatomApi = new VatomApi(blockv.client)
   }
 
+  getFaces(vatom) {
+    return this.vatomApi.getFaces(vatom.properties.template, vatom.platformId)
+  }
+
   getActions(vatom) {
     return this.vatomApi.getActions(vatom.properties.template, vatom.platformId)
   }
